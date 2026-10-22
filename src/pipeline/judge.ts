@@ -21,6 +21,8 @@ What you receive:
 
 Identify first, then judge. Before any lookout, write "identification": what each relevant subject is, from the images alone, as if no lookout existed. For a bird, note its size against its surroundings (grass blades, feeder ports, a nearby bird), its shape (head size, neck, tail length, plumpness), its bill and its plumage, then name the species those best fit. Lookouts must not steer this: a lookout hoping for a new species is no reason to read a soft bird as one.
 - The life list is this camera's regulars, so a soft or partial view consistent with a listed species is that species. Name an unlisted species only when a field mark you can actually see rules out every listed look-alike. Classic traps on a degraded image: a small-headed, plump grey bird on the ground with a long tapered tail is a Mourning Dove, not a Dark-eyed Junco (a junco is sparrow-sized, with a stubby pale pink bill and a sharply bordered dark hood); a streaky brown bird is usually a House Sparrow or House Finch.
+- Feeders draw mixed flocks: identify EVERY bird in every crop and tile, not just the most obvious one. A chickadee in one tile and a nuthatch in another are two species.
+- Black-capped Chickadee vs White-breasted Nuthatch, both black-capped, white-faced and grey-backed: the chickadee has a black bib under its bill, a tiny stubby bill, a round head and a longish tail, and perches upright or hangs from a port. The nuthatch has a clean white throat and face with NO bib, a long straight dagger-like bill, a very short tail, a flat-crowned head, often rust under the tail, and clings head-down or sideways with its body held horizontal along the feeder or post. A black-capped bird with a white throat, or one held horizontal or head-down, is a nuthatch.
 - Every verdict's species must agree with this identification.
 
 How to judge:
@@ -34,6 +36,8 @@ Calibrate confidence (0 to 1) as the probability that your match answer is right
 - 0.6 to 0.9 when most criteria are visible and nothing contradicts them.
 - Below 0.6 when you are guessing either way.
 For match: false, confidence is how sure you are that the lookout is NOT satisfied.
+
+Then return "birds": every distinct bird species in the clip, from any crop, tile or the context image, one entry each, whatever the lookouts ask about: species (named exactly as for a verdict below) and confidence (the probability it is that species). Leave out a bird too small or blurred to favor any species; an empty list when no bird is visible.
 
 For each lookout return:
 - lookoutId: exactly as given.
@@ -54,18 +58,33 @@ const VerdictAnswer = type({
 	"speciesConfidence?": "number | null",
 	rationale: "string"
 })
+const BirdAnswer = type({ species: "string", confidence: "number" })
 // optional on read: the identification only steers generation, nothing downstream stores it
-const JudgeAnswer = type({ "identification?": "string", verdicts: VerdictAnswer.array() })
+const JudgeAnswer = type({ "identification?": "string", "birds?": BirdAnswer.array(), verdicts: VerdictAnswer.array() })
+
+/** A species the judge saw anywhere in the clip, not only the subject a verdict was about. */
+export type SeenBird = { species: string; confidence: number }
 
 /**
  * Property order is generation order: evidence first, then the call. `identification` comes
  * before any verdict so the species is named before a lookout's wording can pull on it: asked
  * "is this a new species?" first, Sonnet read a degraded Mourning Dove as a Dark-eyed Junco.
+ * `birds` lists every species in the clip: a verdict names only one, so on 2026-10-22 a nuthatch that
+ * shared a clip with a chickadee was never checked against the life list.
  */
 export const JUDGE_SCHEMA: JsonSchema = {
 	type: "object",
 	properties: {
 		identification: { type: "string" },
+		birds: {
+			type: "array",
+			items: {
+				type: "object",
+				properties: { species: { type: "string" }, confidence: { type: "number" } },
+				required: ["species", "confidence"],
+				additionalProperties: false
+			}
+		},
 		verdicts: {
 			type: "array",
 			items: {
@@ -84,7 +103,7 @@ export const JUDGE_SCHEMA: JsonSchema = {
 			}
 		}
 	},
-	required: ["identification", "verdicts"],
+	required: ["identification", "birds", "verdicts"],
 	additionalProperties: false
 }
 
@@ -145,7 +164,7 @@ const ask = async (
 	lookouts: Lookout[],
 	llm: VisionLLM,
 	model: string | undefined
-): Promise<{ verdicts: Verdict[]; answered: Set<string>; usage: Usage }> => {
+): Promise<{ verdicts: Verdict[]; birds: SeenBird[]; answered: Set<string>; usage: Usage }> => {
 	input.signal?.throwIfAborted()
 	const res = await llm.complete({
 		purpose: "judge",
@@ -180,15 +199,21 @@ const ask = async (
 			createdAt: now
 		}
 	})
-	return { verdicts, answered: new Set(lookouts.filter(l => byId.has(l.id)).map(l => l.id)), usage: res.usage }
+	const birds = (parsed.birds ?? []).flatMap(b => {
+		const species = b.species.trim()
+		const confidence = clamp01(b.confidence)
+		return species && confidence >= 0.5 ? [{ species, confidence }] : []
+	})
+	return { verdicts, birds, answered: new Set(lookouts.filter(l => byId.has(l.id)).map(l => l.id)), usage: res.usage }
 }
 
 /**
- * How sure the judge must be of a species before look4 calls it new to the life list. Above the 50%
- * a species is named at: almost every bird here is a regular, so a coin-flip ID of an unlisted species
- * is far likelier a misread regular. On 2026-10-22 Sonnet offered five regulars as lifers, all at
- * 0.5-0.6 (Mourning Doves as a Junco and a Collared-Dove, a cardinal as a House Finch); the real lifers
- * before them came in at 0.88-0.9, but a Downy Woodpecker at 0.6 would also have been missed.
+ * How sure the judge must be of a species NOT on the life list before look4 calls it new. Above the
+ * 50% a species is named at: almost every bird here is a regular, so a coin-flip ID of an unlisted
+ * species is far likelier a misread regular. On 2026-10-22 Sonnet offered five regulars as lifers, all
+ * at 0.5-0.6 (Mourning Doves as a Junco and a Collared-Dove, a cardinal as a House Finch); the real
+ * lifers before them came in at 0.88-0.9. A listed species still owed a clip is a regular, so it needs
+ * only the 50% any named species has.
  */
 export const NEW_SPECIES_CONFIDENCE = 0.75
 
@@ -199,21 +224,28 @@ export const isNewSpecies = (species: string, mode: LifeListMode, lifeList: stri
 	return !has(lifeList) || (mode === "newOrClipless" && has(withoutClip))
 }
 
+const onList = (species: string, lifeList: string[]) => lifeList.some(x => x.toLowerCase() === species.toLowerCase())
+
 /**
  * A life-list lookout's verdict, decided here rather than by the judge: its rubric's other criteria
- * (the judge's match) and a species named at `NEW_SPECIES_CONFIDENCE` or more that is new for its mode.
+ * (the judge's match) and any bird in the clip new for its mode, named sure enough: the verdict's own
+ * species or any of `birds`, so a nuthatch behind a chickadee still counts. The verdict then carries
+ * the species that made it, which is the one offered for the life list.
  */
-export const lifeListVerdict = (v: Verdict, mode: LifeListMode, lifeList: string[], withoutClip: string[]): Verdict => {
+export const lifeListVerdict = (v: Verdict, mode: LifeListMode, lifeList: string[], withoutClip: string[], birds: SeenBird[] = []): Verdict => {
 	if (!v.match) return v
+	const named: SeenBird[] = [...(v.species ? [{ species: v.species, confidence: v.speciesConfidence ?? 0 }] : []), ...birds]
+	const sureEnough = (b: SeenBird) => b.confidence >= (onList(b.species, lifeList) ? 0.5 : NEW_SPECIES_CONFIDENCE)
+	const hit = named.find(b => isNewSpecies(b.species, mode, lifeList, withoutClip) && sureEnough(b))
+	if (hit) return { ...v, species: hit.species, speciesConfidence: hit.confidence, confidence: Math.min(v.confidence, hit.confidence) }
 	const sure = v.speciesConfidence ?? 0
 	const why = !v.species
-		? "no species named"
+		? named.length
+			? `${named.map(b => b.species).join(", ")}: none new to the life list`
+			: "no species named"
 		: !isNewSpecies(v.species, mode, lifeList, withoutClip)
 			? `${v.species} is already on the life list${mode === "newOrClipless" ? " with a clip" : ""}`
-			: sure < NEW_SPECIES_CONFIDENCE
-				? `${v.species} at ${Math.round(sure * 100)}% is under the ${Math.round(NEW_SPECIES_CONFIDENCE * 100)}% a new species needs`
-				: null
-	if (!why) return { ...v, confidence: Math.min(v.confidence, sure) }
+			: `${v.species} at ${Math.round(sure * 100)}% is under the ${Math.round(NEW_SPECIES_CONFIDENCE * 100)}% a new species needs`
 	// a "no" is as sure as the species call it rests on
 	return { ...v, match: false, confidence: v.species ? Math.max(sure, 1 - sure) : v.confidence, rationale: `${why}. ${v.rationale}`.slice(0, 400) }
 }
@@ -226,12 +258,14 @@ export const judgeClip = async (input: JudgeInput, llm: VisionLLM, cfg: Config["
 	const first = await ask(input, input.lookouts, llm, undefined)
 	const usage = [first.usage]
 	let verdicts = first.verdicts
+	let birds = first.birds
 	const escalateModel = cfg.escalateModel
 	const unsure = escalateModel ? verdicts.filter(v => uncertain(v, cfg.escalateBelow)).map(v => v.lookoutId) : []
 	if (escalateModel && unsure.length) {
 		try {
 			const again = await ask(input, input.lookouts.filter(l => unsure.includes(l.id)), llm, escalateModel)
 			usage.push(again.usage)
+			birds = [...again.birds, ...birds]
 			const better = new Map(again.verdicts.filter(v => again.answered.has(v.lookoutId)).map(v => [v.lookoutId, v]))
 			verdicts = verdicts.map(v => better.get(v.lookoutId) ?? v)
 		} catch (e) {
@@ -245,7 +279,7 @@ export const judgeClip = async (input: JudgeInput, llm: VisionLLM, cfg: Config["
 	const modes = new Map(input.lookouts.flatMap(l => (l.compiled?.lifeList ? [[l.id, l.compiled.lifeList] as const] : [])))
 	verdicts = verdicts.map(v => {
 		const mode = modes.get(v.lookoutId)
-		return mode ? lifeListVerdict(v, mode, input.lifeList ?? [], input.lifeListWithoutClip ?? []) : v
+		return mode ? lifeListVerdict(v, mode, input.lifeList ?? [], input.lifeListWithoutClip ?? [], birds) : v
 	})
 	return { verdicts, usage }
 }

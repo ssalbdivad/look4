@@ -168,6 +168,39 @@ test("judge: a life-list lookout keeps only a species new for its mode named at 
 	// a regular added by hand without a clip only counts when the lookout asks for those
 	assert.deepEqual((await run("House Finch", 0.9, "newOrClipless")).verdict, [true, 0.8, "Seen"])
 	assert.deepEqual((await run("House Finch", 0.9, "new")).verdict, [false, 0.9, "House Finch is already on the life list"])
+	// a listed regular still owed a clip is no lifer claim, so a plain majority call is enough
+	assert.deepEqual((await run("House Finch", 0.6, "newOrClipless")).verdict, [true, 0.6, "Seen"])
+})
+
+test("judge: a life-list lookout keeps a clip for any bird in it, not only the one its verdict names", async () => {
+	const l = lookout("lifer", ["bird"])
+	const lifer: Lookout = { ...l, compiled: { ...l.compiled!, lifeList: "newOrClipless" } }
+	const run = async (birds: { species: string; confidence: number }[]) => {
+		const { llm, calls } = scripted(() => ({
+			identification: "A chickadee on the port; a nuthatch head-down on the post.",
+			birds,
+			verdicts: [{ lookoutId: "lifer", rationale: "Birds at the feeder.", label: "Black-capped Chickadee", species: "Black-capped Chickadee", speciesConfidence: 0.9, match: true, confidence: 0.9 }]
+		}))
+		const out = await judgeClip(
+			{ ...input([lifer]), lifeList: ["Black-capped Chickadee", "White-breasted Nuthatch", "Mourning Dove"], lifeListWithoutClip: ["White-breasted Nuthatch"] },
+			llm,
+			cfg()
+		)
+		const v = out.verdicts[0]!
+		return { verdict: [v.match, v.species, v.speciesConfidence, v.rationale.split(".")[0]], schema: calls[0]!.schema }
+	}
+	// 2026-10-22: chickadees and nuthatches at the left feeder, every clip rejected as "chickadee already has a clip"
+	const mixed = await run([
+		{ species: "Black-capped Chickadee", confidence: 0.9 },
+		{ species: " White-breasted Nuthatch ", confidence: 0.65 }
+	])
+	assert.deepEqual(mixed.verdict, [true, "White-breasted Nuthatch", 0.65, "Birds at the feeder"])
+	assert.deepEqual((mixed.schema as { required: string[] }).required, ["identification", "birds", "verdicts"])
+	// under 50% the second bird is a guess and does not count
+	assert.deepEqual((await run([{ species: "White-breasted Nuthatch", confidence: 0.4 }])).verdict, [false, "Black-capped Chickadee", 0.9, "Black-capped Chickadee is already on the life list with a clip"])
+	// an unlisted species still needs the lifer bar, wherever in the clip it was seen
+	assert.deepEqual((await run([{ species: "Red-breasted Nuthatch", confidence: 0.6 }])).verdict, [false, "Black-capped Chickadee", 0.9, "Black-capped Chickadee is already on the life list with a clip"])
+	assert.deepEqual((await run([{ species: "Red-breasted Nuthatch", confidence: 0.85 }])).verdict, [true, "Red-breasted Nuthatch", 0.85, "Birds at the feeder"])
 })
 
 test("judge: confidence below the escalation band is a confident no, not escalated", async () => {
