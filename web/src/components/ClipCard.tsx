@@ -30,6 +30,8 @@ export const SightingCard = ({
 	lookoutId?: string
 }) => {
 	const best = (lookoutId && clip.matches.find(m => m.lookoutId === lookoutId)) || clip.matches[0]
+	// its "what was it?" box takes the card's foot, where Confirm sits
+	const [sayingWrong, setSayingWrong] = useState(false)
 	const title = best ? matchName(best) : "Sighting"
 	const sure = best?.species && best.speciesConfidence != null ? best.speciesConfidence : null
 	// a close-up the camera zoomed in for beats a crop of the wide view
@@ -109,8 +111,8 @@ export const SightingCard = ({
 	return (
 		<div className="sighting-wrap">
 			{card}
-			{onWrong && !clip.confirmed && <WrongBird clip={clip} title={title} onWrong={onWrong} />}
-			{onConfirmed && <ConfirmSighting clip={clip} onConfirmed={onConfirmed} />}
+			{onWrong && !clip.confirmed && <WrongBird clip={clip} title={title} onWrong={onWrong} asking={sayingWrong} setAsking={setSayingWrong} />}
+			{onConfirmed && !sayingWrong && <ConfirmSighting clip={clip} onConfirmed={onConfirmed} />}
 		</div>
 	)
 }
@@ -119,8 +121,19 @@ export const SightingCard = ({
  * "Wrong bird": not what the spotter said. Asks what it really was (optional); look4 keeps the answer
  * and shows it to the spotter the next time it is about to make the same call.
  */
-const WrongBird = ({ clip, title, onWrong }: { clip: ClipSummary; title: string; onWrong: (clip: ClipSummary, species: string | null) => void }) => {
-	const [asking, setAsking] = useState(false)
+const WrongBird = ({
+	clip,
+	title,
+	onWrong,
+	asking,
+	setAsking
+}: {
+	clip: ClipSummary
+	title: string
+	onWrong: (clip: ClipSummary, species: string | null) => void
+	asking: boolean
+	setAsking: (asking: boolean) => void
+}) => {
 	const [name, setName] = useState("")
 	if (asking) {
 		const submit = (e: FormEvent) => {
