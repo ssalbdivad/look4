@@ -6,7 +6,7 @@ import sharp from "sharp"
 import { expandBox, fromInner, iou, squareAround, toPixels } from "../geometry.ts"
 import { keyframeRegions, type ProbeResult } from "../media/ffmpeg.ts"
 import type { Detection, NormBox } from "../types.ts"
-import { OCCUPANCY_SIDE, OCCUPIED, scoreFeederFrames } from "./occupancy.ts"
+import { type FrameOccupancy, OCCUPANCY_SIDE, OCCUPIED, scoreFeederFrames } from "./occupancy.ts"
 import type { JudgeCrop } from "./types.ts"
 
 /** Context around the box on every side, as a fraction of the box. */
@@ -157,6 +157,19 @@ export const visitRuns = (scores: number[]): number[][] => {
 }
 
 /**
+ * The frames to close up on: within each visit, the best frame at each place on the feeder (boxes
+ * overlapping by SAME_SUBJECT_IOU are one place). Two birds can make one visit: on 2026-10-22 a
+ * sparrow on the tray and then a nuthatch head-down on the tube kept the feeder occupied for 22 s,
+ * and one close-up per visit went to the sparrow.
+ */
+export const visitorFrames = (occupancy: FrameOccupancy[]): number[] =>
+	visitRuns(occupancy.map(o => o.score)).flatMap(run => {
+		const places: number[] = []
+		for (const i of run) if (places.every(p => iou(occupancy[p]!.box!, occupancy[i]!.box!) < SAME_SUBJECT_IOU)) places.push(i)
+		return places
+	})
+
+/**
  * Up to `max` of a feeder's frames for its sheet, in time order: occupied frames first, taken a visit
  * at a time (each visit's best, then each one's second best, ...) so a nuthatch dropping in for one
  * keyframe still makes it beside a sparrow that sat through twenty; then the rest spread evenly.
@@ -211,10 +224,9 @@ export const feederLook = async (
 			)
 			signal?.throwIfAborted()
 			const occupancy = scoreFeederFrames(small, OCCUPANCY_SIDE)
-			// one close-up per visit, on its best frame
-			for (const [i] of visitRuns(occupancy.map(o => o.score))) {
-				const o = occupancy[i!]!
-				visits.push({ clipId, frameT: frames[i!]!.t, label: FEEDER_VISITOR, score: Math.min(1, o.score / 300), box: fromInner(o.box!, regions[f]!), via: "feeder" })
+			for (const i of visitorFrames(occupancy)) {
+				const o = occupancy[i]!
+				visits.push({ clipId, frameT: frames[i]!.t, label: FEEDER_VISITOR, score: Math.min(1, o.score / 300), box: fromInner(o.box!, regions[f]!), via: "feeder" })
 			}
 			const picked = sheetFrames(
 				occupancy.map(o => o.score),

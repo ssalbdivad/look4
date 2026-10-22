@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import { test } from "node:test"
-import { sheetFrames } from "../src/pipeline/crops.ts"
+import { sheetFrames, visitorFrames } from "../src/pipeline/crops.ts"
 import { OCCUPIED, scoreFeederFrames } from "../src/pipeline/occupancy.ts"
 
 const SIDE = 96
@@ -64,4 +64,13 @@ test("sheetFrames: occupied frames first, a visit at a time, then the rest sprea
 	assert.deepEqual(sheetFrames(busy, 3), [28, 29, 50])
 	// a short clip shows every frame
 	assert.deepEqual(sheetFrames([0, 99, 0], 12), [0, 1, 2])
+})
+
+test("visitorFrames: one close-up per place on the feeder within a visit, on that place's best frame", () => {
+	const tray = { x: 0.6, y: 0.6, w: 0.2, h: 0.15 }
+	const tube = { x: 0.2, y: 0.3, w: 0.15, h: 0.25 }
+	const at = (score: number, box: typeof tray | null) => ({ score, box })
+	// a sparrow on the tray, then a nuthatch on the tube, the feeder never empty between them; later a lone visit
+	const occupancy = [at(0, null), at(200, tray), at(150, tray), at(90, tube), at(120, tube), at(0, null), at(0, null), at(0, null), at(60, tube)]
+	assert.deepEqual(visitorFrames(occupancy), [1, 4, 8])
 })
