@@ -150,6 +150,8 @@ export type Label = {
 	clipId: string
 	lookoutId: string
 	truth: boolean
+	/** On a "no": the species the bird really was, when the person said. */
+	species?: string | null
 	createdAt: string
 }
 

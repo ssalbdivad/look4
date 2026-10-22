@@ -15,7 +15,8 @@ import type {
 	Page,
 	SettingsDto,
 	StatsResponse,
-	UploadResponse
+	UploadResponse,
+	WrongBirdResponse
 } from "../src/api-types.ts"
 import { loadConfig, parseConfig, type LoadedConfig } from "../src/config.ts"
 import type { AppContext } from "../src/context.ts"
@@ -23,6 +24,7 @@ import { DETECTOR_ONLY, openStore, type Store } from "../src/db.ts"
 import { createBus } from "../src/events.ts"
 import { ingestFile } from "../src/ingest.ts"
 import { clipMediaDir, dataPaths, ensureDataDirs } from "../src/paths.ts"
+import { lookAlikes } from "../src/pipeline/process.ts"
 import { freeBytes } from "../src/retention.ts"
 import type { Clip } from "../src/types.ts"
 import { createServer } from "../src/server/index.ts"
@@ -445,6 +447,70 @@ describe("life list", () => {
 
 		assert.equal((await f.app.request("/api/life-list/carolina%20wren", { method: "DELETE" })).status, 200)
 		assert.equal((await f.app.request("/api/life-list/Carolina%20Wren", { method: "DELETE" })).status, 404)
+	})
+})
+
+describe("wrong bird", () => {
+	const named = (f: Fixture, clipId: string, lookoutId: string, species: string, confidence = 0.9) =>
+		f.store.upsertVerdict({ clipId, lookoutId, match: true, confidence, label: species, species, speciesConfidence: confidence, rationale: "", model: "mock", createdAt: "" })
+
+	test("says no on every lookout that kept the clip, takes it out of the feed and keeps it, remembers the misread; clearing the labels undoes it", async () => {
+		const f = setup()
+		addLookout(f, "new-bird")
+		addLookout(f, "red-bird")
+		const id = "20261022-145636-0d0dba"
+		addClip(f, id, "2026-10-22T18:56:36.000Z", { status: "kept", expiresAt: "2026-10-30T00:00:00.000Z" })
+		named(f, id, "new-bird", "House Finch")
+		named(f, id, "red-bird", "House Finch")
+
+		const res = (await (await f.app.request(`/api/clips/${id}/wrong`, post({ species: "Northern Cardinal" }))).json()) as WrongBirdResponse
+		assert.deepEqual([res.undo, res.clip.id], [["new-bird", "red-bird"], id])
+		assert.deepEqual(f.store.getLabels({ clipId: id }).map(l => [l.lookoutId, l.truth, l.species]), [["new-bird", false, "Northern Cardinal"], ["red-bird", false, "Northern Cardinal"]])
+		assert.equal(f.store.getClip(id)!.expiresAt, null)
+		assert.deepEqual(((await (await f.app.request("/api/sightings")).json()) as Page<ClipSummary>).items, [])
+		assert.deepEqual(f.store.misreads(), [{ said: "House Finch", actual: "Northern Cardinal", count: 1 }])
+		// said again with no name, it forgets the name: the latest answer is the one kept
+		await f.app.request(`/api/clips/${id}/wrong`, post({}))
+		assert.deepEqual(f.store.misreads(), [{ said: "House Finch", actual: null, count: 1 }])
+
+		for (const lookoutId of res.undo) await f.app.request(`/api/clips/${id}/label`, post({ lookoutId, truth: null }))
+		assert.deepEqual(((await (await f.app.request("/api/sightings")).json()) as Page<ClipSummary>).items.map(i => i.id), [id])
+		assert.deepEqual(f.store.misreads(), [])
+	})
+
+	test("the confirming call's references: what such a call really was first, then regulars in the clip, then the commonest; never the candidate, never one without a photo", () => {
+		const f = setup()
+		addLookout(f, "new-bird")
+		const regular = (species: string, id: string, clips = 1) => {
+			addClip(f, id, "2026-10-21T12:00:00.000Z", { status: "kept", media: { poster: null, preview: null, crops: ["crop-0.jpg"] } })
+			mkdirSync(clipMediaDir(f.ctx.paths, id), { recursive: true })
+			writeFileSync(join(clipMediaDir(f.ctx.paths, id), "crop-0.jpg"), species)
+			f.store.addLifer({ species, clipId: id, firstSeenAt: null })
+			for (let i = 0; i < clips; i++) {
+				const other = `${id.slice(0, -1)}${i + 1}`
+				addClip(f, other, "2026-10-22T12:00:00.000Z", { status: "rejected" })
+				named(f, other, "new-bird", species)
+			}
+		}
+		regular("Mourning Dove", "20261021-120000-dove00", 5)
+		regular("House Sparrow", "20261021-120000-spar00", 3)
+		regular("Northern Cardinal", "20261021-120000-card00", 1)
+		regular("Black-capped Chickadee", "20261021-120000-chic00", 2)
+		f.store.addLifer({ species: "Blue Jay", clipId: null, firstSeenAt: null })
+		const wrong = "20261022-145636-0d0dba"
+		addClip(f, wrong, "2026-10-22T18:56:36.000Z", { status: "kept" })
+		named(f, wrong, "new-bird", "House Finch", 0.5)
+		f.store.setLabel({ clipId: wrong, lookoutId: "new-bird", truth: false, species: "Northern Cardinal" })
+
+		const pick = lookAlikes(f.ctx)
+		const names = (r: ReturnType<typeof pick>) => [r.references.map(x => x.species), r.misreads]
+		assert.deepEqual(names(pick(["House Finch"], ["Black-capped Chickadee", "Blue Jay", "House Finch"])), [
+			["Northern Cardinal", "Black-capped Chickadee", "Mourning Dove"],
+			['"House Finch" was really Northern Cardinal (1 clip)']
+		])
+		assert.equal(pick(["House Finch"], [])!.references[0]!.jpeg.toString(), "Northern Cardinal")
+		// a candidate with no history: the clip's regulars, then the commonest
+		assert.deepEqual(names(pick(["White-breasted Nuthatch"], ["Black-capped Chickadee"])), [["Black-capped Chickadee", "Mourning Dove", "House Sparrow"], []])
 	})
 })
 

@@ -228,6 +228,18 @@ export type ConfirmClipBody = {
 	species?: string
 }
 
+/** "Wrong bird": the sighting is not what the spotter said. */
+export type WrongBirdBody = {
+	/** What it really was, when known. */
+	species?: string | null
+}
+
+export type WrongBirdResponse = {
+	clip: ClipSummary
+	/** The lookouts it said "no" for: clearing their labels undoes it. */
+	undo: string[]
+}
+
 export type ConfirmClipResponse = {
 	clip: ClipSummary
 	/** The species this added to the life list; null when it was already there or none was named. */

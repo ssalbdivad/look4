@@ -305,8 +305,11 @@ only on the few clips that would become a sighting.
   every lookout that kept it and adds its bird to the life list if it isn't there yet, dated by the
   clip. A card whose bird is new says **New species** and **Confirm + add**. When the spotter only
   said "bird", Confirm asks which one (optional).
-- **Delete a sighting** with the trash button on its card. It goes after a few seconds, during which
-  **Undo** brings it back. A sighting you don't delete stays in the feed under its day.
+- **Wrong bird** on a card says the spotter got it wrong, and asks what it really was (optional). The
+  card leaves the feed (**Undo** brings it back) and the clip is kept as ground truth. Before the
+  next sighting, the confirming model is shown confirmed photos of the regulars the bird is likeliest
+  to be (what you said such a call really was, then the regulars in the clip, then your commonest),
+  with your past corrections, so "a male cardinal from behind was called House Finch" is not repeated.
 - Each species shows how many clips the spotter has named it in (kept or not). Removing one (its ×)
   makes it new again.
 
@@ -352,8 +355,9 @@ The reasons behind these choices, with the benchmarks, are in [docs/decisions.md
 
 ## Getting more accurate over time
 
-- **Label sightings.** "Yes, that's it" / "Not this" on a clip page. "Not this" also hides the clip
-  from Sightings.
+- **Label sightings.** "Yes, that's it" / "Not this" on a clip page, or **Confirm** / **Wrong bird**
+  on a card. A "no" also hides the clip from Sightings, and a Wrong bird's real species is shown to the
+  confirming model from then on (see [Life list](#life-list)).
 - **Mark misses.** On **Activity**, a rejected clip has "This should have matched".
 - **Labeled clips are never deleted** by retention. They become your test set.
 - **Measure.** `pnpm look4 eval` re-runs the current pipeline on every labeled clip and prints

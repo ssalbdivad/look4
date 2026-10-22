@@ -745,3 +745,23 @@ the few clips that would become a sighting.
 unseen. Recall of the scorer is from one labelled clip; precision from contact sheets read by eye.
 The worker ran ~20 minutes behind before this change (concurrency 1, 60-250 s a clip on a loaded
 machine), and the feeder look adds ~30 s a clip.
+
+## 16. Wrong bird: corrections and the camera's regulars go to the confirming call (2026-10-22)
+
+**Decision.** A sighting card's trash button is now **Wrong bird**, with an optional "what was it?":
+a "no" label on every lookout that kept the clip, with the real species (`labels.species`), and the
+clip stays as ground truth instead of being deleted. Learning happens in the prompt, not in weights:
+the confirming call (§15) also gets up to 3 reference photos of this camera's regulars (each
+life-list species' sighting crop) and the corrected misreads for its candidates. Which regulars:
+what the person said such a call really was, then the regulars seen in the clip, then the camera's
+most named species. The first call never sees them.
+
+**Why regulars, not the new bird.** Every false sighting so far was a regular read as new (doves as a
+junco and a collared-dove, a male cardinal from behind and a sparrow as House Finch); the person
+has no photo of a bird they have not seen yet, but the camera has hundreds of its regulars from this
+angle and light. This does not help catch a truly new bird; the risk is the opposite, a confirmer
+made reluctant by the comparison.
+
+**Measured.** Replaying both nuthatch clips with the nuthatch still owed a clip, references in
+place: kept, Opus 0.80 and 0.85 (first look 0.75 and 0.80). Not measured on a false case: the three
+false House Finch clips had been deleted, which is what Wrong bird now prevents.

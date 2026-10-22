@@ -226,6 +226,7 @@ const labelFromRow = (r: Row): Label => ({
 	clipId: r.clip_id as string,
 	lookoutId: r.lookout_id as string,
 	truth: Number(r.truth) === 1,
+	species: (r.species as string | null) ?? null,
 	createdAt: r.created_at as string
 })
 
@@ -295,6 +296,8 @@ export const openStore = (path: string) => {
 	const verdictColumns = new Set(all("PRAGMA table_info(verdicts)").map(c => c.name as string))
 	if (!verdictColumns.has("species")) db.exec("ALTER TABLE verdicts ADD COLUMN species TEXT")
 	if (!verdictColumns.has("species_confidence")) db.exec("ALTER TABLE verdicts ADD COLUMN species_confidence REAL")
+	// on a "no": what the bird really was, when the person said ("Wrong bird")
+	if (!new Set(all("PRAGMA table_info(labels)").map(c => c.name as string)).has("species")) db.exec("ALTER TABLE labels ADD COLUMN species TEXT")
 	const get = (sql: string, ...params: SQLInputValue[]) => stmt(sql).get(...params) as Row | undefined
 	const getKv = <t>(key: string): t | null => {
 		const r = get("SELECT value FROM kv WHERE key = ?", key)
@@ -623,10 +626,27 @@ export const openStore = (path: string) => {
 
 		setLabel: (l: Omit<Label, "createdAt">) => {
 			stmt(
-				`INSERT INTO labels (clip_id, lookout_id, truth, created_at) VALUES (?, ?, ?, ?)
-				 ON CONFLICT (clip_id, lookout_id) DO UPDATE SET truth = excluded.truth, created_at = excluded.created_at`
-			).run(l.clipId, l.lookoutId, l.truth ? 1 : 0, now())
+				`INSERT INTO labels (clip_id, lookout_id, truth, species, created_at) VALUES (?, ?, ?, ?, ?)
+				 ON CONFLICT (clip_id, lookout_id) DO UPDATE SET truth = excluded.truth, species = excluded.species, created_at = excluded.created_at`
+			).run(l.clipId, l.lookoutId, l.truth ? 1 : 0, l.species ?? null, now())
 		},
+		/**
+		 * The species the spotter named on a verdict the person said "no" to, with what the bird really
+		 * was when they said: this camera's misreads, most frequent first.
+		 */
+		misreads: (): { said: string; actual: string | null; count: number }[] =>
+			all(
+				`SELECT v.species said, b.species actual, COUNT(DISTINCT v.clip_id) n FROM labels b
+				 JOIN verdicts v ON v.clip_id = b.clip_id AND v.lookout_id = b.lookout_id
+				 WHERE b.truth = 0 AND v.species IS NOT NULL
+				 GROUP BY v.species COLLATE NOCASE, b.species COLLATE NOCASE ORDER BY n DESC`
+			).map(r => ({ said: r.said as string, actual: (r.actual as string | null) ?? null, count: Number(r.n) })),
+		/** How many clips the spotter named each species in, most first. */
+		speciesCounts: (): { species: string; clips: number }[] =>
+			all("SELECT species, COUNT(DISTINCT clip_id) n FROM verdicts WHERE species IS NOT NULL GROUP BY species COLLATE NOCASE ORDER BY n DESC").map(r => ({
+				species: r.species as string,
+				clips: Number(r.n)
+			})),
 		clearLabel: (clipId: string, lookoutId: string) => {
 			stmt("DELETE FROM labels WHERE clip_id = ? AND lookout_id = ?").run(clipId, lookoutId)
 		},

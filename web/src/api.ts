@@ -30,6 +30,8 @@ import type {
 	AddLiferBody,
 	ConfirmClipBody,
 	ConfirmClipResponse,
+	WrongBirdBody,
+	WrongBirdResponse,
 	LookoutDto,
 	Page,
 	ReprocessBody,
@@ -115,6 +117,7 @@ export const api = {
 	addLifer: (body: AddLiferBody) => request<LifeListResponse>("/api/life-list", { method: "POST", body }),
 	confirmClip: (id: string, body: ConfirmClipBody = {}) =>
 		request<ConfirmClipResponse>(`/api/clips/${enc(id)}/confirm`, { method: "POST", body }),
+	wrongBird: (id: string, body: WrongBirdBody = {}) => request<WrongBirdResponse>(`/api/clips/${enc(id)}/wrong`, { method: "POST", body }),
 	removeLifer: (species: string) => request<LifeListResponse>(`/api/life-list/${enc(species)}`, { method: "DELETE" }),
 	lookouts: (signal?: AbortSignal) => request<LookoutDto[]>("/api/lookouts", { signal }),
 	createLookout: (body: CreateLookoutBody) => request<LookoutDto>("/api/lookouts", { method: "POST", body }),

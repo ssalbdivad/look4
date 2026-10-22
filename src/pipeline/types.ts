@@ -62,7 +62,18 @@ export type JudgeInput = {
 	lifeList?: string[]
 	/** The life-list species added by hand with no clip yet: a lookout may want to capture one. */
 	lifeListWithoutClip?: string[]
+	/**
+	 * For the confirming call: confirmed photos of this camera's regulars most like the candidate
+	 * species, and the misreads the person corrected. Given the candidates and the species seen in the clip.
+	 */
+	lookAlikes?: (candidates: string[], seen: string[]) => LookAlikes
 	signal?: AbortSignal
+}
+
+export type LookAlikes = {
+	references: { species: string; jpeg: Buffer }[]
+	/** One line each: `"House Finch" was really Northern Cardinal (2 clips)`. */
+	misreads: string[]
 }
 
 export type JudgeOutput = {

@@ -6,7 +6,7 @@ import { logger } from "../log.ts"
 import { LlmError, usageOf } from "../llm/errors.ts"
 import type { JsonSchema, LlmImage, VisionLLM } from "../llm/types.ts"
 import type { LifeListMode, Lookout, Usage, Verdict } from "../types.ts"
-import type { JudgeCrop, JudgeInput, JudgeOutput } from "./types.ts"
+import type { JudgeCrop, JudgeInput, JudgeOutput, LookAlikes } from "./types.ts"
 
 const log = logger("judge")
 
@@ -25,6 +25,7 @@ Identify first, then judge. Before any lookout, write "identification": what eac
 - Feeders draw mixed flocks: identify EVERY bird in every crop and tile, not just the most obvious one. A chickadee in one tile and a nuthatch in another are two species.
 - Black-capped Chickadee vs White-breasted Nuthatch, both black-capped, white-faced and grey-backed: the chickadee has a black bib under its bill, a tiny stubby bill, a round head and a longish tail, and perches upright or hangs from a port. The nuthatch has a clean white throat and face with NO bib, a long straight dagger-like bill, a very short tail, a flat-crowned head, often rust under the tail, and clings head-down or sideways with its body held horizontal along the feeder or post. A black-capped bird with a white throat, or one held horizontal or head-down, is a nuthatch.
 - Every verdict's species must agree with this identification.
+- Some requests add reference photos after the context image: confirmed photos of this camera's regulars, NOT from this clip, with notes of misreads the person corrected here. They are only for checking an identification: before naming a species that is none of the references, compare the bird with each one in shape, size, bill and pattern, from the same camera angle and light; a bird that matches one is that regular. Never list a bird, name a species or point a "crop" at a reference photo.
 
 How to judge:
 - Be skeptical. Answer match: true only when the rubric is satisfied by evidence you can actually SEE in the images. Do not infer from what is likely at a feeder, from the time of day, or from the detector's label.
@@ -118,8 +119,8 @@ const boxText = (b: { x: number; y: number; w: number; h: number }) => `x=${fmt(
  * The per-clip text. The `lookout id=` and `crop N:` lines are also what the mock
  * backend parses, so keep their format stable.
  */
-export const judgeText = (input: Pick<JudgeInput, "clip" | "lookouts" | "crops" | "lifeList">) => {
-	const { clip, lookouts, crops, lifeList = [] } = input
+export const judgeText = (input: Pick<JudgeInput, "clip" | "lookouts" | "crops" | "lifeList"> & { lookAlike?: LookAlikes }) => {
+	const { clip, lookouts, crops, lifeList = [], lookAlike } = input
 	const lines: string[] = []
 	lines.push(`Clip ${clip.id}: recorded ${clip.recordedAt}${clip.durationS ? `, ${clip.durationS.toFixed(1)}s long` : ""}.`)
 	lines.push("", `Images, in order (${crops.length} crop${crops.length === 1 ? "" : "s"}, then the context image):`)
@@ -131,6 +132,11 @@ export const judgeText = (input: Pick<JudgeInput, "clip" | "lookouts" | "crops" 
 		)
 	)
 	lines.push("context: the whole scene, downscaled")
+	if (lookAlike?.references.length) {
+		lines.push("", "Reference photos, after the context image, NOT from this clip: confirmed regulars at this camera, to compare against:")
+		lookAlike.references.forEach((r, i) => lines.push(`reference ${i}: ${r.species}`))
+	}
+	if (lookAlike?.misreads.length) lines.push("", "Misreads at this camera the person corrected:", ...lookAlike.misreads.map(m => `- ${m}`))
 	lines.push("", "Lookouts:")
 	for (const l of lookouts) {
 		lines.push(`lookout id=${l.id} queries=${JSON.stringify(l.compiled?.queries ?? [])}`)
@@ -146,9 +152,10 @@ export const judgeText = (input: Pick<JudgeInput, "clip" | "lookouts" | "crops" 
 	return lines.join("\n")
 }
 
-const images = (crops: JudgeCrop[], context: Buffer): LlmImage[] => [
+const images = (crops: JudgeCrop[], context: Buffer, lookAlike?: LookAlikes): LlmImage[] => [
 	...crops.map((c, i): LlmImage => ({ mediaType: "image/jpeg", data: c.jpeg, name: `crop-${i}.jpg` })),
-	{ mediaType: "image/jpeg", data: context, name: "context.jpg" }
+	{ mediaType: "image/jpeg", data: context, name: "context.jpg" },
+	...(lookAlike?.references ?? []).map((r, i): LlmImage => ({ mediaType: "image/jpeg", data: r.jpeg, name: `reference-${i}.jpg` }))
 ]
 
 const clamp01 = (n: number) => (Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0)
@@ -167,15 +174,16 @@ const ask = async (
 	input: JudgeInput,
 	lookouts: Lookout[],
 	llm: VisionLLM,
-	model: string | undefined
+	model: string | undefined,
+	lookAlike?: LookAlikes
 ): Promise<{ verdicts: Verdict[]; birds: SeenBird[]; answered: Set<string>; usage: Usage }> => {
 	input.signal?.throwIfAborted()
 	const res = await llm.complete({
 		purpose: "judge",
 		clipId: input.clip.id,
 		system: JUDGE_SYSTEM,
-		text: judgeText({ ...input, lookouts }),
-		images: images(input.crops, input.context),
+		text: judgeText({ ...input, lookouts, lookAlike }),
+		images: images(input.crops, input.context, lookAlike),
 		schema: JUDGE_SCHEMA,
 		model,
 		maxTokens: 450 + 250 * lookouts.length
@@ -298,7 +306,12 @@ export const judgeClip = async (input: JudgeInput, llm: VisionLLM, cfg: Config["
 	const doubtful = raw.filter(v => candidates(v).length)
 	if (cfg.confirmModel && doubtful.length) {
 		try {
-			const again = await ask(input, input.lookouts.filter(l => doubtful.some(v => v.lookoutId === l.id)), llm, cfg.confirmModel)
+			// the regulars a candidate is likeliest to be, beside it: every false sighting so far was a regular read as new
+			const lookAlike = input.lookAlikes?.(
+				[...new Set(doubtful.flatMap(v => candidates(v).map(b => b.species)))],
+				birds.map(b => b.species)
+			)
+			const again = await ask(input, input.lookouts.filter(l => doubtful.some(v => v.lookoutId === l.id)), llm, cfg.confirmModel, lookAlike)
 			usage.push(again.usage)
 			verdicts = verdicts.map((d, k) => {
 				const wanted = candidates(raw[k]!)

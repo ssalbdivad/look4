@@ -2,7 +2,7 @@
 // `runCascade` is the side-effect-free core (eval dry-runs it); `processClip` wraps it with
 // the DB writes, file moves and media the worker needs.
 
-import { existsSync } from "node:fs"
+import { existsSync, readFileSync } from "node:fs"
 import { appendFile, copyFile, mkdir, readdir, rename, rm, unlink, writeFile } from "node:fs/promises"
 import { basename, dirname, join, relative } from "node:path"
 import sharp from "sharp"
@@ -20,7 +20,7 @@ import { isStale } from "./compile.ts"
 import { buildCrops, contextImage, feederLook, pickDetections } from "./crops.ts"
 import { judgeClip, type SeenBird } from "./judge.ts"
 import { runMotionGate } from "./motion.ts"
-import type { JudgeCrop } from "./types.ts"
+import type { JudgeCrop, LookAlikes } from "./types.ts"
 
 const log = logger("process")
 
@@ -267,7 +267,7 @@ export const runCascade = async (
 			const context = await contextImage(frame, cfg.roi)
 			checkAbort(signal)
 			const probedClip = { ...clip, durationS: probed.durationS, width: probed.width, height: probed.height }
-			const out = await judgeClip({ clip: probedClip, lookouts: candidates, crops: run.crops, context, lifeList: ctx.store.lifeListSpecies(), lifeListWithoutClip: ctx.store.lifeListWithoutClip(), signal }, ctx.llm, cfg.judge)
+			const out = await judgeClip({ clip: probedClip, lookouts: candidates, crops: run.crops, context, lifeList: ctx.store.lifeListSpecies(), lifeListWithoutClip: ctx.store.lifeListWithoutClip(), lookAlikes: lookAlikes(ctx), signal }, ctx.llm, cfg.judge)
 			run.verdicts = out.verdicts
 			run.birds = out.birds
 			run.usage = out.usage.map(u => ({ ...u, clipId: clip.id }))
@@ -357,6 +357,42 @@ export const placeClipFile = async (ctx: Pick<AppContext, "paths">, clip: Clip, 
 	await moveFile(clip.path, target)
 	return target
 }
+
+/** Most reference photos of regulars the confirming call gets. */
+const LOOK_ALIKES = 3
+
+/**
+ * For the confirming call: a confirmed photo (its sighting's first crop) of each of the regulars a
+ * candidate is likeliest to be, and the misreads the person corrected for those candidates. Likeliest:
+ * what the person said such a call really was ("Wrong bird"), then the regulars seen in this clip
+ * (a female cardinal called House Finch shared the clip with a cardinal), then the camera's commonest.
+ * Every false sighting at this camera has been a regular read as something new.
+ */
+export const lookAlikes =
+	(ctx: Pick<AppContext, "store" | "paths">) =>
+	(candidates: string[], seen: string[]): LookAlikes => {
+		const key = (s: string) => s.toLowerCase()
+		const wanted = new Set(candidates.map(key))
+		const photos = new Map<string, { species: string; file: string }>()
+		for (const e of ctx.store.listLifeList()) {
+			const crop = e.clipId ? ctx.store.getClip(e.clipId)?.media.crops[0] : undefined
+			const file = crop && join(clipMediaDir(ctx.paths, e.clipId!), crop)
+			if (file && existsSync(file)) photos.set(key(e.species), { species: e.species, file })
+		}
+		const misreads = ctx.store.misreads().filter(m => wanted.has(key(m.said)))
+		const order = [...misreads.flatMap(m => (m.actual ? [m.actual] : [])), ...seen, ...ctx.store.speciesCounts().map(c => c.species)]
+		const references: LookAlikes["references"] = []
+		for (const s of order) {
+			const photo = photos.get(key(s))
+			if (!photo || wanted.has(key(s)) || references.some(r => key(r.species) === key(s))) continue
+			references.push({ species: photo.species, jpeg: readFileSync(photo.file) })
+			if (references.length >= LOOK_ALIKES) break
+		}
+		return {
+			references,
+			misreads: misreads.map(m => `"${m.said}" was ${m.actual ? `really ${m.actual}` : "not that bird"} (${m.count} clip${m.count === 1 ? "" : "s"})`)
+		}
+	}
 
 /**
  * The crops, the one showing what the clip was kept for first: the first crop is the sighting's

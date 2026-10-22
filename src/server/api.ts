@@ -8,6 +8,7 @@ import type {
 	ClipSummary,
 	CompilePreviewResponse,
 	ConfirmClipResponse,
+	WrongBirdResponse,
 	LifeListResponse,
 	LookoutDto,
 	Page,
@@ -63,6 +64,7 @@ const CompilePreview = type({ prompt: "string.trim |> string > 0", "+": "delete"
 const Backfill = type({ "since?": "string > 0", "+": "delete" })
 const LabelBody = type({ lookoutId: "string > 0", truth: "boolean | null", "+": "delete" })
 const ConfirmBody = type({ "species?": "string.trim |> 0 < string <= 80", "+": "delete" })
+const WrongBirdBody = type({ "species?": "string.trim |> 0 < string <= 80 | null", "+": "delete" })
 const ReprocessBody = type({ "lookoutIds?": "string[]", "+": "delete" })
 const AddLifer = type({
 	species: "string.trim |> 0 < string <= 80",
@@ -302,6 +304,22 @@ export const apiRoutes = (ctx: AppContext, hub: SseHub, checks: StatusChecks) =>
 		const updated = ctx.store.getClip(clip.id)!
 		ctx.bus.emit("clip", { clipId: clip.id, status: updated.status })
 		return c.json(clipDetail(deps, updated))
+	})
+
+	// "Wrong bird": a "no" on every lookout that kept the clip, with what it really was when the person
+	// says. The clip leaves the feed and stays as ground truth, and the confirming call learns the misread.
+	api.post("/clips/:id/wrong", async c => {
+		const clip = getClipOr404(c.req.param("id"))
+		const body = await readBody(c, WrongBirdBody)
+		const before = clipSummary(deps, clip, lookoutMap(ctx.store))
+		if (!before.matches.length) throw new HttpError(409, "this clip is not a sighting")
+		for (const m of before.matches) ctx.store.setLabel({ clipId: clip.id, lookoutId: m.lookoutId, truth: false, species: body.species ?? null })
+		// a labeled clip is ground truth: retention never takes it
+		if (clip.expiresAt !== null) ctx.store.updateClip(clip.id, { expiresAt: null })
+		const updated = ctx.store.getClip(clip.id)!
+		ctx.bus.emit("clip", { clipId: clip.id, status: updated.status })
+		const res: WrongBirdResponse = { clip: clipSummary(deps, updated, lookoutMap(ctx.store)), undo: before.matches.map(m => m.lookoutId) }
+		return c.json(res)
 	})
 
 	api.post("/clips/:id/confirm", async c => {

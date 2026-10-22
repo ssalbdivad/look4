@@ -254,6 +254,37 @@ test("judge: a life-list sighting stands only when the confirming model keeps th
 	assert.deepEqual([alone[0], alone[4], alone[5]], [true, ["first"], 1])
 })
 
+test("judge: only the confirming call gets the look-alike regulars' photos and the corrected misreads, after the context image", async () => {
+	const l = lookout("lifer", ["bird"])
+	const lifer: Lookout = { ...l, compiled: { ...l.compiled!, lifeList: "newOrClipless" } }
+	const answer = { verdicts: [{ lookoutId: "lifer", rationale: "Red bird.", label: "House Finch", species: "House Finch", speciesConfidence: 0.6, match: true, confidence: 0.8 }] }
+	const { llm, calls } = scripted(() => answer)
+	const asked: [string[], string[]][] = []
+	await judgeClip(
+		{
+			...input([lifer]),
+			lifeList: ["Northern Cardinal", "House Finch"],
+			lifeListWithoutClip: ["House Finch"],
+			lookAlikes: (candidates, seen) => {
+				asked.push([candidates, seen])
+				return { references: [{ species: "Northern Cardinal", jpeg: Buffer.from("card") }], misreads: ['"House Finch" was really Northern Cardinal (1 clip)'] }
+			}
+		},
+		llm,
+		cfg({ confirmModel: "claude-opus-5-5" })
+	)
+	assert.deepEqual(asked, [[["House Finch"], []]])
+	assert.deepEqual(
+		calls.map(c => c.images.map(i => i.name)),
+		[
+			["crop-0.jpg", "context.jpg"],
+			["crop-0.jpg", "context.jpg", "reference-0.jpg"]
+		]
+	)
+	assert.doesNotMatch(calls[0]!.text, /reference|Misreads/)
+	assert.match(calls[1]!.text, /reference 0: Northern Cardinal\n[\s\S]*- "House Finch" was really Northern Cardinal \(1 clip\)/)
+})
+
 test("judge: each bird comes back with the crop that shows it, and a sighting's picture is that crop", async () => {
 	const l = lookout("lifer", ["bird"])
 	const lifer: Lookout = { ...l, compiled: { ...l.compiled!, lifeList: "newOrClipless" } }

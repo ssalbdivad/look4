@@ -16,9 +16,6 @@ import { DropZone, useUpload } from "../upload.tsx"
 
 const PAGE = 24
 
-/** How long a deleted sighting can be brought back: as long as its toast shows. */
-const UNDO_MS = 7000
-
 export const SightingsPage = () => {
 	useDocumentTitle("Sightings")
 	const { query } = useLocation()
@@ -50,7 +47,7 @@ export const SightingsPage = () => {
 
 	useEffect(() => {
 		if (!first.data) return
-		setItems(first.data.items.filter(c => !deleting.current.has(c.id)))
+		setItems(first.data.items)
 		setNextBefore(first.data.nextBefore)
 	}, [first.data])
 
@@ -97,36 +94,27 @@ export const SightingsPage = () => {
 		)
 	})
 
-	// A delete waits out its Undo before the file goes; leaving the page carries out the ones still waiting.
-	const deleting = useRef(new Map<string, ReturnType<typeof setTimeout>>())
-	const reallyDelete = (c: ClipSummary) => {
-		deleting.current.delete(c.id)
-		api.deleteClip(c.id).catch(e => {
-			setItems(xs => insertByTime(xs.filter(x => x.id !== c.id), c))
-			toast(errorMessage(e), { tone: "bad" })
-		})
-	}
-	useEffect(
-		() => () => {
-			for (const t of deleting.current.values()) clearTimeout(t)
-			// the timers are gone, so these run now rather than never
-			for (const id of deleting.current.keys()) api.deleteClip(id).catch(() => {})
-		},
-		[]
-	)
-	const remove = (c: ClipSummary) => {
+	// "Wrong bird" takes the card out at once; Undo clears the "no" it recorded
+	const markWrong = (c: ClipSummary, species: string | null) => {
 		setItems(xs => xs.filter(x => x.id !== c.id))
-		deleting.current.set(c.id, setTimeout(() => reallyDelete(c), UNDO_MS))
-		toast("Sighting deleted", {
-			action: {
-				label: "Undo",
-				run: () => {
-					clearTimeout(deleting.current.get(c.id))
-					deleting.current.delete(c.id)
-					setItems(xs => insertByTime(xs.filter(x => x.id !== c.id), c))
-				}
-			}
-		})
+		const putBack = () => setItems(xs => insertByTime(xs.filter(x => x.id !== c.id), c))
+		api
+			.wrongBird(c.id, { species })
+			.then(({ undo }) =>
+				toast(species ? `Noted: it was a ${species}` : "Noted: wrong bird", {
+					action: {
+						label: "Undo",
+						run: () => {
+							putBack()
+							Promise.all(undo.map(lookoutId => api.label(c.id, { lookoutId, truth: null }))).catch(e => toast(errorMessage(e), { tone: "bad" }))
+						}
+					}
+				})
+			)
+			.catch(e => {
+				putBack()
+				toast(errorMessage(e), { tone: "bad" })
+			})
 	}
 
 	const loadMore = async () => {
@@ -258,7 +246,7 @@ export const SightingsPage = () => {
 									lookoutId={lookout || undefined}
 									lookouts={ls}
 									onConfirmed={next => setItems(xs => xs.map(x => (x.id === next.id ? next : x)))}
-									onDelete={remove}
+									onWrong={markWrong}
 								/>
 							))}
 						</section>

@@ -15,15 +15,15 @@ export const SightingCard = ({
 	lookoutId,
 	lookouts,
 	onConfirmed,
-	onDelete
+	onWrong
 }: {
 	clip: ClipSummary
 	fresh?: boolean
 	now: number
 	/** Shows a Confirm button; called with the confirmed clip. */
 	onConfirmed?: (clip: ClipSummary) => void
-	/** Shows a delete button. */
-	onDelete?: (clip: ClipSummary) => void
+	/** Shows a "Wrong bird" button; called with what it really was, when given. */
+	onWrong?: (clip: ClipSummary, species: string | null) => void
 	/** Every lookout, so each chip gets the same accent colour it has everywhere else, and the badge knows its threshold. */
 	lookouts?: readonly { id: string; threshold?: number }[] | null
 	/** The feed's lookout filter: that lookout's verdict titles the card (a cardinal clip can also be the woodpecker sighting). */
@@ -104,18 +104,46 @@ export const SightingCard = ({
 			</div>
 		</Link>
 	)
-	if (!onConfirmed && !onDelete) return card
+	if (!onConfirmed && !onWrong) return card
 	// a button can't sit inside the card's link, so they sit over it
 	return (
 		<div className="sighting-wrap">
 			{card}
-			{onDelete && (
-				<button type="button" className="sighting-delete" onClick={() => onDelete(clip)} aria-label={`Delete this sighting of ${title}`} title="Delete this sighting">
-					<Icon name="trash" size={15} />
-				</button>
-			)}
+			{onWrong && !clip.confirmed && <WrongBird clip={clip} title={title} onWrong={onWrong} />}
 			{onConfirmed && <ConfirmSighting clip={clip} onConfirmed={onConfirmed} />}
 		</div>
+	)
+}
+
+/**
+ * "Wrong bird": not what the spotter said. Asks what it really was (optional); look4 keeps the answer
+ * and shows it to the spotter the next time it is about to make the same call.
+ */
+const WrongBird = ({ clip, title, onWrong }: { clip: ClipSummary; title: string; onWrong: (clip: ClipSummary, species: string | null) => void }) => {
+	const [asking, setAsking] = useState(false)
+	const [name, setName] = useState("")
+	if (asking) {
+		const submit = (e: FormEvent) => {
+			e.preventDefault()
+			onWrong(clip, name.trim() || null)
+		}
+		return (
+			<form className="sighting-confirm-ask" onSubmit={submit}>
+				<input value={name} onChange={e => setName(e.target.value)} placeholder="What was it? (optional)" aria-label="What bird was it really?" autoFocus maxLength={80} />
+				<button type="submit" className="btn btn-primary btn-sm" aria-label="Mark as the wrong bird">
+					<Icon name="check" size={14} />
+				</button>
+				<button type="button" className="btn btn-ghost btn-sm" onClick={() => setAsking(false)} aria-label="Cancel">
+					<Icon name="x" size={14} />
+				</button>
+			</form>
+		)
+	}
+	return (
+		<button type="button" className="sighting-wrong" onClick={() => setAsking(true)} title={`Not a ${title}: say what it was, so look4 learns`}>
+			<Icon name="x" size={14} />
+			Wrong bird
+		</button>
 	)
 }
 
