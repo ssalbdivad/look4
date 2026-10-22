@@ -1,0 +1,148 @@
+{
+	"Ability": {
+		"abilityChn": [
+			{
+				"disableAutoFocus": {
+					"permit": 6,
+					"ver": 1
+				},
+				"floodLight": {
+					"permit": 0,
+					"ver": 0
+				},
+				"ispAntiFlick": {
+					"permit": 6,
+					"ver": 1
+				},
+				"ispFlip": {
+					"permit": 6,
+					"ver": 1
+				},
+				"ledControl": {
+					"permit": 6,
+					"ver": 1
+				},
+				"live": {
+					"permit": 4,
+					"ver": 1
+				},
+				"mainEncType": {
+					"permit": 6,
+					"ver": 1
+				},
+				"powerLed": {
+					"permit": 0,
+					"ver": 0
+				},
+				"ptzCtrl": {
+					"permit": 7,
+					"ver": 2
+				},
+				"ptzDirection": {
+					"permit": 1,
+					"ver": 0
+				},
+				"ptzPatrol": {
+					"permit": 7,
+					"ver": 1
+				},
+				"ptzPreset": {
+					"permit": 7,
+					"ver": 1
+				},
+				"ptzTattern": {
+					"permit": 7,
+					"ver": 0
+				},
+				"ptzType": {
+					"permit": 0,
+					"ver": 2
+				},
+				"snap": {
+					"permit": 6,
+					"ver": 1
+				},
+				"supportAiSnaptlps": {
+					"permit": 0,
+					"ver": 0
+				},
+				"supportAutoPt": {
+					"permit": 1,
+					"ver": 1
+				},
+				"supportDigitalZoom": {
+					"permit": 0,
+					"ver": 0
+				},
+				"supportFLBrightness": {
+					"permit": 6,
+					"ver": 1
+				},
+				"supportFLIntelligent": {
+					"permit": 6,
+					"ver": 1
+				},
+				"supportFLKeepOn": {
+					"permit": 0,
+					"ver": 0
+				},
+				"supportFLSchedule": {
+					"permit": 6,
+					"ver": 1
+				},
+				"supportFLswitch": {
+					"permit": 6,
+					"ver": 1
+				},
+				"supportFocus": {
+					"permit": 6,
+					"ver": 1
+				},
+				"supportPt": {
+					"permit": 6,
+					"ver": 1
+				},
+				"supportPtz3DLocation": {
+					"permit": 6,
+					"ver": 1
+				},
+				"supportPtzCalibration": {
+					"permit": 0,
+					"ver": 0
+				},
+				"supportPtzCheck": {
+					"permit": 6,
+					"ver": 0
+				},
+				"supportPtzPresetImage": {
+					"permit": 6,
+					"ver": 1
+				},
+				"supportPtzSpeed": {
+					"permit": 0,
+					"ver": 1
+				},
+				"supportZoom": {
+					"permit": 6,
+					"ver": 1
+				},
+				"supportZoomAndFocusSliderCfg": {
+					"permit": 6,
+					"ver": 1
+				}
+			}
+		],
+		"rtsp": {
+			"permit": 6,
+			"ver": 3
+		},
+		"http": {
+			"permit": 6,
+			"ver": 3
+		},
+		"https": {
+			"permit": 6,
+			"ver": 3
+		}
+	}
+}

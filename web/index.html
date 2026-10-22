@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="color-scheme" content="light dark" />
+		<meta name="description" content="look4 keeps the camera clips that match what you describe." />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<title>look4</title>
+		<!-- Before the app's script arrives: the page colour and the mark, gently breathing, so a slow first load is never a blank page. -->
+		<style>
+			html { background: #f7f3ea; }
+			@media (prefers-color-scheme: dark) { html { background: #111823; } }
+			.boot { display: grid; place-items: center; min-height: 100vh; animation: boot-in 0.3s ease 0.3s both; }
+			.boot img { width: 72px; height: 72px; animation: boot-breathe 1.8s ease-in-out infinite; }
+			@keyframes boot-in { from { opacity: 0; } }
+			@keyframes boot-breathe { 50% { transform: scale(1.06) rotate(-4deg); } }
+			@media (prefers-reduced-motion: reduce) { .boot img { animation: none; } }
+		</style>
+	</head>
+	<body>
+		<div id="root"><div class="boot"><img src="/logo-mark.svg" alt="look4 is loading" /></div></div>
+		<script type="module" src="/src/main.tsx"></script>
+	</body>
+</html>

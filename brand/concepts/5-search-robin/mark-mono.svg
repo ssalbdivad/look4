@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="lens"><circle cx="220" cy="220" r="140"/></clipPath>
+		<mask id="cut" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+			<g transform="translate(14 12)">
+				<path d="M360 190 L548 190 L516 220 L548 250 L360 250 Z" transform="rotate(45 220 220)" fill="#fff" stroke="#fff" stroke-width="20" stroke-linejoin="round"/>
+				<path d="M200 60 C190 30 206 12 236 8 C226 28 228 44 220 60 Z" fill="#fff"/>
+				<path d="M212 62 C226 40 250 36 270 44 C254 50 242 58 230 68 Z" fill="#fff"/>
+				<path d="M66 192 L14 222 L66 252 Z" fill="#fff" stroke="#fff" stroke-width="14" stroke-linejoin="round"/>
+				<circle cx="220" cy="220" r="168" fill="#fff"/>
+				<!-- the breast is the light part, so in one colour it becomes the cut-out -->
+				<circle cx="250" cy="344" r="152" fill="#000" clip-path="url(#lens)"/>
+				<circle cx="220" cy="220" r="150" fill="none" stroke="#fff" stroke-width="36"/>
+				<circle cx="170" cy="188" r="36" fill="#000"/>
+				<circle cx="176" cy="191" r="21" fill="#fff"/>
+				<circle cx="183" cy="183" r="7" fill="#000"/>
+			</g>
+		</mask>
+	</defs>
+	<rect width="512" height="512" fill="currentColor" mask="url(#cut)"/>
+</svg>

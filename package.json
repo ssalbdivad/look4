@@ -1,0 +1,61 @@
+{
+  "name": "look4",
+  "version": "0.1.0",
+  "description": "Filter camera clips for the moments you describe in plain English.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "bin": {
+    "look4": "./src/cli/main.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "engines": {
+    "node": ">=23.6"
+  },
+  "scripts": {
+    "look4": "node --disable-warning=ExperimentalWarning src/cli/main.ts",
+    "start": "node --disable-warning=ExperimentalWarning src/cli/main.ts start",
+    "dev": "node --disable-warning=ExperimentalWarning scripts/dev.ts",
+    "desktop": "node desktop/scripts/dev.ts",
+    "dev-desktop": "node scripts/dev-desktop.ts",
+    "dd": "node scripts/dev-desktop.ts",
+    "build": "vite build",
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/**/*.test.ts\"",
+    "typecheck": "tsc -p . && tsc -p web",
+    "fixtures": "node --disable-warning=ExperimentalWarning scripts/fetch-fixtures.ts",
+    "e2e": "node --disable-warning=ExperimentalWarning scripts/e2e.ts"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "onnxruntime-node",
+      "sharp",
+      "esbuild",
+      "protobufjs"
+    ]
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.134.0",
+    "@fontsource-variable/fredoka": "^5.3.0",
+    "@fontsource-variable/nunito": "^5.3.0",
+    "@hono/node-server": "^2.1.5",
+    "@huggingface/transformers": "^4.3.1",
+    "arktype": "^2.2.8",
+    "hono": "^4.13.13",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "electron": "^44.7.2",
+    "esbuild": "^0.28.2",
+    "playwright": "^1.64.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  }
+}

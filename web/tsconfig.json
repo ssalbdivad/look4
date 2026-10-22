@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"target": "esnext",
+		"lib": ["dom", "dom.iterable", "esnext"],
+		"module": "esnext",
+		"moduleResolution": "bundler",
+		"jsx": "react-jsx",
+		// node: the shared API types import (type-only) from src/config.ts and src/db.ts,
+		// which reference node built-ins; scripts/ also runs under node.
+		"types": ["vite/client", "node"],
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"noEmit": true,
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true,
+		"erasableSyntaxOnly": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true
+	},
+	"include": ["src", "scripts"]
+}

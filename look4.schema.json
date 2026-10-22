@@ -1,0 +1,390 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"type": "object",
+	"properties": {
+		"alerts": {
+			"type": "object",
+			"properties": {
+				"desktop": {
+					"type": "boolean"
+				}
+			}
+		},
+		"dataDir": {
+			"type": "string",
+			"minLength": 1
+		},
+		"pipeline": {
+			"type": "object",
+			"properties": {
+				"concurrency": {
+					"type": "integer",
+					"maximum": 8,
+					"minimum": 1
+				},
+				"detector": {
+					"type": "object",
+					"properties": {
+						"enabled": {
+							"type": "boolean",
+							"default": true
+						},
+						"model": {
+							"type": "string"
+						},
+						"threshold": {
+							"type": "number",
+							"maximum": 1,
+							"minimum": 0
+						},
+						"zoom": {
+							"type": "boolean"
+						}
+					}
+				},
+				"feeders": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"h": {
+								"type": "number",
+								"maximum": 1,
+								"exclusiveMinimum": 0
+							},
+							"w": {
+								"type": "number",
+								"maximum": 1,
+								"exclusiveMinimum": 0
+							},
+							"x": {
+								"type": "number",
+								"maximum": 1,
+								"minimum": 0
+							},
+							"y": {
+								"type": "number",
+								"maximum": 1,
+								"minimum": 0
+							}
+						},
+						"required": [
+							"h",
+							"w",
+							"x",
+							"y"
+						]
+					}
+				},
+				"judge": {
+					"type": "object",
+					"properties": {
+						"cropSize": {
+							"type": "integer",
+							"maximum": 1568,
+							"minimum": 128
+						},
+						"escalateBelow": {
+							"type": "number",
+							"maximum": 1,
+							"minimum": 0
+						},
+						"escalateModel": {
+							"anyOf": [
+								{
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							]
+						},
+						"maxCrops": {
+							"type": "integer",
+							"maximum": 8,
+							"minimum": 1
+						},
+						"model": {
+							"type": "string"
+						},
+						"provider": {
+							"enum": [
+								"anthropic",
+								"auto",
+								"claude-code",
+								"mock",
+								"none"
+							]
+						}
+					}
+				},
+				"motion": {
+					"type": "object",
+					"properties": {
+						"maxArea": {
+							"type": "number",
+							"maximum": 1,
+							"minimum": 0
+						},
+						"maxFrames": {
+							"type": "integer",
+							"maximum": 24,
+							"minimum": 1
+						},
+						"minArea": {
+							"type": "number",
+							"maximum": 1,
+							"minimum": 0
+						},
+						"pixelThreshold": {
+							"type": "number",
+							"maximum": 255,
+							"minimum": 1
+						},
+						"sampleFps": {
+							"type": "number",
+							"maximum": 10,
+							"exclusiveMinimum": 0
+						}
+					}
+				},
+				"roi": {
+					"anyOf": [
+						{
+							"type": "object",
+							"properties": {
+								"h": {
+									"type": "number",
+									"maximum": 1,
+									"exclusiveMinimum": 0
+								},
+								"w": {
+									"type": "number",
+									"maximum": 1,
+									"exclusiveMinimum": 0
+								},
+								"x": {
+									"type": "number",
+									"maximum": 1,
+									"minimum": 0
+								},
+								"y": {
+									"type": "number",
+									"maximum": 1,
+									"minimum": 0
+								}
+							},
+							"required": [
+								"h",
+								"w",
+								"x",
+								"y"
+							]
+						},
+						{
+							"type": "null"
+						}
+					]
+				}
+			}
+		},
+		"retention": {
+			"type": "object",
+			"properties": {
+				"minFreeGb": {
+					"type": "number",
+					"minimum": 0
+				},
+				"motionlessDays": {
+					"type": "number",
+					"minimum": 0
+				},
+				"rejectedDays": {
+					"type": "number",
+					"minimum": 0
+				},
+				"uncheckedGb": {
+					"type": "number",
+					"minimum": 0
+				}
+			}
+		},
+		"server": {
+			"type": "object",
+			"properties": {
+				"host": {
+					"type": "string"
+				},
+				"port": {
+					"type": "integer",
+					"maximum": 65535,
+					"minimum": 1
+				}
+			}
+		},
+		"sources": {
+			"type": "array",
+			"items": {
+				"anyOf": [
+					{
+						"type": "object",
+						"properties": {
+							"dir": {
+								"type": "string",
+								"minLength": 1
+							},
+							"name": {
+								"type": "string",
+								"pattern": "^[a-z0-9][a-z0-9-]*$"
+							},
+							"type": {
+								"const": "watch"
+							},
+							"enabled": {
+								"type": "boolean"
+							},
+							"extensions": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							},
+							"move": {
+								"type": "boolean"
+							},
+							"pollSeconds": {
+								"type": "number",
+								"exclusiveMinimum": 0
+							},
+							"stableSeconds": {
+								"type": "number",
+								"minimum": 0
+							}
+						},
+						"required": [
+							"dir",
+							"name",
+							"type"
+						]
+					},
+					{
+						"type": "object",
+						"properties": {
+							"host": {
+								"type": "string",
+								"minLength": 1
+							},
+							"name": {
+								"type": "string",
+								"pattern": "^[a-z0-9][a-z0-9-]*$"
+							},
+							"type": {
+								"const": "reolink"
+							},
+							"enabled": {
+								"type": "boolean",
+								"default": true
+							},
+							"capture": {
+								"enum": [
+									"auto",
+									"sd",
+									"stream"
+								]
+							},
+							"channel": {
+								"type": "integer",
+								"minimum": 0
+							},
+							"closeUps": {
+								"type": "boolean"
+							},
+							"lookbackHours": {
+								"type": "number",
+								"minimum": 0
+							},
+							"motionGate": {
+								"enum": [
+									"all",
+									"both",
+									"camera"
+								]
+							},
+							"passwordEnv": {
+								"type": "string"
+							},
+							"pollSeconds": {
+								"type": "number",
+								"minimum": 10
+							},
+							"protocol": {
+								"enum": [
+									"auto",
+									"http",
+									"https"
+								]
+							},
+							"rtspPort": {
+								"type": "integer",
+								"maximum": 65535,
+								"minimum": 1
+							},
+							"segmentSeconds": {
+								"type": "number",
+								"maximum": 30,
+								"minimum": 2
+							},
+							"stream": {
+								"enum": [
+									"main",
+									"sub"
+								]
+							},
+							"username": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"host",
+							"name",
+							"type"
+						]
+					},
+					{
+						"type": "object",
+						"properties": {
+							"name": {
+								"type": "string",
+								"pattern": "^[a-z0-9][a-z0-9-]*$"
+							},
+							"type": {
+								"const": "rtsp"
+							},
+							"enabled": {
+								"type": "boolean",
+								"default": true
+							},
+							"segmentSeconds": {
+								"type": "number",
+								"maximum": 600,
+								"minimum": 5
+							},
+							"url": {
+								"type": "string",
+								"minLength": 1
+							},
+							"urlEnv": {
+								"type": "string",
+								"minLength": 1
+							}
+						},
+						"required": [
+							"name",
+							"type"
+						]
+					}
+				]
+			}
+		}
+	}
+}

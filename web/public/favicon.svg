@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+	<title>look4</title>
+	<defs><clipPath id="l4-fav-disc"><circle cx="256" cy="256" r="248"/></clipPath></defs>
+	<circle cx="256" cy="256" r="248" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-fav-disc)"><ellipse cx="230" cy="560" rx="280" ry="150" fill="#6b3f22"/></g>
+	<path d="M318 186 C392 166 462 190 482 250 C496 296 484 336 452 356 C456 330 446 312 418 310 L322 322 Z" fill="#f6b52e"/>
+	<circle cx="222" cy="262" r="176" fill="#ffffff"/>
+	<circle cx="282" cy="236" r="100" fill="#1b3354"/>
+	<circle cx="282" cy="236" r="80" fill="#f6b52e"/>
+	<circle cx="294" cy="242" r="50" fill="#13243b"/>
+	<circle cx="314" cy="218" r="19" fill="#ffffff"/>
+	<path d="M190 128 Q280 84 380 132" fill="none" stroke="#1b3354" stroke-width="30" stroke-linecap="round"/>
+</svg>

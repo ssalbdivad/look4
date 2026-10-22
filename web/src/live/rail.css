@@ -1,0 +1,740 @@
+/* The Live page's camera controls rail: beside the picture, below it, over it (theater / full screen),
+   or as tabs on a phone. Nothing here reads the viewport: rows wrap when the rail is narrow. */
+
+.rail {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	min-width: 0;
+	font-size: var(--fs-sm);
+}
+
+.rail[hidden] {
+	display: none;
+}
+
+.rail.is-side {
+	padding: 14px 14px 18px;
+	max-height: 100%;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	scrollbar-width: thin;
+}
+
+/* Below the picture there's width to spare: the sections sit side by side. */
+.rail.is-below {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	gap: 18px 24px;
+	align-items: start;
+	padding: 14px 16px 18px;
+}
+
+/* Over the picture: a dark translucent panel (`.lv-opanel`: the controls' header and the rail). The colour
+   tokens are redefined here, so every control inside (switches, sliders, segments, buttons) turns into its
+   on-video version on its own. */
+.rail.is-overlay,
+.lv-opanel {
+	--l4-ink: #eef1f6;
+	--l4-ink-soft: #b3bdcc;
+	--l4-surface: #1d2635;
+	--l4-surface-2: rgb(255 255 255 / 0.08);
+	--l4-border: rgb(255 255 255 / 0.14);
+	--l4-bg: #111823;
+	--l4-accent: #7fb0ea;
+	--l4-good: #4cc184;
+	--l4-warn: #f0b43c;
+	--l4-bad: #f07462;
+	--line: var(--l4-border);
+	--tint-accent: rgb(127 176 234 / 0.18);
+	--tint-primary: rgb(246 181 46 / 0.18);
+	--l4-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+	color: var(--l4-ink);
+	color-scheme: dark;
+}
+
+/* the panel holds the look; the rail inside it scrolls under the header */
+.lv-opanel {
+	display: flex;
+	flex-direction: column;
+	width: min(320px, 100%);
+	max-height: 100%;
+	border-radius: var(--l4-radius);
+	background: rgb(11 15 22 / 0.72);
+	border: 1px solid rgb(255 255 255 / 0.1);
+	-webkit-backdrop-filter: blur(14px) saturate(1.2);
+	backdrop-filter: blur(14px) saturate(1.2);
+	box-shadow: 0 18px 40px -16px rgb(0 0 0 / 0.6);
+}
+
+/* nothing to show yet (controls loading): no empty panel */
+.lv-opanel:not(:has(> .rail)) {
+	display: none;
+}
+
+.rail.is-overlay {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	scrollbar-width: thin;
+	padding: 14px;
+}
+
+.rail.is-tabs {
+	gap: 12px;
+	padding: 10px 12px 16px;
+}
+
+.rail-tabs {
+	display: flex;
+	width: 100%;
+}
+
+.rail-tabs .segment {
+	flex: 1;
+	min-height: 40px;
+}
+
+.rail-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+/* ---------- sections ---------- */
+
+.rail-sec {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	min-width: 0;
+}
+
+.rail.is-side .rail-sec + .rail-sec,
+.rail.is-overlay .rail-sec + .rail-sec,
+.rail-panel .rail-sec + .rail-sec {
+	padding-top: 14px;
+	border-top: 1px solid var(--line);
+}
+
+.rail-head {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0;
+	font-family: var(--l4-font-display);
+	font-size: var(--fs-xs);
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--l4-ink-soft);
+}
+
+/* A tab holding one section already says which it is. */
+.rail-panel .rail-sec:only-child .rail-head {
+	display: none;
+}
+
+.rail-note {
+	margin: 0;
+	font-size: var(--fs-xs);
+	color: var(--l4-ink-soft);
+	line-height: 1.35;
+}
+
+.rail-btns {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+/* ---------- views ---------- */
+
+.rail-views {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+	gap: 8px;
+}
+
+.rail-view {
+	position: relative;
+	min-width: 0;
+}
+
+.rail-view-btn {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	padding: 0;
+	border: 1px solid var(--line);
+	border-radius: var(--l4-radius-sm);
+	overflow: hidden;
+	background: var(--l4-surface);
+	color: var(--l4-ink);
+	text-align: left;
+	cursor: pointer;
+	transition:
+		border-color 0.15s,
+		box-shadow 0.15s,
+		transform 0.2s var(--spring);
+}
+
+.rail-view-btn:hover:not(:disabled) {
+	border-color: color-mix(in srgb, var(--l4-primary) 60%, var(--line));
+}
+
+.rail-view-btn:active:not(:disabled) {
+	transform: scale(0.97);
+}
+
+.rail-view-btn:disabled {
+	cursor: not-allowed;
+	opacity: 0.55;
+}
+
+.rail-view.is-on .rail-view-btn {
+	border-color: var(--l4-primary);
+	box-shadow: 0 0 0 2px var(--l4-primary);
+}
+
+.rail-view-img {
+	display: grid;
+	place-items: center;
+	aspect-ratio: 16 / 9;
+	background: var(--l4-surface-2);
+	color: var(--l4-ink-soft);
+	overflow: hidden;
+}
+
+.rail-view-img img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.rail-view-img.is-home {
+	background: color-mix(in srgb, var(--l4-accent) 16%, var(--l4-surface-2));
+	color: var(--l4-accent);
+}
+
+.rail-view-img.is-add {
+	background: transparent;
+	border-bottom: 1px dashed var(--line);
+}
+
+.rail-view-btn.is-add .rail-view-name {
+	white-space: normal;
+}
+
+.rail-view-btn.is-add {
+	border-style: dashed;
+	background: transparent;
+	color: var(--l4-ink-soft);
+}
+
+.rail-view-btn.is-add:hover {
+	color: var(--l4-ink);
+}
+
+.rail-view-name {
+	padding: 4px 8px 5px;
+	font-size: var(--fs-xs);
+	font-weight: 700;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.rail-view-moving {
+	position: absolute;
+	inset: 0 0 auto;
+	aspect-ratio: 16 / 9;
+	display: grid;
+	place-items: center;
+	background: rgb(11 15 22 / 0.55);
+}
+
+.rail-view-moving .spinner {
+	border-color: rgb(255 255 255 / 0.3);
+	border-top-color: #fff;
+}
+
+.rail-view-key {
+	position: absolute;
+	top: 4px;
+	left: 4px;
+	min-width: 18px;
+	padding: 0 5px;
+	border-radius: 6px;
+	background: rgb(11 15 22 / 0.62);
+	color: #fff;
+	font: 700 0.7rem / 18px var(--l4-font-body);
+	text-align: center;
+	pointer-events: none;
+}
+
+.rail-view-more {
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	display: grid;
+	place-items: center;
+	width: 26px;
+	height: 26px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: rgb(11 15 22 / 0.62);
+	color: #fff;
+	cursor: pointer;
+	opacity: 0;
+	transition: opacity 0.15s;
+}
+
+.rail-view:hover .rail-view-more,
+.rail-view:focus-within .rail-view-more,
+.rail-view-more[aria-expanded="true"] {
+	opacity: 1;
+}
+
+@media (hover: none) {
+	.rail-view-more {
+		opacity: 1;
+	}
+}
+
+.rail-menu {
+	position: fixed;
+	inset: auto;
+	margin: 0;
+	right: auto;
+	min-width: 200px;
+	color: var(--l4-ink);
+}
+
+.rail-menu .menu-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.rail-name-form {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+/* ---------- move ---------- */
+
+.rail-move {
+	align-items: stretch;
+}
+
+.rail-dpad {
+	--cell: 44px;
+	align-self: center;
+	display: grid;
+	grid-template-columns: repeat(3, var(--cell));
+	grid-template-rows: repeat(3, var(--cell));
+	gap: 4px;
+	padding: 6px;
+	border-radius: 50%;
+	background: var(--l4-surface-2);
+	border: 1px solid var(--line);
+}
+
+.rail-dpad.is-sm {
+	--cell: 32px;
+	gap: 2px;
+	padding: 4px;
+}
+
+.rail-dpad-btn,
+.rail-dpad-hub {
+	display: grid;
+	place-items: center;
+	padding: 0;
+	border: 0;
+	color: var(--l4-ink);
+	touch-action: none;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+.rail-dpad-btn {
+	border-radius: 14px;
+	background: var(--l4-surface);
+	box-shadow: var(--l4-shadow);
+	cursor: pointer;
+	transition:
+		transform 0.12s var(--ease),
+		background 0.12s;
+}
+
+.rail-dpad-btn.is-diag {
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--l4-surface) 65%, var(--l4-surface-2));
+	color: var(--l4-ink-soft);
+}
+
+.rail-dpad-btn:active:not(:disabled) {
+	transform: scale(0.92);
+	background: var(--l4-primary);
+	color: var(--l4-primary-ink);
+}
+
+.rail-dpad-btn:disabled {
+	opacity: 0.35;
+	cursor: default;
+}
+
+.rail-dpad-arrow {
+	display: grid;
+}
+
+.rail-dpad-hub {
+	margin: 4px;
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--l4-ink) 8%, var(--l4-surface-2));
+	color: var(--l4-accent);
+}
+
+button.rail-dpad-hub {
+	cursor: pointer;
+	transition: transform 0.12s var(--ease);
+}
+
+button.rail-dpad-hub:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--l4-accent) 18%, var(--l4-surface-2));
+}
+
+button.rail-dpad-hub:active:not(:disabled) {
+	transform: scale(0.9);
+}
+
+button.rail-dpad-hub:disabled {
+	color: var(--l4-ink-soft);
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.rail-range {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+}
+
+.rail-range input[type="range"] {
+	flex: 1;
+	min-width: 60px;
+}
+
+.rail-range-val {
+	min-width: 3.4em;
+	text-align: right;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	color: var(--l4-ink-soft);
+}
+
+.rail-step {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: var(--l4-ink-soft);
+	cursor: pointer;
+	touch-action: none;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+.rail-step:hover:not(:disabled) {
+	background: var(--l4-surface-2);
+	color: var(--l4-ink);
+}
+
+.rail-step:active:not(:disabled) {
+	background: var(--l4-primary);
+	color: var(--l4-primary-ink);
+}
+
+.rail-step:disabled {
+	opacity: 0.35;
+	cursor: default;
+}
+
+.rail-holds {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+}
+
+.rail-holds-label {
+	font-weight: 700;
+	color: var(--l4-ink-soft);
+}
+
+.rail-move-more {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.rail-disclose {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 4px 8px 4px 2px;
+	border: 0;
+	border-radius: var(--l4-radius-sm);
+	background: transparent;
+	color: var(--l4-ink-soft);
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.rail-disclose:hover {
+	color: var(--l4-ink);
+}
+
+.rail-disclose .icon {
+	transition: transform 0.2s var(--ease);
+}
+
+.rail-disclose[aria-expanded="true"] .icon {
+	transform: rotate(90deg);
+}
+
+.rail-aim {
+	margin-left: auto;
+}
+
+.rail-focus {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 8px 10px;
+	border-radius: var(--l4-radius-sm);
+	background: var(--l4-surface-2);
+}
+
+/* ---------- rows: picture & lights, home ---------- */
+
+.rail-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-height: 36px;
+	min-width: 0;
+}
+
+.rail-row-icon {
+	flex: none;
+	color: var(--l4-ink-soft);
+}
+
+.rail-row-text {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-width: 0;
+}
+
+.rail-row-label {
+	flex: 1;
+	font-weight: 700;
+	line-height: 1.25;
+}
+
+.rail-row.is-end {
+	justify-content: flex-end;
+	min-height: 0;
+}
+
+.rail-row-note {
+	font-size: var(--fs-xs);
+	color: var(--l4-ink-soft);
+	line-height: 1.3;
+}
+
+.rail-row-note.is-warn {
+	color: var(--l4-warn);
+	font-weight: 700;
+}
+
+.rail-sub {
+	padding-left: 28px;
+}
+
+.rail-seg {
+	flex: none;
+}
+
+.rail-seg .segment {
+	padding: 5px 9px;
+	font-size: var(--fs-xs);
+}
+
+.rail-seg .segment:disabled {
+	cursor: default;
+}
+
+/* Too narrow for the label and the choices side by side: the choices go under the label, kept right. */
+.rail-row:has(.rail-seg) {
+	flex-wrap: wrap;
+	row-gap: 4px;
+}
+
+.rail-row:has(.rail-seg) .rail-row-text {
+	flex: 1 0 auto;
+}
+
+.rail-row .rail-seg {
+	margin-left: auto;
+}
+
+/* ---------- shoo ---------- */
+
+.rail-shoo {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	flex: none;
+	padding: 3px 12px 3px 3px;
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	background: var(--l4-surface);
+	color: var(--l4-ink);
+	font-weight: 700;
+	cursor: pointer;
+	touch-action: none;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+.rail-shoo:hover:not(:disabled) {
+	border-color: color-mix(in srgb, var(--l4-bad) 50%, var(--line));
+}
+
+.rail-shoo:disabled {
+	cursor: default;
+}
+
+.rail-shoo-dial {
+	position: relative;
+	display: grid;
+	place-items: center;
+	width: 28px;
+	height: 28px;
+	color: var(--l4-bad);
+}
+
+.rail-shoo-ring {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	transform: rotate(-90deg);
+}
+
+.rail-shoo-ring circle {
+	fill: none;
+	stroke-width: 3;
+}
+
+.rail-shoo-track {
+	stroke: color-mix(in srgb, var(--l4-bad) 18%, transparent);
+}
+
+.rail-shoo-fill {
+	stroke: var(--l4-bad);
+	stroke-linecap: round;
+	stroke-dasharray: 100;
+	stroke-dashoffset: 100;
+}
+
+.rail-shoo.is-holding .rail-shoo-fill {
+	animation: rail-shoo-fill linear forwards;
+}
+
+.rail-shoo.is-sounding {
+	background: var(--l4-bad);
+	border-color: var(--l4-bad);
+	color: #fff;
+}
+
+.rail-shoo.is-sounding .rail-shoo-dial {
+	color: #fff;
+	animation: rail-shoo-pulse 0.5s ease-in-out infinite alternate;
+}
+
+.rail-shoo.is-sounding .rail-shoo-fill {
+	stroke-dashoffset: 0;
+	stroke: #fff;
+}
+
+@keyframes rail-shoo-fill {
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes rail-shoo-pulse {
+	to {
+		transform: scale(1.15);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rail-shoo.is-sounding .rail-shoo-dial {
+		animation: none;
+	}
+}
+
+/* ---------- touch ---------- */
+
+@media (pointer: coarse) {
+	.rail-step,
+	.rail-view-more {
+		width: 40px;
+		height: 40px;
+	}
+	.rail-view-more {
+		top: 0;
+		right: 0;
+		background: transparent;
+	}
+	.rail-view-more .icon {
+		padding: 3px;
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		background: rgb(11 15 22 / 0.62);
+	}
+	.rail-seg .segment,
+	.rail-disclose,
+	.rail-shoo {
+		min-height: 44px;
+	}
+	.rail-dpad {
+		--cell: 48px;
+	}
+	.rail-row {
+		min-height: 44px;
+	}
+}

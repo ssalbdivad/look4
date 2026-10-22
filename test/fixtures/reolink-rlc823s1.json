@@ -1,0 +1,2639 @@
+{
+	"_about": "Read-only answers of the real Reolink RLC-823S1 (firmware v3.2.0.5511_25101331), 2026-10-14. GetAbility, GetDevInfo, GetAiState, GetMdState and GetPtzStat were asked with action 0; the rest with action 1, so they carry the camera's range (and initial) next to value. The mock camera starts from these.",
+	"answers": {
+		"GetAbility": {
+			"value": {
+				"Ability": {
+					"3g": {
+						"permit": 0,
+						"ver": 0
+					},
+					"abilityChn": [
+						{
+							"aiTrack": {
+								"permit": 6,
+								"ver": 1
+							},
+							"aiTrackDogCat": {
+								"permit": 6,
+								"ver": 1
+							},
+							"alarmAudio": {
+								"permit": 6,
+								"ver": 1
+							},
+							"alarmIoIn": {
+								"permit": 0,
+								"ver": 0
+							},
+							"alarmIoOut": {
+								"permit": 0,
+								"ver": 0
+							},
+							"alarmMd": {
+								"permit": 6,
+								"ver": 1
+							},
+							"alarmRf": {
+								"permit": 0,
+								"ver": 0
+							},
+							"batAnalysis": {
+								"permit": 0,
+								"ver": 0
+							},
+							"battery": {
+								"permit": 0,
+								"ver": 0
+							},
+							"cameraMode": {
+								"permit": 6,
+								"ver": 0
+							},
+							"disableAutoFocus": {
+								"permit": 6,
+								"ver": 1
+							},
+							"enc": {
+								"permit": 6,
+								"ver": 1
+							},
+							"floodLight": {
+								"permit": 0,
+								"ver": 0
+							},
+							"ftp": {
+								"permit": 6,
+								"ver": 6
+							},
+							"image": {
+								"permit": 6,
+								"ver": 1
+							},
+							"indicatorLight": {
+								"permit": 0,
+								"ver": 0
+							},
+							"isp": {
+								"permit": 6,
+								"ver": 1
+							},
+							"isp3Dnr": {
+								"permit": 0,
+								"ver": 0
+							},
+							"ispAntiFlick": {
+								"permit": 6,
+								"ver": 1
+							},
+							"ispBackLight": {
+								"permit": 0,
+								"ver": 0
+							},
+							"ispBright": {
+								"permit": 6,
+								"ver": 1
+							},
+							"ispContrast": {
+								"permit": 6,
+								"ver": 1
+							},
+							"ispDayNight": {
+								"permit": 6,
+								"ver": 1
+							},
+							"ispExposureMode": {
+								"permit": 0,
+								"ver": 0
+							},
+							"ispFlip": {
+								"permit": 6,
+								"ver": 1
+							},
+							"ispHue": {
+								"permit": 0,
+								"ver": 0
+							},
+							"ispMirror": {
+								"permit": 6,
+								"ver": 1
+							},
+							"ispSatruation": {
+								"permit": 6,
+								"ver": 1
+							},
+							"ispSharpen": {
+								"permit": 6,
+								"ver": 1
+							},
+							"ispWhiteBalance": {
+								"permit": 6,
+								"ver": 0
+							},
+							"ledControl": {
+								"permit": 6,
+								"ver": 1
+							},
+							"live": {
+								"permit": 4,
+								"ver": 1
+							},
+							"mainEncType": {
+								"permit": 6,
+								"ver": 1
+							},
+							"mask": {
+								"permit": 6,
+								"ver": 1
+							},
+							"mdTriggerAudio": {
+								"permit": 0,
+								"ver": 0
+							},
+							"mdTriggerRecord": {
+								"permit": 0,
+								"ver": 0
+							},
+							"mdWithPir": {
+								"permit": 0,
+								"ver": 0
+							},
+							"osd": {
+								"permit": 6,
+								"ver": 1
+							},
+							"powerLed": {
+								"permit": 0,
+								"ver": 0
+							},
+							"ptzCtrl": {
+								"permit": 7,
+								"ver": 2
+							},
+							"ptzDirection": {
+								"permit": 1,
+								"ver": 0
+							},
+							"ptzPatrol": {
+								"permit": 7,
+								"ver": 1
+							},
+							"ptzPreset": {
+								"permit": 7,
+								"ver": 1
+							},
+							"ptzTattern": {
+								"permit": 7,
+								"ver": 0
+							},
+							"ptzType": {
+								"permit": 0,
+								"ver": 2
+							},
+							"recCfg": {
+								"permit": 6,
+								"ver": 1
+							},
+							"recDownload": {
+								"permit": 6,
+								"ver": 1
+							},
+							"recReplay": {
+								"permit": 6,
+								"ver": 1
+							},
+							"recSchedule": {
+								"permit": 6,
+								"ver": 2
+							},
+							"shelterCfg": {
+								"permit": 6,
+								"ver": 1
+							},
+							"snap": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportAIDenoise": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportAITrackLimit": {
+								"permit": 6,
+								"ver": 0
+							},
+							"supportAITrackSchedule": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportAfAlgorithmSwitch": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportAi": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportAiAnimal": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportAiDetectConfig": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportAiDogCat": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportAiFace": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportAiPeople": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportAiSensitivity": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportAiSnaptlps": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportAiStayTime": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportAiTargetSize": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportAiTrackClassify": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportAiVehicle": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportAllColors": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportAoAdjust": {
+								"permit": 0,
+								"ver": 1
+							},
+							"supportAutoPt": {
+								"permit": 1,
+								"ver": 1
+							},
+							"supportAutoTrackStream": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportBinoStitch": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportDigitalZoom": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportEncoderSelect": {
+								"permit": 6,
+								"ver": 3
+							},
+							"supportFLBrightness": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportFLIntelligent": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportFLKeepOn": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportFLSchedule": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportFLswitch": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportFishEyeCfg": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportFocus": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportGop": {
+								"permit": 0,
+								"ver": 1
+							},
+							"supportGuardPointImage": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportIfttt": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportImportExportImage": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportIspBinningModeCfg": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportIspCorridorMode": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportIspHdr": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportIspHdrAutoMode": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportLightAutoBrightness": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportMd": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportPt": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportPtz3DLocation": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportPtzCalibration": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportPtzCheck": {
+								"permit": 6,
+								"ver": 0
+							},
+							"supportPtzPresetImage": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportPtzSpeed": {
+								"permit": 0,
+								"ver": 1
+							},
+							"supportSmartRec": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportThresholdAdjust": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportWLLightAlarm": {
+								"permit": 0,
+								"ver": 0
+							},
+							"supportWebhook": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportWhiteDark": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportZoom": {
+								"permit": 6,
+								"ver": 1
+							},
+							"supportZoomAndFocusSliderCfg": {
+								"permit": 6,
+								"ver": 1
+							},
+							"videoClip": {
+								"permit": 6,
+								"ver": 2
+							},
+							"waterMark": {
+								"permit": 6,
+								"ver": 1
+							},
+							"white_balance": {
+								"permit": 6,
+								"ver": 0
+							}
+						}
+					],
+					"alarmAudio": {
+						"permit": 6,
+						"ver": 1
+					},
+					"alarmDisconnet": {
+						"permit": 6,
+						"ver": 1
+					},
+					"alarmHddErr": {
+						"permit": 6,
+						"ver": 1
+					},
+					"alarmHddFull": {
+						"permit": 6,
+						"ver": 1
+					},
+					"alarmIpConflict": {
+						"permit": 6,
+						"ver": 1
+					},
+					"auth": {
+						"permit": 6,
+						"ver": 1
+					},
+					"autoMaint": {
+						"permit": 6,
+						"ver": 1
+					},
+					"cloudStorage": {
+						"permit": 6,
+						"ver": 35
+					},
+					"customAudio": {
+						"permit": 1,
+						"ver": 1
+					},
+					"dateFormat": {
+						"permit": 6,
+						"ver": 1
+					},
+					"ddns": {
+						"permit": 6,
+						"ver": 9
+					},
+					"ddnsCfg": {
+						"permit": 6,
+						"ver": 1
+					},
+					"devInfo": {
+						"permit": 4,
+						"ver": 1
+					},
+					"devName": {
+						"permit": 6,
+						"ver": 2
+					},
+					"disableAutoFocus": {
+						"permit": 6,
+						"ver": 1
+					},
+					"disk": {
+						"permit": 0,
+						"ver": 0
+					},
+					"display": {
+						"permit": 6,
+						"ver": 1
+					},
+					"email": {
+						"permit": 6,
+						"ver": 3
+					},
+					"emailInterval": {
+						"permit": 6,
+						"ver": 1
+					},
+					"emailSchedule": {
+						"permit": 6,
+						"ver": 1
+					},
+					"exportCfg": {
+						"permit": 4,
+						"ver": 0
+					},
+					"ftpAutoDir": {
+						"permit": 6,
+						"ver": 1
+					},
+					"ftpExtStream": {
+						"permit": 6,
+						"ver": 1
+					},
+					"ftpPic": {
+						"permit": 0,
+						"ver": 0
+					},
+					"ftpSubStream": {
+						"permit": 6,
+						"ver": 1
+					},
+					"ftpTest": {
+						"permit": 6,
+						"ver": 0
+					},
+					"hourFmt": {
+						"permit": 6,
+						"ver": 2
+					},
+					"http": {
+						"permit": 6,
+						"ver": 3
+					},
+					"httpFlv": {
+						"permit": 6,
+						"ver": 1
+					},
+					"https": {
+						"permit": 6,
+						"ver": 3
+					},
+					"importCfg": {
+						"permit": 1,
+						"ver": 0
+					},
+					"ipcManager": {
+						"permit": 6,
+						"ver": 1
+					},
+					"ledControl": {
+						"permit": 7,
+						"ver": 1
+					},
+					"localLink": {
+						"permit": 6,
+						"ver": 1
+					},
+					"log": {
+						"permit": 6,
+						"ver": 1
+					},
+					"mediaPort": {
+						"permit": 6,
+						"ver": 1
+					},
+					"ntp": {
+						"permit": 6,
+						"ver": 1
+					},
+					"online": {
+						"permit": 6,
+						"ver": 1
+					},
+					"onvif": {
+						"permit": 6,
+						"ver": 3
+					},
+					"p2p": {
+						"permit": 6,
+						"ver": 1
+					},
+					"performance": {
+						"permit": 4,
+						"ver": 1
+					},
+					"pppoe": {
+						"permit": 6,
+						"ver": 0
+					},
+					"push": {
+						"permit": 6,
+						"ver": 2
+					},
+					"pushSchedule": {
+						"permit": 6,
+						"ver": 1
+					},
+					"reboot": {
+						"permit": 1,
+						"ver": 1
+					},
+					"recExtensionTimeList": {
+						"permit": 6,
+						"ver": 1
+					},
+					"recOverWrite": {
+						"permit": 6,
+						"ver": 1
+					},
+					"recPackDuration": {
+						"permit": 6,
+						"ver": 0
+					},
+					"recPreRecord": {
+						"permit": 6,
+						"ver": 1
+					},
+					"restore": {
+						"permit": 1,
+						"ver": 1
+					},
+					"rtmp": {
+						"permit": 6,
+						"ver": 3
+					},
+					"rtsp": {
+						"permit": 6,
+						"ver": 3
+					},
+					"scheduleVersion": {
+						"permit": 6,
+						"ver": 1
+					},
+					"sdCard": {
+						"permit": 6,
+						"ver": 1
+					},
+					"showQrCode": {
+						"permit": 6,
+						"ver": 0
+					},
+					"simMoudule": {
+						"permit": 6,
+						"ver": 0
+					},
+					"supportAudioAlarm": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportAudioAlarmEnable": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportAudioAlarmSchedule": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportAudioAlarmTaskEnable": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportBuzzer": {
+						"permit": 0,
+						"ver": 0
+					},
+					"supportBuzzerEnable": {
+						"permit": 0,
+						"ver": 0
+					},
+					"supportBuzzerTask": {
+						"permit": 0,
+						"ver": 0
+					},
+					"supportBuzzerTaskEnable": {
+						"permit": 0,
+						"ver": 0
+					},
+					"supportEmailEnable": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportEmailTaskEnable": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportFileStreaming": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportFtpCoverPicture": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportFtpCoverVideo": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportFtpDirYM": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportFtpEnable": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportFtpPicCaptureMode": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportFtpPicResoCustom": {
+						"permit": 6,
+						"ver": 0
+					},
+					"supportFtpPictureSwap": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportFtpTask": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportFtpTaskEnable": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportFtpVideoSwap": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportFtpsEncrypt": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportHttpEnable": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportHttpsEnable": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportOnvifEnable": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportPushInterval": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportRecScheduleEnable": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportRecordEnable": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportRecordEncrypt": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportRtmpEnable": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportRtspEnable": {
+						"permit": 6,
+						"ver": 1
+					},
+					"supportWiFiFreqPolicy": {
+						"permit": 0,
+						"ver": 0
+					},
+					"supportWifiEnable5G": {
+						"permit": 0,
+						"ver": 0
+					},
+					"supportWifiEnableDfs": {
+						"permit": 0,
+						"ver": 0
+					},
+					"talk": {
+						"permit": 4,
+						"ver": 1
+					},
+					"time": {
+						"permit": 6,
+						"ver": 2
+					},
+					"tvSystem": {
+						"permit": 6,
+						"ver": 0
+					},
+					"upgrade": {
+						"permit": 1,
+						"ver": 2
+					},
+					"upnp": {
+						"permit": 6,
+						"ver": 1
+					},
+					"user": {
+						"permit": 6,
+						"ver": 1
+					},
+					"videoClip": {
+						"permit": 6,
+						"ver": 2
+					},
+					"wifi": {
+						"permit": 0,
+						"ver": 0
+					},
+					"wifiTest": {
+						"permit": 6,
+						"ver": 0
+					}
+				}
+			}
+		},
+		"GetDevInfo": {
+			"value": {
+				"DevInfo": {
+					"B485": 0,
+					"IOInputNum": 0,
+					"IOOutputNum": 0,
+					"audioNum": 1,
+					"buildDay": "build 25101331",
+					"cfgVer": "v3.2.0.0",
+					"channelNum": 1,
+					"detail": "IPC_NT18NA68MPS38A11TC0E1W01100",
+					"diskNum": 1,
+					"exactType": "IPC",
+					"firmVer": "v3.2.0.5511_25101331_v1.0.0.155",
+					"frameworkVer": 1,
+					"hardVer": "IPC_NT18NA68MP",
+					"itemNo": "P840",
+					"model": "RLC-823S1",
+					"name": "Backyard",
+					"pakSuffix": "pak,paks",
+					"serial": "00000000000000",
+					"type": "IPC",
+					"wifi": 0
+				}
+			}
+		},
+		"GetAiState": {
+			"value": {
+				"channel": 0,
+				"dog_cat": {
+					"alarm_state": 0,
+					"support": 1
+				},
+				"face": {
+					"alarm_state": 0,
+					"support": 0
+				},
+				"people": {
+					"alarm_state": 0,
+					"support": 1
+				},
+				"vehicle": {
+					"alarm_state": 0,
+					"support": 1
+				}
+			}
+		},
+		"GetMdState": {
+			"value": {
+				"state": 0
+			}
+		},
+		"GetZoomFocus": {
+			"value": {
+				"ZoomFocus": {
+					"channel": 0,
+					"focus": {
+						"pos": 143
+					},
+					"zoom": {
+						"pos": 8
+					}
+				}
+			},
+			"range": {
+				"ZoomFocus": {
+					"channel": 0,
+					"focus": {
+						"pos": {
+							"max": 205,
+							"min": 0
+						}
+					},
+					"zoom": {
+						"pos": {
+							"max": 28,
+							"min": 0
+						}
+					}
+				}
+			},
+			"initial": {
+				"ZoomFocus": {
+					"channel": 0,
+					"focus": {
+						"pos": 143
+					},
+					"zoom": {
+						"pos": 8
+					}
+				}
+			}
+		},
+		"GetAutoFocus": {
+			"value": {
+				"AutoFocus": {
+					"afType": 0,
+					"channel": 0,
+					"disable": 0
+				}
+			},
+			"range": {
+				"AutoFocus": {
+					"disable": "boolean"
+				}
+			},
+			"initial": {
+				"AutoFocus": {
+					"disable": 0
+				}
+			}
+		},
+		"Get3DPos": {
+			"value": {
+				"3d_pos": {
+					"channel": 0,
+					"extStream": {
+						"height": 512,
+						"width": 896
+					},
+					"mainStream": {
+						"height": 2160,
+						"width": 3840
+					},
+					"subStream": {
+						"height": 360,
+						"width": 640
+					}
+				}
+			}
+		},
+		"GetPtzCurPos": {
+			"value": {
+				"PtzCurPos": {
+					"Fpos": 883,
+					"Ppos": 1166,
+					"Tpos": 163,
+					"Zpos": 234,
+					"channel": 0
+				}
+			},
+			"range": {
+				"PtzPreset": {}
+			}
+		},
+		"GetPtzPreset": {
+			"value": {
+				"PtzPreset": [
+					{
+						"channel": 0,
+						"enable": 1,
+						"id": 0,
+						"imgName": "preset_00",
+						"name": "Tree and Left Feeder"
+					},
+					{
+						"channel": 0,
+						"enable": 1,
+						"id": 1,
+						"imgName": "preset_01",
+						"name": "Feeders"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 2,
+						"imgName": "",
+						"name": "pos3"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 3,
+						"imgName": "",
+						"name": "pos4"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 4,
+						"imgName": "",
+						"name": "pos5"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 5,
+						"imgName": "",
+						"name": "pos6"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 6,
+						"imgName": "",
+						"name": "pos7"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 7,
+						"imgName": "",
+						"name": "pos8"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 8,
+						"imgName": "",
+						"name": "pos9"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 9,
+						"imgName": "",
+						"name": "pos10"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 10,
+						"imgName": "",
+						"name": "pos11"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 11,
+						"imgName": "",
+						"name": "pos12"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 12,
+						"imgName": "",
+						"name": "pos13"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 13,
+						"imgName": "",
+						"name": "pos14"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 14,
+						"imgName": "",
+						"name": "pos15"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 15,
+						"imgName": "",
+						"name": "pos16"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 16,
+						"imgName": "",
+						"name": "pos17"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 17,
+						"imgName": "",
+						"name": "pos18"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 18,
+						"imgName": "",
+						"name": "pos19"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 19,
+						"imgName": "",
+						"name": "pos20"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 20,
+						"imgName": "",
+						"name": "pos21"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 21,
+						"imgName": "",
+						"name": "pos22"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 22,
+						"imgName": "",
+						"name": "pos23"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 23,
+						"imgName": "",
+						"name": "pos24"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 24,
+						"imgName": "",
+						"name": "pos25"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 25,
+						"imgName": "",
+						"name": "pos26"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 26,
+						"imgName": "",
+						"name": "pos27"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 27,
+						"imgName": "",
+						"name": "pos28"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 28,
+						"imgName": "",
+						"name": "pos29"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 29,
+						"imgName": "",
+						"name": "pos30"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 30,
+						"imgName": "",
+						"name": "pos31"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 31,
+						"imgName": "",
+						"name": "pos32"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 32,
+						"imgName": "",
+						"name": "pos33"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 33,
+						"imgName": "",
+						"name": "pos34"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 34,
+						"imgName": "",
+						"name": "pos35"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 35,
+						"imgName": "",
+						"name": "pos36"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 36,
+						"imgName": "",
+						"name": "pos37"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 37,
+						"imgName": "",
+						"name": "pos38"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 38,
+						"imgName": "",
+						"name": "pos39"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 39,
+						"imgName": "",
+						"name": "pos40"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 40,
+						"imgName": "",
+						"name": "pos41"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 41,
+						"imgName": "",
+						"name": "pos42"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 42,
+						"imgName": "",
+						"name": "pos43"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 43,
+						"imgName": "",
+						"name": "pos44"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 44,
+						"imgName": "",
+						"name": "pos45"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 45,
+						"imgName": "",
+						"name": "pos46"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 46,
+						"imgName": "",
+						"name": "pos47"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 47,
+						"imgName": "",
+						"name": "pos48"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 48,
+						"imgName": "",
+						"name": "pos49"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 49,
+						"imgName": "",
+						"name": "pos50"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 50,
+						"imgName": "",
+						"name": "pos51"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 51,
+						"imgName": "",
+						"name": "pos52"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 52,
+						"imgName": "",
+						"name": "pos53"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 53,
+						"imgName": "",
+						"name": "pos54"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 54,
+						"imgName": "",
+						"name": "pos55"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 55,
+						"imgName": "",
+						"name": "pos56"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 56,
+						"imgName": "",
+						"name": "pos57"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 57,
+						"imgName": "",
+						"name": "pos58"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 58,
+						"imgName": "",
+						"name": "pos59"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 59,
+						"imgName": "",
+						"name": "pos60"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 60,
+						"imgName": "",
+						"name": "pos61"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 61,
+						"imgName": "",
+						"name": "pos62"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 62,
+						"imgName": "",
+						"name": "pos63"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 63,
+						"imgName": "",
+						"name": "pos64"
+					}
+				]
+			},
+			"range": {
+				"PtzPreset": {
+					"channel": 0,
+					"enable": "boolean",
+					"id": {
+						"max": 64,
+						"min": 1
+					},
+					"imgName": {
+						"maxLen": 31
+					},
+					"name": {
+						"maxLen": 31
+					}
+				}
+			},
+			"initial": {
+				"PtzPreset": [
+					{
+						"channel": 0,
+						"enable": 1,
+						"id": 0,
+						"imgName": "preset_00",
+						"name": "Tree and Left Feeder"
+					},
+					{
+						"channel": 0,
+						"enable": 1,
+						"id": 1,
+						"imgName": "preset_01",
+						"name": "Feeders"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 2,
+						"imgName": "",
+						"name": "pos3"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 3,
+						"imgName": "",
+						"name": "pos4"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 4,
+						"imgName": "",
+						"name": "pos5"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 5,
+						"imgName": "",
+						"name": "pos6"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 6,
+						"imgName": "",
+						"name": "pos7"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 7,
+						"imgName": "",
+						"name": "pos8"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 8,
+						"imgName": "",
+						"name": "pos9"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 9,
+						"imgName": "",
+						"name": "pos10"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 10,
+						"imgName": "",
+						"name": "pos11"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 11,
+						"imgName": "",
+						"name": "pos12"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 12,
+						"imgName": "",
+						"name": "pos13"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 13,
+						"imgName": "",
+						"name": "pos14"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 14,
+						"imgName": "",
+						"name": "pos15"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 15,
+						"imgName": "",
+						"name": "pos16"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 16,
+						"imgName": "",
+						"name": "pos17"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 17,
+						"imgName": "",
+						"name": "pos18"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 18,
+						"imgName": "",
+						"name": "pos19"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 19,
+						"imgName": "",
+						"name": "pos20"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 20,
+						"imgName": "",
+						"name": "pos21"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 21,
+						"imgName": "",
+						"name": "pos22"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 22,
+						"imgName": "",
+						"name": "pos23"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 23,
+						"imgName": "",
+						"name": "pos24"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 24,
+						"imgName": "",
+						"name": "pos25"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 25,
+						"imgName": "",
+						"name": "pos26"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 26,
+						"imgName": "",
+						"name": "pos27"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 27,
+						"imgName": "",
+						"name": "pos28"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 28,
+						"imgName": "",
+						"name": "pos29"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 29,
+						"imgName": "",
+						"name": "pos30"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 30,
+						"imgName": "",
+						"name": "pos31"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 31,
+						"imgName": "",
+						"name": "pos32"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 32,
+						"imgName": "",
+						"name": "pos33"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 33,
+						"imgName": "",
+						"name": "pos34"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 34,
+						"imgName": "",
+						"name": "pos35"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 35,
+						"imgName": "",
+						"name": "pos36"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 36,
+						"imgName": "",
+						"name": "pos37"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 37,
+						"imgName": "",
+						"name": "pos38"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 38,
+						"imgName": "",
+						"name": "pos39"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 39,
+						"imgName": "",
+						"name": "pos40"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 40,
+						"imgName": "",
+						"name": "pos41"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 41,
+						"imgName": "",
+						"name": "pos42"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 42,
+						"imgName": "",
+						"name": "pos43"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 43,
+						"imgName": "",
+						"name": "pos44"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 44,
+						"imgName": "",
+						"name": "pos45"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 45,
+						"imgName": "",
+						"name": "pos46"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 46,
+						"imgName": "",
+						"name": "pos47"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 47,
+						"imgName": "",
+						"name": "pos48"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 48,
+						"imgName": "",
+						"name": "pos49"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 49,
+						"imgName": "",
+						"name": "pos50"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 50,
+						"imgName": "",
+						"name": "pos51"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 51,
+						"imgName": "",
+						"name": "pos52"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 52,
+						"imgName": "",
+						"name": "pos53"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 53,
+						"imgName": "",
+						"name": "pos54"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 54,
+						"imgName": "",
+						"name": "pos55"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 55,
+						"imgName": "",
+						"name": "pos56"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 56,
+						"imgName": "",
+						"name": "pos57"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 57,
+						"imgName": "",
+						"name": "pos58"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 58,
+						"imgName": "",
+						"name": "pos59"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 59,
+						"imgName": "",
+						"name": "pos60"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 60,
+						"imgName": "",
+						"name": "pos61"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 61,
+						"imgName": "",
+						"name": "pos62"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 62,
+						"imgName": "",
+						"name": "pos63"
+					},
+					{
+						"channel": 0,
+						"enable": 0,
+						"id": 63,
+						"imgName": "",
+						"name": "pos64"
+					}
+				]
+			}
+		},
+		"GetPtzGuard": {
+			"value": {
+				"PtzGuard": {
+					"benable": 0,
+					"bexistPos": 0,
+					"channel": 0,
+					"imgName": "",
+					"timeout": 60
+				}
+			},
+			"range": {
+				"PtzGuard": {
+					"benable": 0,
+					"bexistPos": 0,
+					"bneedSetPos": 0,
+					"channel": 0,
+					"cmdStr": [
+						"setPos",
+						"toPos"
+					],
+					"imgName": {
+						"maxLen": 31
+					},
+					"timeout": {
+						"max": 300,
+						"min": 10
+					}
+				}
+			},
+			"initial": {
+				"PtzGuard": {
+					"benable": 0,
+					"bexistPos": 0,
+					"channel": 0,
+					"imgName": "",
+					"timeout": 60
+				}
+			}
+		},
+		"GetAiCfg": {
+			"value": {
+				"AiDetectType": {
+					"dog_cat": 1,
+					"face": 0,
+					"people": 1,
+					"vehicle": 1
+				},
+				"aiDisappearBackTime": 10,
+				"aiStopBackTime": 20,
+				"aiTrack": 1,
+				"bSmartTrack": 0,
+				"channel": 0,
+				"trackTask": "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+				"trackType": {
+					"dog_cat": 0,
+					"face": 0,
+					"people": 1,
+					"vehicle": 0
+				}
+			},
+			"range": {
+				"AiDetectType": {
+					"dog_cat": "boolean",
+					"face": "boolean",
+					"people": "boolean",
+					"vehicle": "boolean"
+				},
+				"aiDisappearBackTime": [
+					10,
+					20,
+					30,
+					60
+				],
+				"aiStopBackTime": [
+					10,
+					20,
+					30,
+					60
+				],
+				"aiTrack": [
+					1
+				],
+				"channel": 0,
+				"trackType": {
+					"trackType": {
+						"maxLen": 167,
+						"minLen": 0
+					}
+				}
+			},
+			"initial": {
+				"AiDetectType": {
+					"dog_cat": 1,
+					"face": 0,
+					"people": 1,
+					"vehicle": 1
+				},
+				"aiDisappearBackTime": 10,
+				"aiStopBackTime": 20,
+				"aiTrack": 1,
+				"bSmartTrack": 0,
+				"channel": 0,
+				"trackTask": "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+				"trackType": {
+					"dog_cat": 0,
+					"face": 0,
+					"people": 1,
+					"vehicle": 0
+				}
+			}
+		},
+		"GetWhiteLed": {
+			"value": {
+				"WhiteLed": {
+					"LightingSchedule": {
+						"EndHour": 6,
+						"EndMin": 0,
+						"StartHour": 18,
+						"StartMin": 0
+					},
+					"bright": 85,
+					"channel": 0,
+					"mode": 1,
+					"state": 0,
+					"wlAiDetectType": {
+						"dog_cat": 1,
+						"people": 1,
+						"vehicle": 1
+					}
+				}
+			},
+			"range": {
+				"AiDetectType": {
+					"dog_cat": "boolean",
+					"people": "boolean",
+					"vehicle": "boolean"
+				},
+				"WhiteLed": {
+					"bright": {
+						"max": 100,
+						"min": 0
+					}
+				}
+			},
+			"initial": {
+				"WhiteLed": {
+					"wlAiDetectType": {
+						"dog_cat": 1,
+						"people": 1,
+						"vehicle": 1
+					}
+				}
+			}
+		},
+		"GetIrLights": {
+			"value": {
+				"IrLights": {
+					"state": "Auto"
+				}
+			},
+			"range": {
+				"IrLights": {
+					"state": [
+						"Auto",
+						"Off"
+					]
+				}
+			},
+			"initial": {
+				"IrLights": {
+					"state": "Auto"
+				}
+			}
+		},
+		"GetIsp": {
+			"value": {
+				"Isp": {
+					"antiFlicker": "60HZ",
+					"backLight": "Off",
+					"bd_day": {
+						"bright": 128,
+						"dark": 128,
+						"mode": "Auto"
+					},
+					"bd_led_color": {
+						"bright": 128,
+						"dark": 128,
+						"mode": "Auto"
+					},
+					"bd_night": {
+						"bright": 128,
+						"dark": 128,
+						"mode": "Auto"
+					},
+					"blc": 128,
+					"blueGain": 128,
+					"channel": 0,
+					"constantFrameRate": 0,
+					"dayNight": "Auto",
+					"dayNightThreshold": 50,
+					"drc": 128,
+					"encType": "VBR",
+					"exposure": "Auto",
+					"gain": {
+						"max": 62,
+						"min": 1
+					},
+					"hdr": 1,
+					"mirroring": 0,
+					"nr3d": 1,
+					"redGain": 128,
+					"rotation": 0,
+					"shutter": {
+						"max": 125,
+						"min": 0
+					},
+					"whiteBalance": "Auto"
+				}
+			},
+			"range": {
+				"Isp": {
+					"antiFlicker": [
+						"Other",
+						"50HZ",
+						"60HZ",
+						"Off"
+					],
+					"backLight": [
+						"Off",
+						"BackLightControl",
+						"DynamicRangeControl"
+					],
+					"bd_day": {
+						"bright": {
+							"max": 255,
+							"min": 0
+						},
+						"dark": {
+							"max": 255,
+							"min": 0
+						},
+						"mode": [
+							"Auto",
+							"Manual"
+						]
+					},
+					"bd_led_color": {
+						"bright": {
+							"max": 255,
+							"min": 0
+						},
+						"dark": {
+							"max": 255,
+							"min": 0
+						},
+						"mode": [
+							"Auto",
+							"Manual"
+						]
+					},
+					"bd_night": {
+						"bright": {
+							"max": 255,
+							"min": 0
+						},
+						"dark": {
+							"max": 255,
+							"min": 0
+						},
+						"mode": [
+							"Auto",
+							"Manual"
+						]
+					},
+					"blc": {
+						"max": 255,
+						"min": 0
+					},
+					"blueGain": {
+						"max": 255,
+						"min": 0
+					},
+					"channel": 0,
+					"constantFrameRate": [
+						0,
+						1
+					],
+					"dayNight": [
+						"Auto",
+						"Color",
+						"Black&White"
+					],
+					"dayNightThreshold": {
+						"max": 100,
+						"min": 0
+					},
+					"drc": {
+						"max": 255,
+						"min": 0
+					},
+					"encType": [
+						"VBR",
+						"CBR"
+					],
+					"exposure": [
+						"Auto",
+						"LowNoise",
+						"Anti-Smearing",
+						"Manual"
+					],
+					"gain": {
+						"max": 100,
+						"min": 1
+					},
+					"hdr": [
+						0,
+						1,
+						2
+					],
+					"mirroring": "boolean",
+					"nr3d": "boolean",
+					"redGain": {
+						"max": 255,
+						"min": 0
+					},
+					"rotation": "boolean",
+					"shutter": {
+						"max": 125,
+						"min": 0
+					},
+					"whiteBalance": [
+						"Auto",
+						"Manual"
+					]
+				}
+			},
+			"initial": {
+				"Isp": {
+					"antiFlicker": "Off",
+					"backLight": "Off",
+					"bd_day": {
+						"bright": 128,
+						"dark": 128,
+						"mode": "Auto"
+					},
+					"bd_led_color": {
+						"bright": 128,
+						"dark": 128,
+						"mode": "Auto"
+					},
+					"bd_night": {
+						"bright": 128,
+						"dark": 128,
+						"mode": "Auto"
+					},
+					"blc": 128,
+					"blueGain": 128,
+					"channel": 0,
+					"constantFrameRate": 0,
+					"dayNight": "Auto",
+					"dayNightThreshold": 50,
+					"drc": 128,
+					"encType": "VBR",
+					"exposure": "Auto",
+					"gain": {
+						"max": 62,
+						"min": 1
+					},
+					"hdr": 1,
+					"mirroring": 0,
+					"nr3d": 1,
+					"redGain": 128,
+					"rotation": 0,
+					"shutter": {
+						"max": 125,
+						"min": 0
+					},
+					"whiteBalance": "Auto"
+				}
+			}
+		},
+		"GetEnc": {
+			"value": {
+				"Enc": {
+					"audio": 0,
+					"channel": 0,
+					"mainStream": {
+						"bitRate": 6144,
+						"frameRate": 25,
+						"gop": 2,
+						"height": 2160,
+						"profile": "High",
+						"size": "3840*2160",
+						"vType": "h265",
+						"width": 3840
+					},
+					"subStream": {
+						"bitRate": 256,
+						"frameRate": 10,
+						"gop": 4,
+						"height": 360,
+						"profile": "High",
+						"size": "640*360",
+						"vType": "h264",
+						"width": 640
+					}
+				}
+			},
+			"range": {
+				"Enc": [
+					{
+						"audio": "boolean",
+						"chnBit": 1,
+						"mainStream": {
+							"bitRate": [
+								2048,
+								3072,
+								4096,
+								5120,
+								6144,
+								7168,
+								8192
+							],
+							"default": {
+								"bitRate": 6144,
+								"frameRate": 25,
+								"gop": 2
+							},
+							"frameRate": [
+								25,
+								22,
+								20,
+								18,
+								16,
+								15,
+								12,
+								10,
+								8,
+								6,
+								4,
+								2
+							],
+							"gop": {
+								"max": 2,
+								"min": 1
+							},
+							"height": 2160,
+							"profile": [
+								"Base",
+								"Main",
+								"High"
+							],
+							"size": "3840*2160",
+							"vType": [
+								"h265"
+							],
+							"width": 3840
+						},
+						"subStream": {
+							"bitRate": [
+								64,
+								128,
+								160,
+								192,
+								256,
+								384,
+								512
+							],
+							"default": {
+								"bitRate": 256,
+								"frameRate": 10,
+								"gop": 4
+							},
+							"frameRate": [
+								15,
+								10,
+								7,
+								4
+							],
+							"gop": {
+								"max": 4,
+								"min": 1
+							},
+							"height": 360,
+							"profile": [
+								"Base",
+								"Main",
+								"High"
+							],
+							"size": "640*360",
+							"vType": [
+								"h264"
+							],
+							"width": 640
+						}
+					},
+					{
+						"audio": "boolean",
+						"chnBit": 1,
+						"mainStream": {
+							"bitRate": [
+								1024,
+								1536,
+								2048,
+								3072,
+								4096,
+								5120,
+								6144,
+								7168,
+								8192
+							],
+							"default": {
+								"bitRate": 6144,
+								"frameRate": 25,
+								"gop": 2
+							},
+							"frameRate": [
+								25,
+								22,
+								20,
+								18,
+								16,
+								15,
+								12,
+								10,
+								8,
+								6,
+								4,
+								2
+							],
+							"gop": {
+								"max": 2,
+								"min": 1
+							},
+							"height": 1440,
+							"profile": [
+								"Base",
+								"Main",
+								"High"
+							],
+							"size": "2560*1440",
+							"vType": [
+								"h264"
+							],
+							"width": 2560
+						},
+						"subStream": {
+							"bitRate": [
+								64,
+								128,
+								160,
+								192,
+								256,
+								384,
+								512
+							],
+							"default": {
+								"bitRate": 256,
+								"frameRate": 10,
+								"gop": 4
+							},
+							"frameRate": [
+								15,
+								10,
+								7,
+								4
+							],
+							"gop": {
+								"max": 4,
+								"min": 1
+							},
+							"height": 360,
+							"profile": [
+								"Base",
+								"Main",
+								"High"
+							],
+							"size": "640*360",
+							"vType": [
+								"h264"
+							],
+							"width": 640
+						}
+					},
+					{
+						"audio": "boolean",
+						"chnBit": 1,
+						"mainStream": {
+							"bitRate": [
+								1024,
+								1536,
+								2048,
+								3072,
+								4096,
+								5120,
+								6144,
+								7168,
+								8192
+							],
+							"default": {
+								"bitRate": 6144,
+								"frameRate": 25,
+								"gop": 2
+							},
+							"frameRate": [
+								25,
+								22,
+								20,
+								18,
+								16,
+								15,
+								12,
+								10,
+								8,
+								6,
+								4,
+								2
+							],
+							"gop": {
+								"max": 2,
+								"min": 1
+							},
+							"height": 1296,
+							"profile": [
+								"Base",
+								"Main",
+								"High"
+							],
+							"size": "2304*1296",
+							"vType": [
+								"h264"
+							],
+							"width": 2304
+						},
+						"subStream": {
+							"bitRate": [
+								64,
+								128,
+								160,
+								192,
+								256,
+								384,
+								512
+							],
+							"default": {
+								"bitRate": 256,
+								"frameRate": 10,
+								"gop": 4
+							},
+							"frameRate": [
+								15,
+								10,
+								7,
+								4
+							],
+							"gop": {
+								"max": 4,
+								"min": 1
+							},
+							"height": 360,
+							"profile": [
+								"Base",
+								"Main",
+								"High"
+							],
+							"size": "640*360",
+							"vType": [
+								"h264"
+							],
+							"width": 640
+						}
+					}
+				]
+			},
+			"initial": {
+				"Enc": {
+					"audio": 0,
+					"channel": 0,
+					"mainStream": {
+						"bitRate": 6144,
+						"frameRate": 25,
+						"gop": 2,
+						"height": 2160,
+						"profile": "High",
+						"size": "3840*2160",
+						"vType": "h265",
+						"width": 3840
+					},
+					"subStream": {
+						"bitRate": 256,
+						"frameRate": 10,
+						"gop": 4,
+						"height": 360,
+						"profile": "High",
+						"size": "640*360",
+						"vType": "h264",
+						"width": 640
+					}
+				}
+			}
+		},
+		"GetAudioCfg": {
+			"value": {
+				"AudioCfg": {
+					"volume": 100
+				}
+			},
+			"range": {
+				"AudioCfg": {
+					"volume": {
+						"max": 100,
+						"min": 0
+					}
+				}
+			},
+			"initial": {
+				"AudioCfg": {
+					"volume": 50
+				}
+			}
+		},
+		"GetPtzStat": {
+			"value": {
+				"PtzStat": {
+					"channel": 0,
+					"stat": 0
+				}
+			}
+		}
+	}
+}

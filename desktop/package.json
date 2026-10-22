@@ -1,0 +1,8 @@
+{
+	"name": "look4-desktop",
+	"productName": "look4",
+	"private": true,
+	"description": "look4 in an Electron window: a window onto the UI `pnpm start` serves, to pin to the taskbar",
+	"type": "module",
+	"main": "dist/main.mjs"
+}

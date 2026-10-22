@@ -1,0 +1,49 @@
+/* look4 brand tokens: the "Eagle Eye" identity (see brand/README.md). Names are fixed; values come
+   from the mark: sky-blue disc, navy ink, the eagle's gold eye. `node brand/render.ts` checks the
+   contrast of every text pair below and fails if one drops under its minimum. */
+:root {
+	--l4-font-display: "Fredoka Variable", ui-rounded, system-ui, sans-serif;
+	--l4-font-body: "Nunito Variable", ui-rounded, system-ui, sans-serif;
+	--l4-bg: #f7f3ea;
+	--l4-surface: #ffffff;
+	--l4-surface-2: #efe9dc;
+	--l4-border: #e2d9c7;
+	--l4-ink: #1b2a40;
+	--l4-ink-soft: #5a6577;
+	--l4-primary: #f6b52e;
+	--l4-primary-ink: #1b2a40;
+	--l4-accent: #2f6fb6;
+	--l4-accent-ink: #ffffff;
+	--l4-good: #23794b;
+	--l4-bad: #c2412f;
+	--l4-warn: #9a5f00;
+	/* Mark colours, for illustrations and highlights; not text colours. */
+	--l4-eye: #f6b52e;
+	--l4-sky: #2f6fb6;
+	--l4-radius: 20px;
+	--l4-radius-sm: 12px;
+	/* Layered, warm-tinted depth: a crisp contact line, a soft near shadow and a wide ambient one. */
+	--l4-shadow: 0 0 0 1px rgb(27 42 64 / 0.03), 0 1px 2px rgb(60 42 20 / 0.06), 0 6px 16px -4px rgb(60 42 20 / 0.08),
+		0 18px 40px -16px rgb(27 42 64 / 0.12);
+}
+@media (prefers-color-scheme: dark) {
+	:root {
+		--l4-bg: #111823;
+		--l4-surface: #18212f;
+		--l4-surface-2: #212c3d;
+		--l4-border: #2e3b50;
+		--l4-ink: #eef1f6;
+		--l4-ink-soft: #a3afc2;
+		--l4-primary: #f6b52e;
+		--l4-primary-ink: #13243b;
+		--l4-accent: #7fb0ea;
+		--l4-accent-ink: #111823;
+		--l4-good: #4cc184;
+		--l4-bad: #f07462;
+		--l4-warn: #f0b43c;
+		--l4-eye: #f6b52e;
+		--l4-sky: #2f6fb6;
+		--l4-shadow: 0 0 0 1px rgb(0 0 0 / 0.12), 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 20px -6px rgb(0 0 0 / 0.38),
+			0 24px 48px -20px rgb(0 0 0 / 0.5);
+	}
+}

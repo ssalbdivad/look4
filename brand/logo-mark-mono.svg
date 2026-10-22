@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+	<title>look4</title>
+	<defs>
+		<mask id="l4-mono" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+			<circle cx="256" cy="256" r="244" fill="#fff"/>
+			<ellipse cx="236" cy="540" rx="270" ry="160" fill="none" stroke="#000" stroke-width="12"/>
+			<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#000"/>
+			<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#000"/>
+			<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#000"/>
+			<circle cx="232" cy="254" r="156" fill="#000"/>
+			<circle cx="286" cy="236" r="76" fill="#fff"/>
+			<circle cx="286" cy="236" r="58" fill="#000"/>
+			<circle cx="296" cy="242" r="38" fill="#fff"/>
+			<circle cx="312" cy="222" r="15" fill="#000"/>
+			<circle cx="282" cy="262" r="7" fill="#000"/>
+			<path d="M208 164 Q280 124 354 166" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
+		</mask>
+	</defs>
+	<rect width="512" height="512" fill="currentColor" mask="url(#l4-mono)"/>
+</svg>

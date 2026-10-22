@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="glass"><circle cx="256" cy="256" r="192"/></clipPath>
+		<mask id="cut" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+			<circle cx="256" cy="256" r="244" fill="#fff"/>
+			<circle cx="256" cy="256" r="204" fill="#000"/>
+			<g clip-path="url(#glass)">
+				<path d="M30 420 C160 404 340 404 480 392" fill="none" stroke="#fff" stroke-width="26" stroke-linecap="round"/>
+				<path d="M150 330 L52 420 L114 420 L196 372 Z" fill="#fff"/>
+				<circle cx="234" cy="298" r="112" fill="#fff"/>
+				<circle cx="302" cy="212" r="78" fill="#fff"/>
+				<path d="M290 208 C314 188 344 180 374 186" fill="none" stroke="#000" stroke-width="12" stroke-linecap="round"/>
+				<path d="M262 252 C226 218 150 232 128 300 C122 322 118 342 110 360 C170 360 252 334 262 252 Z" fill="#fff" stroke="#000" stroke-width="12" stroke-linejoin="round"/>
+				<path d="M146 318 C176 300 214 290 246 288" fill="none" stroke="#000" stroke-width="12" stroke-linecap="round"/>
+				<path d="M376 196 L420 214 L376 232 Z" fill="#fff" stroke="#fff" stroke-width="12" stroke-linejoin="round"/>
+				<circle cx="336" cy="212" r="13" fill="#000"/>
+				<path d="M220 404 v16 M262 404 v16" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+			</g>
+			<path d="M104 196 A168 168 0 0 1 178 108" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round"/>
+			<circle cx="412" cy="100" r="15" fill="#000"/>
+		</mask>
+	</defs>
+	<rect width="512" height="512" fill="currentColor" mask="url(#cut)"/>
+</svg>

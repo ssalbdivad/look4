@@ -1,0 +1,174 @@
+[
+	{
+		"file": "blue-jay.mp4",
+		"description": "A Blue Jay on a wooden platform feeder, close up, shifting around and pecking seed.",
+		"kind": "real",
+		"source": "https://commons.wikimedia.org/wiki/File:Blue_Jay_at_bird_feeder,_video_(3675639120).webm",
+		"license": "CC BY 2.0",
+		"author": "Matt MacGillivray",
+		"segment": {
+			"start": 0,
+			"duration": 12
+		},
+		"expect": {
+			"motion": true,
+			"subjects": [
+				"bird"
+			],
+			"species": [
+				"blue jay"
+			]
+		}
+	},
+	{
+		"file": "cardinal-woodpecker.mp4",
+		"description": "A male Northern Cardinal and a Downy Woodpecker at a snowy suet feeder.",
+		"kind": "real",
+		"source": "https://commons.wikimedia.org/wiki/File:Busy_Bird_Feeder_(31524812531).webm",
+		"license": "Public domain",
+		"author": "U.S. Fish and Wildlife Service - Midwest Region",
+		"segment": {
+			"start": 4,
+			"duration": 12
+		},
+		"expect": {
+			"motion": true,
+			"subjects": [
+				"bird"
+			],
+			"species": [
+				"northern cardinal",
+				"downy woodpecker"
+			]
+		}
+	},
+	{
+		"file": "chipping-sparrow.mp4",
+		"description": "A Chipping Sparrow eating peanuts on a tube feeder tray, filmed from a feeder-mounted camera.",
+		"kind": "real",
+		"source": "https://commons.wikimedia.org/wiki/File:Chipping_sparrow_and_black-capped_chickadee.webm",
+		"license": "CC BY 3.0",
+		"author": "kev0nte 77x",
+		"segment": {
+			"start": 28,
+			"duration": 15
+		},
+		"expect": {
+			"motion": true,
+			"subjects": [
+				"bird"
+			],
+			"species": [
+				"chipping sparrow"
+			]
+		}
+	},
+	{
+		"file": "great-tits.mp4",
+		"description": "Two Great Tits (Eurasian, chickadee-like) and a Willow Tit landing on a platform feeder; a bird flies off at the end.",
+		"kind": "real",
+		"source": "https://commons.wikimedia.org/wiki/File:Bird_feeder_in_the_mountains_of_Slovakia.webm",
+		"license": "CC BY 3.0",
+		"author": "Lubo Ondrasko",
+		"segment": {
+			"start": 91.2,
+			"duration": 8.8
+		},
+		"expect": {
+			"motion": true,
+			"subjects": [
+				"bird"
+			],
+			"species": [
+				"great tit",
+				"willow tit"
+			]
+		}
+	},
+	{
+		"file": "squirrel.mp4",
+		"description": "A grey squirrel hanging upside down below a caged hanging feeder, partly hidden by leaves moving in the wind.",
+		"kind": "real",
+		"source": "https://commons.wikimedia.org/wiki/File:Grey_squirrel_eating_from_bird_feeder.webm",
+		"license": "CC BY-SA 3.0",
+		"author": "Alexis Markwick (User:Dr-Mx)",
+		"segment": {
+			"start": 64,
+			"duration": 15
+		},
+		"expect": {
+			"motion": true,
+			"subjects": [
+				"squirrel"
+			],
+			"species": [
+				"eastern gray squirrel"
+			]
+		}
+	},
+	{
+		"file": "empty-feeder-snow.mp4",
+		"description": "An empty snowy suet feeder: falling snow and slight camera drift, no animal visible.",
+		"kind": "real",
+		"source": "https://commons.wikimedia.org/wiki/File:Busy_Bird_Feeder_(31524812531).webm",
+		"license": "Public domain",
+		"author": "U.S. Fish and Wildlife Service - Midwest Region",
+		"segment": {
+			"start": 95.7,
+			"duration": 5.3
+		},
+		"expect": {
+			"motion": true,
+			"subjects": [],
+			"species": []
+		}
+	},
+	{
+		"file": "static.mp4",
+		"description": "10 s still of the empty snowy feeder with faint temporal noise; nothing moves.",
+		"kind": "synthetic",
+		"source": "https://commons.wikimedia.org/wiki/File:Busy_Bird_Feeder_(31524812531).webm",
+		"license": "Public domain",
+		"author": "U.S. Fish and Wildlife Service - Midwest Region",
+		"expect": {
+			"motion": false,
+			"subjects": [],
+			"species": []
+		}
+	},
+	{
+		"file": "light-change.mp4",
+		"description": "The same still with brightness dipping ~30% and recovering over 10 s, like a passing cloud; no animal.",
+		"kind": "synthetic",
+		"source": "https://commons.wikimedia.org/wiki/File:Busy_Bird_Feeder_(31524812531).webm",
+		"license": "Public domain",
+		"author": "U.S. Fish and Wildlife Service - Midwest Region",
+		"expect": {
+			"motion": false,
+			"subjects": [],
+			"species": []
+		}
+	},
+	{
+		"file": "RecM07_20261014_093012_093042_6D28808_1E2F3A.mp4",
+		"description": "Reolink-named 3840x2160 H.265 clip upscaled from the cardinal + woodpecker suet feeder (source 20-30 s).",
+		"kind": "synthetic",
+		"source": "https://commons.wikimedia.org/wiki/File:Busy_Bird_Feeder_(31524812531).webm",
+		"license": "Public domain",
+		"author": "U.S. Fish and Wildlife Service - Midwest Region",
+		"segment": {
+			"start": 20,
+			"duration": 10
+		},
+		"expect": {
+			"motion": true,
+			"subjects": [
+				"bird"
+			],
+			"species": [
+				"northern cardinal",
+				"downy woodpecker"
+			]
+		}
+	}
+]

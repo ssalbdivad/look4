@@ -1,0 +1,402 @@
+/* The live picture surface (LiveStage): player layers, digital zoom, Aim box, detection zone, overlay slot.
+   The stage is 16:9 by default; a page that sizes it (theater, full screen) sets `height` and `aspect-ratio: auto`,
+   and the picture letterboxes inside. */
+
+.stage {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	overflow: hidden;
+	background: #0b0f16;
+	color: #eef1f6;
+	isolation: isolate;
+}
+
+.stage-surface {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	/* at 1× a finger may still scroll the page; zoomed or aiming, every gesture belongs to the picture */
+	touch-action: pan-y;
+	user-select: none;
+	-webkit-user-select: none;
+	-webkit-touch-callout: none;
+}
+
+.stage.is-zoomed .stage-surface,
+.stage.is-aim .stage-surface {
+	touch-action: none;
+}
+
+.stage.is-zoomed .stage-surface {
+	cursor: grab;
+}
+
+.stage.is-panning .stage-surface {
+	cursor: grabbing;
+}
+
+.stage.is-aim .stage-surface {
+	cursor: crosshair;
+}
+
+.stage-zoom {
+	position: absolute;
+	inset: 0;
+	transform-origin: 0 0;
+	will-change: transform;
+}
+
+.stage-zoom.is-anim {
+	transition: transform 180ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.stage-zoom.is-anim {
+		transition: none;
+	}
+}
+
+/* the stream being switched to plays underneath; the old picture stays on top until it does */
+.stage-layer {
+	position: absolute;
+	inset: 0;
+}
+
+.stage-layer.is-front {
+	z-index: 2;
+}
+
+.stage-layer.is-next {
+	z-index: 1;
+}
+
+.stage-media {
+	position: absolute;
+	inset: 0;
+}
+
+.stage-el,
+.stage-poster {
+	position: absolute;
+	inset: 0;
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	/* transparent until the first frame, so the poster (or the stream underneath) shows through */
+	background: transparent;
+	pointer-events: none;
+	-webkit-user-drag: none;
+}
+
+.stage-poster {
+	z-index: 0;
+	filter: saturate(0.85) brightness(0.8);
+}
+
+.stage-zone,
+.stage-aimbox {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 3;
+	pointer-events: none;
+	box-sizing: border-box;
+}
+
+.stage-zone[hidden],
+.stage-aimbox[hidden] {
+	display: none;
+}
+
+.stage-zone {
+	border: 2px dashed rgb(255 214 10 / 0.9);
+	border-radius: 4px;
+	box-shadow:
+		0 0 0 1px rgb(0 0 0 / 0.35),
+		inset 0 0 0 1px rgb(0 0 0 / 0.35);
+}
+
+/* the scene from before a lens move, covering the picture until the move settles (LiveStage's toLens) */
+.stage-freeze {
+	position: absolute;
+	inset: 0;
+	z-index: 3;
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.stage-freeze.is-on {
+	visibility: visible;
+}
+
+/* the picture is held while the lens moves (magnify first): a sweep along the top says it is working */
+.stage.is-held::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 4;
+	width: 30%;
+	height: 2px;
+	background: rgb(255 255 255 / 0.85);
+	box-shadow: 0 0 0 1px rgb(0 0 0 / 0.25);
+	pointer-events: none;
+	animation: stage-lens 900ms ease-in-out infinite alternate;
+}
+
+@keyframes stage-lens {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(233%);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.stage.is-held::after {
+		animation: none;
+		width: 100%;
+		opacity: 0.6;
+	}
+}
+
+.stage-aimbox {
+	border: 2px solid #fff;
+	border-radius: 3px;
+	background: rgb(255 255 255 / 0.1);
+	box-shadow:
+		0 0 0 1px rgb(0 0 0 / 0.5),
+		0 0 0 100vmax rgb(0 0 0 / 0.28);
+}
+
+/* Camera first: where the lens is going, from the first notch until its move shows in the picture (driven by
+   web/src/live/iris.ts, which says how it moves). The container has no opacity, filter, mask or clip of its
+   own: any of them would make it the backdrop root, and the shade would blur nothing. It is always there, its
+   layers at opacity 0 when idle, so the first notch's frame doesn't wait on layer creation. `--lens-s` is the
+   stage's scale (its height over 720 px), so lines, glow and blur read the same from 480 px to 4K. */
+.stage-lens {
+	position: absolute;
+	inset: 0;
+	z-index: 3;
+	pointer-events: none;
+	visibility: hidden;
+	--lens-s: 1;
+}
+
+.stage-lens.is-on {
+	visibility: visible;
+}
+
+/* Hidden while unused, not only at opacity 0, which still costs: the compositor keeps drawing a backdrop
+   filter at opacity 0 (measured at 4K: a third of the frame rate), and each masked layer takes a surface. The
+   shade has no part in the quiet cue, the light running round the rim only while the first step is on its
+   way (`is-sent`), and the quiet cue's lines no part in the box. */
+.stage-lens.is-quiet .stage-lens-shade,
+.stage-lens:not(.is-sent) :is(.stage-lens-glow, .stage-lens-trace),
+.stage-lens:not(.is-quiet) .stage-lens-ripple {
+	visibility: hidden;
+}
+
+/* What is about to be zoomed away: ONE stage-wide layer, dimmed, greyed and blurred, darker away from the
+   pointer (where every anchored box closes in). Never transformed (a scaled backdrop-filter samples the wrong
+   backdrop) and never split into panels (their blurs show seams); the box is a hole in its mask: four bands
+   around it and four rounded corner pieces, placed by iris.ts (holeMask), added up. */
+.stage-lens-shade {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	-webkit-backdrop-filter: blur(var(--lens-blur, 9px)) saturate(0.4) brightness(0.62);
+	backdrop-filter: blur(var(--lens-blur, 9px)) saturate(0.4) brightness(0.62);
+	background: radial-gradient(circle at var(--lens-ax, 50%) var(--lens-ay, 50%), rgb(4 7 12 / 0.12) 18%, rgb(4 7 12 / 0.58) 85%);
+	-webkit-mask-image: var(--lens-hole);
+	mask-image: var(--lens-hole);
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	will-change: opacity;
+	--lens-hole:
+		linear-gradient(#000 0 0), linear-gradient(#000 0 0), linear-gradient(#000 0 0), linear-gradient(#000 0 0),
+		radial-gradient(circle at 100% 100%, transparent 69.5%, #000 72%), radial-gradient(circle at 0 100%, transparent 69.5%, #000 72%),
+		radial-gradient(circle at 100% 0, transparent 69.5%, #000 72%), radial-gradient(circle at 0 0, transparent 69.5%, #000 72%);
+}
+
+/* The box's lit edge: a picture-sized layer mapped onto the box by its transform, so it moves on the
+   compositor. Its own units are the picture's px; `--u` (1 / the box's scale) keeps its lines as wide on
+   screen at any zoom. Everything in it lies outside the box: nothing covers what the user is aiming at. */
+.stage-lens-rim {
+	position: absolute;
+	top: 0;
+	left: 0;
+	transform-origin: 0 0;
+	opacity: 0;
+	will-change: transform, opacity;
+	--u: 1;
+	--r: 0px;
+	--px: calc(var(--u) * var(--lens-s) * 1px);
+}
+
+/* the box in the rim's own units: everything below is placed around it */
+.stage-lens-box {
+	position: absolute;
+	inset: 0;
+	border-radius: var(--r);
+}
+
+.stage-lens-box > * {
+	position: absolute;
+	box-sizing: border-box;
+}
+
+/* a dark hairline against a bright picture, then the light band, then the glow */
+.stage-lens-line {
+	inset: 0;
+	border-radius: inherit;
+	box-shadow: 0 0 0 var(--px) rgb(0 0 0 / 0.6);
+}
+
+.stage-lens-halo {
+	inset: calc(var(--px) * -2);
+	border-radius: calc(var(--r) + var(--px) * 2);
+	opacity: 0.75;
+	box-shadow:
+		0 0 calc(var(--px) * 10) var(--px) rgb(170 214 255 / 0.7),
+		0 0 calc(var(--px) * 36) calc(var(--px) * 4) rgb(120 184 255 / 0.24);
+}
+
+/* while the first step is on its way: the comet's head throws a soft light outward, never into the box. A
+   12 px ring outside it whose mask fades with the distance from the box: four bands, each a gradient away
+   from its side, and four corner pieces, each a radial one about the corner's own centre, so the light
+   follows the box's rounded corners. Static in the rim's own units; only the comet under it turns. */
+.stage-lens-glow {
+	--g: calc(var(--px) * 12);
+	--gr: calc(var(--g) + var(--r));
+	/* roughly a gaussian's tail, so it reads as light, not as a band */
+	--fall: #000, rgb(0 0 0 / 0.72) 25%, rgb(0 0 0 / 0.38) 50%, rgb(0 0 0 / 0.13) 75%, transparent;
+	--round: transparent var(--r), #000 var(--r), rgb(0 0 0 / 0.72) calc(var(--r) + var(--g) * 0.25), rgb(0 0 0 / 0.38) calc(var(--r) + var(--g) * 0.5), rgb(0 0 0 / 0.13) calc(var(--r) + var(--g) * 0.75), transparent var(--gr);
+	--long: calc(100% - 2 * var(--gr));
+	inset: calc(var(--g) * -1);
+	overflow: hidden;
+	opacity: 0;
+	mask:
+		linear-gradient(to top, var(--fall)) var(--gr) 0 / var(--long) var(--g),
+		linear-gradient(to bottom, var(--fall)) var(--gr) 100% / var(--long) var(--g),
+		linear-gradient(to left, var(--fall)) 0 var(--gr) / var(--g) var(--long),
+		linear-gradient(to right, var(--fall)) 100% var(--gr) / var(--g) var(--long),
+		radial-gradient(circle at 100% 100%, var(--round)) 0 0 / var(--gr) var(--gr),
+		radial-gradient(circle at 0 100%, var(--round)) 100% 0 / var(--gr) var(--gr),
+		radial-gradient(circle at 100% 0, var(--round)) 0 100% / var(--gr) var(--gr),
+		radial-gradient(circle at 0 0, var(--round)) 100% 100% / var(--gr) var(--gr);
+	mask-repeat: no-repeat;
+}
+
+/* a ring band: a gradient cut down to its padding by an exclude mask, lit from the top left */
+.stage-lens-edge,
+.stage-lens-trace {
+	-webkit-mask:
+		linear-gradient(#000 0 0) content-box exclude,
+		linear-gradient(#000 0 0);
+	mask:
+		linear-gradient(#000 0 0) content-box exclude,
+		linear-gradient(#000 0 0);
+	-webkit-mask-composite: xor;
+}
+
+.stage-lens-edge {
+	inset: calc(var(--px) * -3);
+	padding: calc(var(--px) * 2);
+	border-radius: calc(var(--r) + var(--px) * 3);
+	background: conic-gradient(from 225deg, #fff 0turn, rgb(196 226 255 / 0.95) 0.18turn, rgb(255 255 255 / 0.55) 0.42turn, rgb(150 200 255 / 0.7) 0.62turn, rgb(220 238 255 / 0.95) 0.82turn, #fff 1turn);
+}
+
+/* while the first step is on its way: a comet turning (transform only) under the same kind of band, the edge
+   dimmed under it (iris.ts working). Its tail is in the gradient and its head's light in the glow ring above,
+   so no filter repaints as it turns. */
+.stage-lens-trace {
+	inset: calc(var(--px) * -4.5);
+	padding: calc(var(--px) * 4);
+	border-radius: calc(var(--r) + var(--px) * 4.5);
+	overflow: hidden;
+	opacity: 0;
+}
+
+.stage-lens-comet {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	/* covers its ring at any turn, the glow's 12 px past the box too */
+	--d: calc(var(--diag) + var(--px) * 30);
+	width: var(--d);
+	height: var(--d);
+	margin: calc(var(--d) / -2) 0 0 calc(var(--d) / -2);
+	background: conic-gradient(from 0turn, transparent 0turn 0.4turn, rgb(120 190 255 / 0.18) 0.62turn, rgb(140 205 255 / 0.55) 0.84turn, rgb(205 235 255 / 0.95) 0.95turn, #fff 0.97turn 0.985turn, rgb(205 235 255 / 0.5) 0.993turn, transparent 1turn);
+	will-change: transform;
+}
+
+/* the head's light: about 0.90–0.99 of a turn, on the band's head */
+.stage-lens-glow > .stage-lens-comet {
+	background: conic-gradient(from 0turn, transparent 0turn 0.86turn, rgb(140 200 255 / 0.4) 0.9turn, rgb(205 235 255 / 0.9) 0.95turn, #fff 0.975turn, rgb(225 242 255 / 0.7) 0.99turn, transparent 0.998turn);
+}
+
+/* reduced motion: nothing turns; the band lights evenly instead */
+.stage-lens.is-reduced .stage-lens-comet {
+	background: rgb(190 225 255 / 0.75);
+}
+
+/* the zoom asked so far, under the box's bottom-left corner (iris.ts moves it above or inside near the edges) */
+.stage-lens-read {
+	position: absolute;
+	top: 0;
+	left: 0;
+	opacity: 0;
+	padding: max(2px, calc(var(--lens-s) * 2px)) max(4px, calc(var(--lens-s) * 5px));
+	border-radius: max(3px, calc(var(--lens-s) * 4px));
+	background: rgb(0 0 0 / 0.55);
+	color: #fff;
+	/* small stages (s < 1.1) would make it unreadable: below 11 px at 1× the decimal point vanishes into
+	   the digits, and 1.8× reads 18× */
+	font-size: max(11px, calc(var(--lens-s) * 10px));
+	font-weight: 600;
+	line-height: 1.2;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: 0.05em;
+	white-space: nowrap;
+	overflow: hidden;
+	will-change: transform, opacity;
+}
+
+.stage-lens-read > span {
+	display: inline-block;
+}
+
+/* later steps' quiet cue: a thin line at the frame's edge closing in towards the pointer, once per notch */
+.stage-lens-ripple {
+	position: absolute;
+	box-sizing: border-box;
+	opacity: 0;
+	border: max(2px, calc(var(--lens-s) * 2px)) solid rgb(240 248 255 / 0.95);
+	border-radius: calc(var(--lens-s) * 6px);
+	/* dark both sides, so it reads on a bright day too */
+	box-shadow:
+		0 0 0 1px rgb(0 0 0 / 0.4),
+		inset 0 0 0 1px rgb(0 0 0 / 0.4),
+		0 0 calc(var(--lens-s) * 12px) rgb(150 200 255 / 0.55);
+	will-change: transform, opacity;
+}
+
+/* chips and toolbar: above the picture, never zoomed; only the controls themselves take the pointer */
+.stage-over {
+	position: absolute;
+	inset: 0;
+	z-index: 5;
+	pointer-events: none;
+}
+
+.stage-over > * {
+	pointer-events: auto;
+}

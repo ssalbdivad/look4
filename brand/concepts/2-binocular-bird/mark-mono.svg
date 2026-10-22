@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+	<defs>
+		<mask id="cut" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+			<path d="M250 120 C236 86 250 58 284 50 C276 74 280 98 268 120 Z" fill="#fff"/>
+			<path d="M262 122 C276 98 300 90 322 98 C304 108 292 120 278 130 Z" fill="#fff"/>
+			<path d="M192 446 L180 480 M192 446 L198 482 M320 446 L314 482 M320 446 L332 480" stroke="#fff" stroke-width="14" stroke-linecap="round"/>
+			<circle cx="256" cy="290" r="178" fill="#fff"/>
+			<ellipse cx="256" cy="374" rx="108" ry="78" fill="#000"/>
+			<path d="M232 316 L280 316 L256 350 Z" fill="#fff" stroke="#fff" stroke-width="10" stroke-linejoin="round"/>
+			<g stroke="#000" stroke-width="14">
+				<rect x="214" y="218" width="84" height="54" rx="14" fill="#fff"/>
+				<circle cx="182" cy="246" r="84" fill="#fff"/>
+				<circle cx="330" cy="246" r="84" fill="#fff"/>
+			</g>
+			<circle cx="182" cy="246" r="56" fill="#000"/>
+			<circle cx="330" cy="246" r="56" fill="#000"/>
+			<path d="M144 236 A40 40 0 0 1 176 204 M292 236 A40 40 0 0 1 324 204" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round"/>
+		</mask>
+	</defs>
+	<rect width="512" height="512" fill="currentColor" mask="url(#cut)"/>
+</svg>

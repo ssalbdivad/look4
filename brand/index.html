@@ -1,0 +1,923 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>look4 — brand</title>
+<link rel="icon" href="../web/public/favicon.svg">
+<link rel="stylesheet" href="../node_modules/@fontsource-variable/fredoka/index.css">
+<link rel="stylesheet" href="../node_modules/@fontsource-variable/nunito/index.css">
+<style>
+	body { margin: 0; padding: 40px; background: #e9e5dc; color: #1b2a40; font: 16px/1.5 "Nunito Variable", system-ui, sans-serif; }
+	h1, h2, h3, button, .display { font-family: "Fredoka Variable", ui-rounded, system-ui, sans-serif; }
+	h1 { font-weight: 600; font-size: 34px; margin: 0; }
+	h2 { font-weight: 600; font-size: 24px; margin: 48px 0 12px; }
+	p { max-width: 820px; }
+	.hero { display: flex; align-items: center; gap: 28px; margin-bottom: 8px; }
+	.panel { border-radius: 20px; padding: 28px; margin-bottom: 16px; }
+	.sizes { display: flex; align-items: flex-end; gap: 26px; flex-wrap: wrap; }
+	figure { margin: 0; display: grid; justify-items: center; gap: 6px; }
+	figcaption { font-size: 12px; color: var(--soft); }
+	.row { display: flex; align-items: center; gap: 28px; margin-top: 26px; flex-wrap: wrap; }
+	.monos { display: flex; align-items: flex-end; gap: 16px; }
+	button { border: 0; border-radius: 999px; padding: 10px 20px; font-size: 16px; font-weight: 600; }
+	.card { border: 1px solid; border-radius: 14px; padding: 12px 16px; display: grid; gap: 2px; min-width: 260px; }
+	.card b { font-family: "Fredoka Variable", sans-serif; font-weight: 600; }
+	.card span { display: flex; gap: 12px; font-size: 13px; font-weight: 700; }
+	.card i { font-style: normal; }
+	.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px 16px; margin-top: 26px; }
+	.table-scroll { overflow-x: auto; border-radius: 16px; }
+	img, svg { max-width: 100%; height: auto; }
+	.sw { display: grid; grid-template-columns: 30px 1fr; gap: 0 10px; font-size: 13px; align-items: center; }
+	.sw span { grid-row: span 2; width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border); }
+	.sw b { font-weight: 600; }
+	.sw code { color: var(--soft); font-size: 12px; }
+	.type { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+	.type > div { background: #fff; border-radius: 16px; padding: 20px 24px; }
+	.type .big { font-size: 44px; line-height: 1.1; margin: 4px 0 8px; }
+	table { border-collapse: separate; border-spacing: 0; background: #fff; border-radius: 16px; overflow: hidden; width: 100%; }
+	th, td { padding: 10px 12px; border-bottom: 1px solid #eee7da; text-align: left; vertical-align: middle; }
+	thead th { font-family: "Fredoka Variable", sans-serif; font-weight: 600; font-size: 13px; background: #f7f3ea; }
+	tbody th { font-family: "Fredoka Variable", sans-serif; font-weight: 600; font-size: 17px; width: 40%; }
+	tbody th small { display: block; font-family: "Nunito Variable", sans-serif; font-weight: 400; font-size: 13px; color: #5a6577; margin-top: 2px; }
+	td.n { text-align: center; font-variant-numeric: tabular-nums; font-size: 17px; }
+	td.tot { font-weight: 800; }
+	tr.win { background: #fff8e6; }
+	mark { background: #f6b52e; color: #1b2a40; border-radius: 999px; padding: 1px 8px; font-size: 12px; margin-left: 6px; vertical-align: 2px; }
+	pre { background: #111823; color: #eef1f6; border-radius: 16px; padding: 20px 24px; font-size: 15px; line-height: 1.35; overflow-x: auto; }
+	pre .eye { color: #f6b52e; } pre .four { color: #2f6fb6; }
+	.mascots { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 24px 16px; }
+	.mascots figure { gap: 4px; align-content: start; }
+	.mascots .tiny { display: flex; align-items: flex-end; gap: 10px; }
+	.mascots figcaption { text-align: center; max-width: 180px; }
+	@media (max-width: 600px) { body { padding: 20px 14px; } .type { grid-template-columns: minmax(0, 1fr); } .type .big { font-size: 32px; } .card { min-width: 0; } .hero svg { width: 100%; } }
+	.mascots figcaption b { display: block; font-family: "Fredoka Variable", sans-serif; font-weight: 600; font-size: 16px; color: inherit; }
+</style>
+</head>
+<body>
+<div class="hero"><svg xmlns="http://www.w3.org/2000/svg" width="363" height="120"  viewBox="0 0 605 200">
+	
+	<svg width="200" height="200" viewBox="0 0 512 512"><defs><clipPath id="l4-disc-c15"><circle cx="256" cy="256" r="244"/></clipPath></defs>
+	<circle cx="256" cy="256" r="244" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-disc-c15)"><ellipse cx="236" cy="540" rx="270" ry="160" fill="#6b3f22"/></g>
+	<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#ffffff"/>
+	<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#ffffff"/>
+	<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="254" r="156" fill="#ffffff"/>
+	<ellipse cx="256" cy="324" rx="28" ry="15" fill="#f9b8ad"/>
+	<circle cx="286" cy="236" r="76" fill="#1b3354"/>
+	<circle cx="286" cy="236" r="62" fill="#f6b52e"/>
+	<circle cx="296" cy="242" r="38" fill="#13243b"/>
+	<path d="M243 220 A46 46 0 0 1 270 193" fill="none" stroke="#fff3cf" stroke-width="9" stroke-linecap="round"/>
+	<circle cx="312" cy="222" r="15" fill="#ffffff"/>
+	<circle cx="282" cy="262" r="7" fill="#ffffff"/>
+	<path d="M208 164 Q280 124 354 166" fill="none" stroke="#1b3354" stroke-width="18" stroke-linecap="round"/></svg>
+	<g transform="translate(201.97 4.06) scale(0.78)"><g fill="none" stroke-width="29" stroke-linecap="round" stroke-linejoin="round"><path class="l4-look" stroke="#1b3354" d="M53 64.5V158Q53 181 73 181M331.5 64.5V181M382 110L346 147L388 181"/><circle class="l4-look" stroke="#1b3354" cx="143" cy="145" r="36.5"/><circle class="l4-look" stroke="#1b3354" cx="253" cy="145" r="36.5"/><path class="l4-four" stroke="#2f6fb6" d="M494 69.5V181M443 69.5L426 140H494"/></g></g>
+</svg></div>
+<p>The final mark is a chubby bald eagle whose one huge gold eye, glint and all, is also a camera lens: it is the eagle eye that watches the feeder for you. Sources: <code>brand/logo-mark.svg</code>, <code>logo-mark-mono.svg</code>, <code>favicon.svg</code>; everything else is generated by <code>node brand/render.ts</code>.</p>
+
+<h2>Light and dark</h2>
+<div class="panel" style="background:#f7f3ea;color:#1b2a40;--soft:#5a6577;--border:#e2d9c7;--surface:#ffffff">
+	<div class="sizes"><figure><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-fav-disc-c16"><circle cx="256" cy="256" r="248"/></clipPath></defs>
+	<circle cx="256" cy="256" r="248" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-fav-disc-c16)"><ellipse cx="230" cy="560" rx="280" ry="150" fill="#6b3f22"/></g>
+	<path d="M318 186 C392 166 462 190 482 250 C496 296 484 336 452 356 C456 330 446 312 418 310 L322 322 Z" fill="#f6b52e"/>
+	<circle cx="222" cy="262" r="176" fill="#ffffff"/>
+	<circle cx="282" cy="236" r="100" fill="#1b3354"/>
+	<circle cx="282" cy="236" r="80" fill="#f6b52e"/>
+	<circle cx="294" cy="242" r="50" fill="#13243b"/>
+	<circle cx="314" cy="218" r="19" fill="#ffffff"/>
+	<path d="M190 128 Q280 84 380 132" fill="none" stroke="#1b3354" stroke-width="30" stroke-linecap="round"/>
+</svg><figcaption>16 · favicon</figcaption></figure><figure><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-fav-disc-c17"><circle cx="256" cy="256" r="248"/></clipPath></defs>
+	<circle cx="256" cy="256" r="248" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-fav-disc-c17)"><ellipse cx="230" cy="560" rx="280" ry="150" fill="#6b3f22"/></g>
+	<path d="M318 186 C392 166 462 190 482 250 C496 296 484 336 452 356 C456 330 446 312 418 310 L322 322 Z" fill="#f6b52e"/>
+	<circle cx="222" cy="262" r="176" fill="#ffffff"/>
+	<circle cx="282" cy="236" r="100" fill="#1b3354"/>
+	<circle cx="282" cy="236" r="80" fill="#f6b52e"/>
+	<circle cx="294" cy="242" r="50" fill="#13243b"/>
+	<circle cx="314" cy="218" r="19" fill="#ffffff"/>
+	<path d="M190 128 Q280 84 380 132" fill="none" stroke="#1b3354" stroke-width="30" stroke-linecap="round"/>
+</svg><figcaption>24 · favicon</figcaption></figure><figure><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-fav-disc-c18"><circle cx="256" cy="256" r="248"/></clipPath></defs>
+	<circle cx="256" cy="256" r="248" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-fav-disc-c18)"><ellipse cx="230" cy="560" rx="280" ry="150" fill="#6b3f22"/></g>
+	<path d="M318 186 C392 166 462 190 482 250 C496 296 484 336 452 356 C456 330 446 312 418 310 L322 322 Z" fill="#f6b52e"/>
+	<circle cx="222" cy="262" r="176" fill="#ffffff"/>
+	<circle cx="282" cy="236" r="100" fill="#1b3354"/>
+	<circle cx="282" cy="236" r="80" fill="#f6b52e"/>
+	<circle cx="294" cy="242" r="50" fill="#13243b"/>
+	<circle cx="314" cy="218" r="19" fill="#ffffff"/>
+	<path d="M190 128 Q280 84 380 132" fill="none" stroke="#1b3354" stroke-width="30" stroke-linecap="round"/>
+</svg><figcaption>32 · favicon</figcaption></figure><figure><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-disc-c19"><circle cx="256" cy="256" r="244"/></clipPath></defs>
+	<circle cx="256" cy="256" r="244" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-disc-c19)"><ellipse cx="236" cy="540" rx="270" ry="160" fill="#6b3f22"/></g>
+	<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#ffffff"/>
+	<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#ffffff"/>
+	<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="254" r="156" fill="#ffffff"/>
+	<ellipse cx="256" cy="324" rx="28" ry="15" fill="#f9b8ad"/>
+	<circle cx="286" cy="236" r="76" fill="#1b3354"/>
+	<circle cx="286" cy="236" r="62" fill="#f6b52e"/>
+	<circle cx="296" cy="242" r="38" fill="#13243b"/>
+	<path d="M243 220 A46 46 0 0 1 270 193" fill="none" stroke="#fff3cf" stroke-width="9" stroke-linecap="round"/>
+	<circle cx="312" cy="222" r="15" fill="#ffffff"/>
+	<circle cx="282" cy="262" r="7" fill="#ffffff"/>
+	<path d="M208 164 Q280 124 354 166" fill="none" stroke="#1b3354" stroke-width="18" stroke-linecap="round"/>
+</svg><figcaption>48</figcaption></figure><figure><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-disc-c20"><circle cx="256" cy="256" r="244"/></clipPath></defs>
+	<circle cx="256" cy="256" r="244" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-disc-c20)"><ellipse cx="236" cy="540" rx="270" ry="160" fill="#6b3f22"/></g>
+	<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#ffffff"/>
+	<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#ffffff"/>
+	<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="254" r="156" fill="#ffffff"/>
+	<ellipse cx="256" cy="324" rx="28" ry="15" fill="#f9b8ad"/>
+	<circle cx="286" cy="236" r="76" fill="#1b3354"/>
+	<circle cx="286" cy="236" r="62" fill="#f6b52e"/>
+	<circle cx="296" cy="242" r="38" fill="#13243b"/>
+	<path d="M243 220 A46 46 0 0 1 270 193" fill="none" stroke="#fff3cf" stroke-width="9" stroke-linecap="round"/>
+	<circle cx="312" cy="222" r="15" fill="#ffffff"/>
+	<circle cx="282" cy="262" r="7" fill="#ffffff"/>
+	<path d="M208 164 Q280 124 354 166" fill="none" stroke="#1b3354" stroke-width="18" stroke-linecap="round"/>
+</svg><figcaption>64</figcaption></figure><figure><svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-disc-c21"><circle cx="256" cy="256" r="244"/></clipPath></defs>
+	<circle cx="256" cy="256" r="244" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-disc-c21)"><ellipse cx="236" cy="540" rx="270" ry="160" fill="#6b3f22"/></g>
+	<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#ffffff"/>
+	<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#ffffff"/>
+	<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="254" r="156" fill="#ffffff"/>
+	<ellipse cx="256" cy="324" rx="28" ry="15" fill="#f9b8ad"/>
+	<circle cx="286" cy="236" r="76" fill="#1b3354"/>
+	<circle cx="286" cy="236" r="62" fill="#f6b52e"/>
+	<circle cx="296" cy="242" r="38" fill="#13243b"/>
+	<path d="M243 220 A46 46 0 0 1 270 193" fill="none" stroke="#fff3cf" stroke-width="9" stroke-linecap="round"/>
+	<circle cx="312" cy="222" r="15" fill="#ffffff"/>
+	<circle cx="282" cy="262" r="7" fill="#ffffff"/>
+	<path d="M208 164 Q280 124 354 166" fill="none" stroke="#1b3354" stroke-width="18" stroke-linecap="round"/>
+</svg><figcaption>96</figcaption></figure><figure><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-disc-c22"><circle cx="256" cy="256" r="244"/></clipPath></defs>
+	<circle cx="256" cy="256" r="244" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-disc-c22)"><ellipse cx="236" cy="540" rx="270" ry="160" fill="#6b3f22"/></g>
+	<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#ffffff"/>
+	<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#ffffff"/>
+	<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="254" r="156" fill="#ffffff"/>
+	<ellipse cx="256" cy="324" rx="28" ry="15" fill="#f9b8ad"/>
+	<circle cx="286" cy="236" r="76" fill="#1b3354"/>
+	<circle cx="286" cy="236" r="62" fill="#f6b52e"/>
+	<circle cx="296" cy="242" r="38" fill="#13243b"/>
+	<path d="M243 220 A46 46 0 0 1 270 193" fill="none" stroke="#fff3cf" stroke-width="9" stroke-linecap="round"/>
+	<circle cx="312" cy="222" r="15" fill="#ffffff"/>
+	<circle cx="282" cy="262" r="7" fill="#ffffff"/>
+	<path d="M208 164 Q280 124 354 166" fill="none" stroke="#1b3354" stroke-width="18" stroke-linecap="round"/>
+</svg><figcaption>128</figcaption></figure><figure><svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-disc-c23"><circle cx="256" cy="256" r="244"/></clipPath></defs>
+	<circle cx="256" cy="256" r="244" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-disc-c23)"><ellipse cx="236" cy="540" rx="270" ry="160" fill="#6b3f22"/></g>
+	<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#ffffff"/>
+	<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#ffffff"/>
+	<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="254" r="156" fill="#ffffff"/>
+	<ellipse cx="256" cy="324" rx="28" ry="15" fill="#f9b8ad"/>
+	<circle cx="286" cy="236" r="76" fill="#1b3354"/>
+	<circle cx="286" cy="236" r="62" fill="#f6b52e"/>
+	<circle cx="296" cy="242" r="38" fill="#13243b"/>
+	<path d="M243 220 A46 46 0 0 1 270 193" fill="none" stroke="#fff3cf" stroke-width="9" stroke-linecap="round"/>
+	<circle cx="312" cy="222" r="15" fill="#ffffff"/>
+	<circle cx="282" cy="262" r="7" fill="#ffffff"/>
+	<path d="M208 164 Q280 124 354 166" fill="none" stroke="#1b3354" stroke-width="18" stroke-linecap="round"/>
+</svg><figcaption>256</figcaption></figure></div>
+	<div class="row">
+		<svg xmlns="http://www.w3.org/2000/svg" width="254" height="84"  viewBox="0 0 605 200">
+	
+	<svg width="200" height="200" viewBox="0 0 512 512"><defs><clipPath id="l4-disc-c24"><circle cx="256" cy="256" r="244"/></clipPath></defs>
+	<circle cx="256" cy="256" r="244" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-disc-c24)"><ellipse cx="236" cy="540" rx="270" ry="160" fill="#6b3f22"/></g>
+	<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#ffffff"/>
+	<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#ffffff"/>
+	<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="254" r="156" fill="#ffffff"/>
+	<ellipse cx="256" cy="324" rx="28" ry="15" fill="#f9b8ad"/>
+	<circle cx="286" cy="236" r="76" fill="#1b3354"/>
+	<circle cx="286" cy="236" r="62" fill="#f6b52e"/>
+	<circle cx="296" cy="242" r="38" fill="#13243b"/>
+	<path d="M243 220 A46 46 0 0 1 270 193" fill="none" stroke="#fff3cf" stroke-width="9" stroke-linecap="round"/>
+	<circle cx="312" cy="222" r="15" fill="#ffffff"/>
+	<circle cx="282" cy="262" r="7" fill="#ffffff"/>
+	<path d="M208 164 Q280 124 354 166" fill="none" stroke="#1b3354" stroke-width="18" stroke-linecap="round"/></svg>
+	<g transform="translate(201.97 4.06) scale(0.78)"><g fill="none" stroke-width="29" stroke-linecap="round" stroke-linejoin="round"><path class="l4-look" stroke="#1b3354" d="M53 64.5V158Q53 181 73 181M331.5 64.5V181M382 110L346 147L388 181"/><circle class="l4-look" stroke="#1b3354" cx="143" cy="145" r="36.5"/><circle class="l4-look" stroke="#1b3354" cx="253" cy="145" r="36.5"/><path class="l4-four" stroke="#2f6fb6" d="M494 69.5V181M443 69.5L426 140H494"/></g></g>
+</svg>
+		<div class="monos"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" style="color:#1b2a40" viewBox="0 0 512 512">
+	
+	<defs>
+		<mask id="l4-mono-c25" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+			<circle cx="256" cy="256" r="244" fill="#fff"/>
+			<ellipse cx="236" cy="540" rx="270" ry="160" fill="none" stroke="#000" stroke-width="12"/>
+			<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#000"/>
+			<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#000"/>
+			<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#000"/>
+			<circle cx="232" cy="254" r="156" fill="#000"/>
+			<circle cx="286" cy="236" r="76" fill="#fff"/>
+			<circle cx="286" cy="236" r="58" fill="#000"/>
+			<circle cx="296" cy="242" r="38" fill="#fff"/>
+			<circle cx="312" cy="222" r="15" fill="#000"/>
+			<circle cx="282" cy="262" r="7" fill="#000"/>
+			<path d="M208 164 Q280 124 354 166" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
+		</mask>
+	</defs>
+	<rect width="512" height="512" fill="currentColor" mask="url(#l4-mono-c25)"/>
+</svg><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" style="color:#1b2a40" viewBox="0 0 512 512">
+	
+	<defs>
+		<mask id="l4-mono-c26" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+			<circle cx="256" cy="256" r="244" fill="#fff"/>
+			<ellipse cx="236" cy="540" rx="270" ry="160" fill="none" stroke="#000" stroke-width="12"/>
+			<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#000"/>
+			<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#000"/>
+			<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#000"/>
+			<circle cx="232" cy="254" r="156" fill="#000"/>
+			<circle cx="286" cy="236" r="76" fill="#fff"/>
+			<circle cx="286" cy="236" r="58" fill="#000"/>
+			<circle cx="296" cy="242" r="38" fill="#fff"/>
+			<circle cx="312" cy="222" r="15" fill="#000"/>
+			<circle cx="282" cy="262" r="7" fill="#000"/>
+			<path d="M208 164 Q280 124 354 166" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
+		</mask>
+	</defs>
+	<rect width="512" height="512" fill="currentColor" mask="url(#l4-mono-c26)"/>
+</svg><svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" style="color:#1b2a40" viewBox="0 0 512 512">
+	
+	<defs>
+		<mask id="l4-mono-c27" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+			<circle cx="256" cy="256" r="244" fill="#fff"/>
+			<ellipse cx="236" cy="540" rx="270" ry="160" fill="none" stroke="#000" stroke-width="12"/>
+			<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#000"/>
+			<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#000"/>
+			<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#000"/>
+			<circle cx="232" cy="254" r="156" fill="#000"/>
+			<circle cx="286" cy="236" r="76" fill="#fff"/>
+			<circle cx="286" cy="236" r="58" fill="#000"/>
+			<circle cx="296" cy="242" r="38" fill="#fff"/>
+			<circle cx="312" cy="222" r="15" fill="#000"/>
+			<circle cx="282" cy="262" r="7" fill="#000"/>
+			<path d="M208 164 Q280 124 354 166" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
+		</mask>
+	</defs>
+	<rect width="512" height="512" fill="currentColor" mask="url(#l4-mono-c27)"/>
+</svg></div>
+	</div>
+	<div class="row">
+		<button style="background:#f6b52e;color:#1b2a40">Add lookout</button>
+		<button style="background:#2f6fb6;color:#ffffff">Check camera now</button>
+		<div class="card" style="background:#ffffff;border-color:#e2d9c7">
+			<b>Cardinal at the feeder</b>
+			<small style="color:#5a6577">92% · 2 min ago · <a style="color:#2f6fb6" href="#">view clip</a></small>
+			<span><i style="color:#23794b">kept</i><i style="color:#9a5f00">unsure</i><i style="color:#c2412f">rejected</i></span>
+		</div>
+	</div>
+	<div class="swatches"><div class="sw"><span style="background:#f7f3ea"></span><b>--l4-bg</b><code>#f7f3ea</code></div><div class="sw"><span style="background:#ffffff"></span><b>--l4-surface</b><code>#ffffff</code></div><div class="sw"><span style="background:#efe9dc"></span><b>--l4-surface-2</b><code>#efe9dc</code></div><div class="sw"><span style="background:#e2d9c7"></span><b>--l4-border</b><code>#e2d9c7</code></div><div class="sw"><span style="background:#1b2a40"></span><b>--l4-ink</b><code>#1b2a40</code></div><div class="sw"><span style="background:#5a6577"></span><b>--l4-ink-soft</b><code>#5a6577</code></div><div class="sw"><span style="background:#f6b52e"></span><b>--l4-primary</b><code>#f6b52e</code></div><div class="sw"><span style="background:#1b2a40"></span><b>--l4-primary-ink</b><code>#1b2a40</code></div><div class="sw"><span style="background:#2f6fb6"></span><b>--l4-accent</b><code>#2f6fb6</code></div><div class="sw"><span style="background:#ffffff"></span><b>--l4-accent-ink</b><code>#ffffff</code></div><div class="sw"><span style="background:#23794b"></span><b>--l4-good</b><code>#23794b</code></div><div class="sw"><span style="background:#c2412f"></span><b>--l4-bad</b><code>#c2412f</code></div><div class="sw"><span style="background:#9a5f00"></span><b>--l4-warn</b><code>#9a5f00</code></div><div class="sw"><span style="background:#f6b52e"></span><b>--l4-eye</b><code>#f6b52e</code></div><div class="sw"><span style="background:#2f6fb6"></span><b>--l4-sky</b><code>#2f6fb6</code></div></div>
+</div>
+<div class="panel" style="background:#111823;color:#eef1f6;--soft:#a3afc2;--border:#2e3b50;--surface:#18212f">
+	<div class="sizes"><figure><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-fav-disc-c28"><circle cx="256" cy="256" r="248"/></clipPath></defs>
+	<circle cx="256" cy="256" r="248" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-fav-disc-c28)"><ellipse cx="230" cy="560" rx="280" ry="150" fill="#6b3f22"/></g>
+	<path d="M318 186 C392 166 462 190 482 250 C496 296 484 336 452 356 C456 330 446 312 418 310 L322 322 Z" fill="#f6b52e"/>
+	<circle cx="222" cy="262" r="176" fill="#ffffff"/>
+	<circle cx="282" cy="236" r="100" fill="#1b3354"/>
+	<circle cx="282" cy="236" r="80" fill="#f6b52e"/>
+	<circle cx="294" cy="242" r="50" fill="#13243b"/>
+	<circle cx="314" cy="218" r="19" fill="#ffffff"/>
+	<path d="M190 128 Q280 84 380 132" fill="none" stroke="#1b3354" stroke-width="30" stroke-linecap="round"/>
+</svg><figcaption>16 · favicon</figcaption></figure><figure><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-fav-disc-c29"><circle cx="256" cy="256" r="248"/></clipPath></defs>
+	<circle cx="256" cy="256" r="248" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-fav-disc-c29)"><ellipse cx="230" cy="560" rx="280" ry="150" fill="#6b3f22"/></g>
+	<path d="M318 186 C392 166 462 190 482 250 C496 296 484 336 452 356 C456 330 446 312 418 310 L322 322 Z" fill="#f6b52e"/>
+	<circle cx="222" cy="262" r="176" fill="#ffffff"/>
+	<circle cx="282" cy="236" r="100" fill="#1b3354"/>
+	<circle cx="282" cy="236" r="80" fill="#f6b52e"/>
+	<circle cx="294" cy="242" r="50" fill="#13243b"/>
+	<circle cx="314" cy="218" r="19" fill="#ffffff"/>
+	<path d="M190 128 Q280 84 380 132" fill="none" stroke="#1b3354" stroke-width="30" stroke-linecap="round"/>
+</svg><figcaption>24 · favicon</figcaption></figure><figure><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-fav-disc-c30"><circle cx="256" cy="256" r="248"/></clipPath></defs>
+	<circle cx="256" cy="256" r="248" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-fav-disc-c30)"><ellipse cx="230" cy="560" rx="280" ry="150" fill="#6b3f22"/></g>
+	<path d="M318 186 C392 166 462 190 482 250 C496 296 484 336 452 356 C456 330 446 312 418 310 L322 322 Z" fill="#f6b52e"/>
+	<circle cx="222" cy="262" r="176" fill="#ffffff"/>
+	<circle cx="282" cy="236" r="100" fill="#1b3354"/>
+	<circle cx="282" cy="236" r="80" fill="#f6b52e"/>
+	<circle cx="294" cy="242" r="50" fill="#13243b"/>
+	<circle cx="314" cy="218" r="19" fill="#ffffff"/>
+	<path d="M190 128 Q280 84 380 132" fill="none" stroke="#1b3354" stroke-width="30" stroke-linecap="round"/>
+</svg><figcaption>32 · favicon</figcaption></figure><figure><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-disc-c31"><circle cx="256" cy="256" r="244"/></clipPath></defs>
+	<circle cx="256" cy="256" r="244" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-disc-c31)"><ellipse cx="236" cy="540" rx="270" ry="160" fill="#6b3f22"/></g>
+	<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#ffffff"/>
+	<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#ffffff"/>
+	<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="254" r="156" fill="#ffffff"/>
+	<ellipse cx="256" cy="324" rx="28" ry="15" fill="#f9b8ad"/>
+	<circle cx="286" cy="236" r="76" fill="#1b3354"/>
+	<circle cx="286" cy="236" r="62" fill="#f6b52e"/>
+	<circle cx="296" cy="242" r="38" fill="#13243b"/>
+	<path d="M243 220 A46 46 0 0 1 270 193" fill="none" stroke="#fff3cf" stroke-width="9" stroke-linecap="round"/>
+	<circle cx="312" cy="222" r="15" fill="#ffffff"/>
+	<circle cx="282" cy="262" r="7" fill="#ffffff"/>
+	<path d="M208 164 Q280 124 354 166" fill="none" stroke="#1b3354" stroke-width="18" stroke-linecap="round"/>
+</svg><figcaption>48</figcaption></figure><figure><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-disc-c32"><circle cx="256" cy="256" r="244"/></clipPath></defs>
+	<circle cx="256" cy="256" r="244" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-disc-c32)"><ellipse cx="236" cy="540" rx="270" ry="160" fill="#6b3f22"/></g>
+	<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#ffffff"/>
+	<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#ffffff"/>
+	<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="254" r="156" fill="#ffffff"/>
+	<ellipse cx="256" cy="324" rx="28" ry="15" fill="#f9b8ad"/>
+	<circle cx="286" cy="236" r="76" fill="#1b3354"/>
+	<circle cx="286" cy="236" r="62" fill="#f6b52e"/>
+	<circle cx="296" cy="242" r="38" fill="#13243b"/>
+	<path d="M243 220 A46 46 0 0 1 270 193" fill="none" stroke="#fff3cf" stroke-width="9" stroke-linecap="round"/>
+	<circle cx="312" cy="222" r="15" fill="#ffffff"/>
+	<circle cx="282" cy="262" r="7" fill="#ffffff"/>
+	<path d="M208 164 Q280 124 354 166" fill="none" stroke="#1b3354" stroke-width="18" stroke-linecap="round"/>
+</svg><figcaption>64</figcaption></figure><figure><svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-disc-c33"><circle cx="256" cy="256" r="244"/></clipPath></defs>
+	<circle cx="256" cy="256" r="244" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-disc-c33)"><ellipse cx="236" cy="540" rx="270" ry="160" fill="#6b3f22"/></g>
+	<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#ffffff"/>
+	<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#ffffff"/>
+	<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="254" r="156" fill="#ffffff"/>
+	<ellipse cx="256" cy="324" rx="28" ry="15" fill="#f9b8ad"/>
+	<circle cx="286" cy="236" r="76" fill="#1b3354"/>
+	<circle cx="286" cy="236" r="62" fill="#f6b52e"/>
+	<circle cx="296" cy="242" r="38" fill="#13243b"/>
+	<path d="M243 220 A46 46 0 0 1 270 193" fill="none" stroke="#fff3cf" stroke-width="9" stroke-linecap="round"/>
+	<circle cx="312" cy="222" r="15" fill="#ffffff"/>
+	<circle cx="282" cy="262" r="7" fill="#ffffff"/>
+	<path d="M208 164 Q280 124 354 166" fill="none" stroke="#1b3354" stroke-width="18" stroke-linecap="round"/>
+</svg><figcaption>96</figcaption></figure><figure><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-disc-c34"><circle cx="256" cy="256" r="244"/></clipPath></defs>
+	<circle cx="256" cy="256" r="244" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-disc-c34)"><ellipse cx="236" cy="540" rx="270" ry="160" fill="#6b3f22"/></g>
+	<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#ffffff"/>
+	<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#ffffff"/>
+	<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="254" r="156" fill="#ffffff"/>
+	<ellipse cx="256" cy="324" rx="28" ry="15" fill="#f9b8ad"/>
+	<circle cx="286" cy="236" r="76" fill="#1b3354"/>
+	<circle cx="286" cy="236" r="62" fill="#f6b52e"/>
+	<circle cx="296" cy="242" r="38" fill="#13243b"/>
+	<path d="M243 220 A46 46 0 0 1 270 193" fill="none" stroke="#fff3cf" stroke-width="9" stroke-linecap="round"/>
+	<circle cx="312" cy="222" r="15" fill="#ffffff"/>
+	<circle cx="282" cy="262" r="7" fill="#ffffff"/>
+	<path d="M208 164 Q280 124 354 166" fill="none" stroke="#1b3354" stroke-width="18" stroke-linecap="round"/>
+</svg><figcaption>128</figcaption></figure><figure><svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"  viewBox="0 0 512 512">
+	
+	<defs><clipPath id="l4-disc-c35"><circle cx="256" cy="256" r="244"/></clipPath></defs>
+	<circle cx="256" cy="256" r="244" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-disc-c35)"><ellipse cx="236" cy="540" rx="270" ry="160" fill="#6b3f22"/></g>
+	<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#ffffff"/>
+	<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#ffffff"/>
+	<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="254" r="156" fill="#ffffff"/>
+	<ellipse cx="256" cy="324" rx="28" ry="15" fill="#f9b8ad"/>
+	<circle cx="286" cy="236" r="76" fill="#1b3354"/>
+	<circle cx="286" cy="236" r="62" fill="#f6b52e"/>
+	<circle cx="296" cy="242" r="38" fill="#13243b"/>
+	<path d="M243 220 A46 46 0 0 1 270 193" fill="none" stroke="#fff3cf" stroke-width="9" stroke-linecap="round"/>
+	<circle cx="312" cy="222" r="15" fill="#ffffff"/>
+	<circle cx="282" cy="262" r="7" fill="#ffffff"/>
+	<path d="M208 164 Q280 124 354 166" fill="none" stroke="#1b3354" stroke-width="18" stroke-linecap="round"/>
+</svg><figcaption>256</figcaption></figure></div>
+	<div class="row">
+		<svg xmlns="http://www.w3.org/2000/svg" width="254" height="84"  viewBox="0 0 605 200">
+	
+	<svg width="200" height="200" viewBox="0 0 512 512"><defs><clipPath id="l4-disc-c36"><circle cx="256" cy="256" r="244"/></clipPath></defs>
+	<circle cx="256" cy="256" r="244" fill="#2f6fb6"/>
+	<g clip-path="url(#l4-disc-c36)"><ellipse cx="236" cy="540" rx="270" ry="160" fill="#6b3f22"/></g>
+	<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#ffffff"/>
+	<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#ffffff"/>
+	<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="254" r="156" fill="#ffffff"/>
+	<ellipse cx="256" cy="324" rx="28" ry="15" fill="#f9b8ad"/>
+	<circle cx="286" cy="236" r="76" fill="#1b3354"/>
+	<circle cx="286" cy="236" r="62" fill="#f6b52e"/>
+	<circle cx="296" cy="242" r="38" fill="#13243b"/>
+	<path d="M243 220 A46 46 0 0 1 270 193" fill="none" stroke="#fff3cf" stroke-width="9" stroke-linecap="round"/>
+	<circle cx="312" cy="222" r="15" fill="#ffffff"/>
+	<circle cx="282" cy="262" r="7" fill="#ffffff"/>
+	<path d="M208 164 Q280 124 354 166" fill="none" stroke="#1b3354" stroke-width="18" stroke-linecap="round"/></svg>
+	<g transform="translate(201.97 4.06) scale(0.78)"><g fill="none" stroke-width="29" stroke-linecap="round" stroke-linejoin="round"><path class="l4-look" stroke="#eef1f6" d="M53 64.5V158Q53 181 73 181M331.5 64.5V181M382 110L346 147L388 181"/><circle class="l4-look" stroke="#eef1f6" cx="143" cy="145" r="36.5"/><circle class="l4-look" stroke="#eef1f6" cx="253" cy="145" r="36.5"/><path class="l4-four" stroke="#f6b52e" d="M494 69.5V181M443 69.5L426 140H494"/></g></g>
+</svg>
+		<div class="monos"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" style="color:#eef1f6" viewBox="0 0 512 512">
+	
+	<defs>
+		<mask id="l4-mono-c37" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+			<circle cx="256" cy="256" r="244" fill="#fff"/>
+			<ellipse cx="236" cy="540" rx="270" ry="160" fill="none" stroke="#000" stroke-width="12"/>
+			<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#000"/>
+			<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#000"/>
+			<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#000"/>
+			<circle cx="232" cy="254" r="156" fill="#000"/>
+			<circle cx="286" cy="236" r="76" fill="#fff"/>
+			<circle cx="286" cy="236" r="58" fill="#000"/>
+			<circle cx="296" cy="242" r="38" fill="#fff"/>
+			<circle cx="312" cy="222" r="15" fill="#000"/>
+			<circle cx="282" cy="262" r="7" fill="#000"/>
+			<path d="M208 164 Q280 124 354 166" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
+		</mask>
+	</defs>
+	<rect width="512" height="512" fill="currentColor" mask="url(#l4-mono-c37)"/>
+</svg><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" style="color:#eef1f6" viewBox="0 0 512 512">
+	
+	<defs>
+		<mask id="l4-mono-c38" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+			<circle cx="256" cy="256" r="244" fill="#fff"/>
+			<ellipse cx="236" cy="540" rx="270" ry="160" fill="none" stroke="#000" stroke-width="12"/>
+			<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#000"/>
+			<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#000"/>
+			<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#000"/>
+			<circle cx="232" cy="254" r="156" fill="#000"/>
+			<circle cx="286" cy="236" r="76" fill="#fff"/>
+			<circle cx="286" cy="236" r="58" fill="#000"/>
+			<circle cx="296" cy="242" r="38" fill="#fff"/>
+			<circle cx="312" cy="222" r="15" fill="#000"/>
+			<circle cx="282" cy="262" r="7" fill="#000"/>
+			<path d="M208 164 Q280 124 354 166" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
+		</mask>
+	</defs>
+	<rect width="512" height="512" fill="currentColor" mask="url(#l4-mono-c38)"/>
+</svg><svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" style="color:#eef1f6" viewBox="0 0 512 512">
+	
+	<defs>
+		<mask id="l4-mono-c39" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+			<circle cx="256" cy="256" r="244" fill="#fff"/>
+			<ellipse cx="236" cy="540" rx="270" ry="160" fill="none" stroke="#000" stroke-width="12"/>
+			<path d="M112 300 Q70 342 64 384 Q100 362 128 362 Q108 394 112 428 Q154 392 196 388 Z" fill="#000"/>
+			<path d="M204 108 C190 80 202 54 232 44 C226 66 236 86 230 104 Z M236 102 C244 80 266 70 288 74 C272 84 264 96 258 108 Z" fill="#000"/>
+			<path d="M330 194 C392 180 452 196 470 246 C484 286 476 320 450 338 C454 316 446 300 422 298 L334 310 Z" fill="#000"/>
+			<circle cx="232" cy="254" r="156" fill="#000"/>
+			<circle cx="286" cy="236" r="76" fill="#fff"/>
+			<circle cx="286" cy="236" r="58" fill="#000"/>
+			<circle cx="296" cy="242" r="38" fill="#fff"/>
+			<circle cx="312" cy="222" r="15" fill="#000"/>
+			<circle cx="282" cy="262" r="7" fill="#000"/>
+			<path d="M208 164 Q280 124 354 166" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
+		</mask>
+	</defs>
+	<rect width="512" height="512" fill="currentColor" mask="url(#l4-mono-c39)"/>
+</svg></div>
+	</div>
+	<div class="row">
+		<button style="background:#f6b52e;color:#13243b">Add lookout</button>
+		<button style="background:#7fb0ea;color:#111823">Check camera now</button>
+		<div class="card" style="background:#18212f;border-color:#2e3b50">
+			<b>Cardinal at the feeder</b>
+			<small style="color:#a3afc2">92% · 2 min ago · <a style="color:#7fb0ea" href="#">view clip</a></small>
+			<span><i style="color:#4cc184">kept</i><i style="color:#f0b43c">unsure</i><i style="color:#f07462">rejected</i></span>
+		</div>
+	</div>
+	<div class="swatches"><div class="sw"><span style="background:#111823"></span><b>--l4-bg</b><code>#111823</code></div><div class="sw"><span style="background:#18212f"></span><b>--l4-surface</b><code>#18212f</code></div><div class="sw"><span style="background:#212c3d"></span><b>--l4-surface-2</b><code>#212c3d</code></div><div class="sw"><span style="background:#2e3b50"></span><b>--l4-border</b><code>#2e3b50</code></div><div class="sw"><span style="background:#eef1f6"></span><b>--l4-ink</b><code>#eef1f6</code></div><div class="sw"><span style="background:#a3afc2"></span><b>--l4-ink-soft</b><code>#a3afc2</code></div><div class="sw"><span style="background:#f6b52e"></span><b>--l4-primary</b><code>#f6b52e</code></div><div class="sw"><span style="background:#13243b"></span><b>--l4-primary-ink</b><code>#13243b</code></div><div class="sw"><span style="background:#7fb0ea"></span><b>--l4-accent</b><code>#7fb0ea</code></div><div class="sw"><span style="background:#111823"></span><b>--l4-accent-ink</b><code>#111823</code></div><div class="sw"><span style="background:#4cc184"></span><b>--l4-good</b><code>#4cc184</code></div><div class="sw"><span style="background:#f07462"></span><b>--l4-bad</b><code>#f07462</code></div><div class="sw"><span style="background:#f0b43c"></span><b>--l4-warn</b><code>#f0b43c</code></div><div class="sw"><span style="background:#f6b52e"></span><b>--l4-eye</b><code>#f6b52e</code></div><div class="sw"><span style="background:#2f6fb6"></span><b>--l4-sky</b><code>#2f6fb6</code></div></div>
+</div>
+
+<h2>Mascot</h2>
+<p>The eagle from the mark, with a body so it can act. The head is the mark's own geometry; a navy sticker outline keeps the white head visible on white cards, and on dark backgrounds the outline turns pale (<code>--l4m-line</code>; <code>mascot/&lt;pose&gt;-dark.svg</code>). Below 48 px use the logo mark or an icon instead of a pose. In the app: <code>&lt;Mascot pose="looking" size={120} /&gt;</code> from <code>web/src/components/Mascot.tsx</code>. Every pose blinks every few seconds and has its own motion, and all of it stops under <code>prefers-reduced-motion</code>. Rebuild these files with <code>node brand/mascot/render.ts</code>.</p>
+<div class="panel mascots" style="background:#f7f3ea;color:#1b2a40;--soft:#5a6577"><figure><img src="mascot/looking.svg" width="160" height="160" alt="looking"><div class="tiny"><img src="mascot/looking.svg" width="48" height="48" alt=""></div><figcaption><b>looking</b>Watching: the first pull, scanning the network</figcaption></figure><figure><img src="mascot/found.svg" width="160" height="160" alt="found"><div class="tiny"><img src="mascot/found.svg" width="48" height="48" alt=""></div><figcaption><b>found</b>A find: wizard success, the first sighting</figcaption></figure><figure><img src="mascot/sleepy.svg" width="160" height="160" alt="sleepy"><div class="tiny"><img src="mascot/sleepy.svg" width="48" height="48" alt=""></div><figcaption><b>sleepy</b>Nothing yet: empty states</figcaption></figure><figure><img src="mascot/puzzled.svg" width="160" height="160" alt="puzzled"><div class="tiny"><img src="mascot/puzzled.svg" width="48" height="48" alt=""></div><figcaption><b>puzzled</b>Something's off: errors, setup problems</figcaption></figure><figure><img src="mascot/hello.svg" width="160" height="160" alt="hello"><div class="tiny"><img src="mascot/hello.svg" width="48" height="48" alt=""></div><figcaption><b>hello</b>Welcome: the setup wizard's first step</figcaption></figure><figure><img src="mascot/thinking.svg" width="160" height="160" alt="thinking"><div class="tiny"><img src="mascot/thinking.svg" width="48" height="48" alt=""></div><figcaption><b>thinking</b>Working: “the judge is looking…”</figcaption></figure></div>
+<div class="panel mascots" style="background:#111823;color:#eef1f6;--soft:#a3afc2"><figure><img src="mascot/looking-dark.svg" width="160" height="160" alt="looking"><div class="tiny"><img src="mascot/looking-dark.svg" width="48" height="48" alt=""></div><figcaption><b>looking</b>Watching: the first pull, scanning the network</figcaption></figure><figure><img src="mascot/found-dark.svg" width="160" height="160" alt="found"><div class="tiny"><img src="mascot/found-dark.svg" width="48" height="48" alt=""></div><figcaption><b>found</b>A find: wizard success, the first sighting</figcaption></figure><figure><img src="mascot/sleepy-dark.svg" width="160" height="160" alt="sleepy"><div class="tiny"><img src="mascot/sleepy-dark.svg" width="48" height="48" alt=""></div><figcaption><b>sleepy</b>Nothing yet: empty states</figcaption></figure><figure><img src="mascot/puzzled-dark.svg" width="160" height="160" alt="puzzled"><div class="tiny"><img src="mascot/puzzled-dark.svg" width="48" height="48" alt=""></div><figcaption><b>puzzled</b>Something's off: errors, setup problems</figcaption></figure><figure><img src="mascot/hello-dark.svg" width="160" height="160" alt="hello"><div class="tiny"><img src="mascot/hello-dark.svg" width="48" height="48" alt=""></div><figcaption><b>hello</b>Welcome: the setup wizard's first step</figcaption></figure><figure><img src="mascot/thinking-dark.svg" width="160" height="160" alt="thinking"><div class="tiny"><img src="mascot/thinking-dark.svg" width="48" height="48" alt=""></div><figcaption><b>thinking</b>Working: “the judge is looking…”</figcaption></figure></div>
+
+<h2>Type</h2>
+<div class="type">
+	<div><small>Display + wordmark · Fredoka SemiBold 600</small><div class="big display" style="font-weight:600">Cardinal at the feeder</div><small>The wordmark in the logo is drawn as strokes traced over Fredoka, so it needs no font.</small></div>
+	<div><small>Body · Nunito 400 / 700</small><div class="big" style="font-weight:700">Keep the clips worth watching</div><small>Nunito's rounded terminals match Fredoka at text sizes, where Fredoka gets too soft to read.</small></div>
+</div>
+
+<h2>Terminal banner</h2>
+<p>For the CLI startup banner (also in README.md). Colour the eye gold and the 4 sky blue only when stdout is a colour TTY.</p>
+<pre>    ,--^-.
+   / <span class="eye">(@)</span>  `--.
+  |      .--. )   <b>look<span class="four">4</span></b>
+   \     /   v    keep the clips worth watching
+    `~~~'</pre>
+
+<h2>Contrast (WCAG, from web/src/brand.css)</h2>
+<pre>light ink         on bg        13.06:1 ok
+light ink         on surface   14.46:1 ok
+light ink         on surface-2 11.96:1 ok
+light ink-soft    on bg         5.32:1 ok
+light ink-soft    on surface    5.89:1 ok
+light ink-soft    on surface-2  4.87:1 ok
+light primary-ink on primary    7.97:1 ok
+light accent-ink  on accent     5.16:1 ok
+light accent      on bg         4.66:1 ok
+light accent      on surface    5.16:1 ok
+light good        on surface    5.37:1 ok
+light bad         on surface    5.13:1 ok
+light warn        on surface    5.24:1 ok
+light good        on surface-2  4.44:1 ok
+light bad         on surface-2  4.24:1 ok
+light warn        on surface-2  4.33:1 ok
+dark  ink         on bg        15.74:1 ok
+dark  ink         on surface   14.30:1 ok
+dark  ink         on surface-2 12.43:1 ok
+dark  ink-soft    on bg         8.03:1 ok
+dark  ink-soft    on surface    7.30:1 ok
+dark  ink-soft    on surface-2  6.34:1 ok
+dark  primary-ink on primary    8.61:1 ok
+dark  accent-ink  on accent     7.89:1 ok
+dark  accent      on bg         7.89:1 ok
+dark  accent      on surface    7.17:1 ok
+dark  good        on surface    7.14:1 ok
+dark  bad         on surface    5.69:1 ok
+dark  warn        on surface    8.71:1 ok
+dark  good        on surface-2  6.21:1 ok
+dark  bad         on surface-2  4.95:1 ok
+dark  warn        on surface-2  7.57:1 ok</pre>
+
+<h2>The five concepts, scored</h2>
+<p><b>Why Eagle Eye won:</b> it was the only concept that answers “eagle eye” literally, and the most legible at 16 px. Binocular Bird was cuter, so the final grafts its charm onto the eagle: a feather tuft, a rounder eye with a lens glint, a blush, a softer brow. A sky-blue disc replaces the navy one that disappeared on dark backgrounds, and the favicon drops the details that blur below 32 px.</p>
+<div class="table-scroll"><table>
+	<thead><tr><th>Mark</th><th>16 · 32 px</th><th>Concept</th><th>Cute</th><th>Bird + looking</th><th>Eagle-eye nod</th><th>16–32 px</th><th>Distinctive</th><th>One colour</th><th>Total /60</th></tr></thead>
+	<tbody><tr class="win">
+	<td><svg xmlns="http://www.w3.org/2000/svg" width="72" height="72"  viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="disc-c0"><circle cx="256" cy="256" r="244"/></clipPath>
+	</defs>
+	<circle cx="256" cy="256" r="244" fill="#1f3a5f"/>
+	<g clip-path="url(#disc-c0)">
+		<ellipse cx="226" cy="524" rx="250" ry="150" fill="#7a4a2a"/>
+	</g>
+	<!-- shaggy nape so the round head reads as a raptor, not a chick -->
+	<path d="M118 292 Q76 334 70 376 Q104 356 132 356 Q112 388 116 420 Q156 386 196 382 Z" fill="#ffffff"/>
+	<!-- beak sits behind the head so it grows out of the curve instead of being pasted on -->
+	<path d="M320 186 L410 186 C466 188 492 238 482 294 C476 324 458 344 432 354 C446 324 436 306 410 308 L320 324 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="256" r="150" fill="#ffffff"/>
+	<path d="M378 312 Q394 307 410 308" fill="none" stroke="#c27d12" stroke-width="10" stroke-linecap="round"/>
+	<circle cx="282" cy="234" r="66" fill="#1f3a5f"/>
+	<circle cx="282" cy="234" r="54" fill="#f6b52e"/>
+	<circle cx="294" cy="238" r="30" fill="#13243b"/>
+	<circle cx="307" cy="222" r="13" fill="#ffffff"/>
+	<circle cx="282" cy="256" r="6" fill="#ffffff"/>
+	<path d="M216 184 C254 150 320 150 366 196 C320 182 268 182 226 200 Q206 204 216 184 Z" fill="#1f3a5f"/>
+</svg></td>
+	<td><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"  viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="disc-c1"><circle cx="256" cy="256" r="244"/></clipPath>
+	</defs>
+	<circle cx="256" cy="256" r="244" fill="#1f3a5f"/>
+	<g clip-path="url(#disc-c1)">
+		<ellipse cx="226" cy="524" rx="250" ry="150" fill="#7a4a2a"/>
+	</g>
+	<!-- shaggy nape so the round head reads as a raptor, not a chick -->
+	<path d="M118 292 Q76 334 70 376 Q104 356 132 356 Q112 388 116 420 Q156 386 196 382 Z" fill="#ffffff"/>
+	<!-- beak sits behind the head so it grows out of the curve instead of being pasted on -->
+	<path d="M320 186 L410 186 C466 188 492 238 482 294 C476 324 458 344 432 354 C446 324 436 306 410 308 L320 324 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="256" r="150" fill="#ffffff"/>
+	<path d="M378 312 Q394 307 410 308" fill="none" stroke="#c27d12" stroke-width="10" stroke-linecap="round"/>
+	<circle cx="282" cy="234" r="66" fill="#1f3a5f"/>
+	<circle cx="282" cy="234" r="54" fill="#f6b52e"/>
+	<circle cx="294" cy="238" r="30" fill="#13243b"/>
+	<circle cx="307" cy="222" r="13" fill="#ffffff"/>
+	<circle cx="282" cy="256" r="6" fill="#ffffff"/>
+	<path d="M216 184 C254 150 320 150 366 196 C320 182 268 182 226 200 Q206 204 216 184 Z" fill="#1f3a5f"/>
+</svg> <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"  viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="disc-c2"><circle cx="256" cy="256" r="244"/></clipPath>
+	</defs>
+	<circle cx="256" cy="256" r="244" fill="#1f3a5f"/>
+	<g clip-path="url(#disc-c2)">
+		<ellipse cx="226" cy="524" rx="250" ry="150" fill="#7a4a2a"/>
+	</g>
+	<!-- shaggy nape so the round head reads as a raptor, not a chick -->
+	<path d="M118 292 Q76 334 70 376 Q104 356 132 356 Q112 388 116 420 Q156 386 196 382 Z" fill="#ffffff"/>
+	<!-- beak sits behind the head so it grows out of the curve instead of being pasted on -->
+	<path d="M320 186 L410 186 C466 188 492 238 482 294 C476 324 458 344 432 354 C446 324 436 306 410 308 L320 324 Z" fill="#f6b52e"/>
+	<circle cx="232" cy="256" r="150" fill="#ffffff"/>
+	<path d="M378 312 Q394 307 410 308" fill="none" stroke="#c27d12" stroke-width="10" stroke-linecap="round"/>
+	<circle cx="282" cy="234" r="66" fill="#1f3a5f"/>
+	<circle cx="282" cy="234" r="54" fill="#f6b52e"/>
+	<circle cx="294" cy="238" r="30" fill="#13243b"/>
+	<circle cx="307" cy="222" r="13" fill="#ffffff"/>
+	<circle cx="282" cy="256" r="6" fill="#ffffff"/>
+	<path d="M216 184 C254 150 320 150 366 196 C320 182 268 182 226 200 Q206 204 216 184 Z" fill="#1f3a5f"/>
+</svg></td>
+	<th>1. Eagle Eye <mark>winner</mark><small>The only literal answer to “eagle eye”, and the strongest at 16 px: white head, gold eye, yellow beak. Read a little stern, and the navy disc vanished on dark backgrounds.</small></th>
+	<td class="n">6</td><td class="n">8</td><td class="n">10</td><td class="n">8</td><td class="n">6</td><td class="n">8</td><td class="n tot">46</td>
+</tr><tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" width="72" height="72"  viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="body-c3"><circle cx="256" cy="290" r="178"/></clipPath>
+	</defs>
+	<path d="M250 120 C236 86 250 58 284 50 C276 74 280 98 268 120 Z" fill="#3a69b0"/>
+	<path d="M262 122 C276 98 300 90 322 98 C304 108 292 120 278 130 Z" fill="#3a69b0"/>
+	<path d="M192 446 L180 480 M192 446 L198 482 M320 446 L314 482 M320 446 L332 480" stroke="#e0702e" stroke-width="14" stroke-linecap="round"/>
+	<circle cx="256" cy="290" r="178" fill="#f29e4c"/>
+	<g clip-path="url(#body-c3)">
+		<rect x="0" y="0" width="512" height="214" fill="#3a69b0"/>
+		<ellipse cx="256" cy="374" rx="108" ry="78" fill="#fde7c8"/>
+	</g>
+	<path d="M84 280 C66 342 96 406 158 416 C138 380 132 336 144 298 Z" fill="#3a69b0"/>
+	<path d="M428 280 C446 342 416 406 354 416 C374 380 380 336 368 298 Z" fill="#3a69b0"/>
+	<path d="M232 316 L280 316 L256 350 Z" fill="#2b2733" stroke="#2b2733" stroke-width="10" stroke-linejoin="round"/>
+	<g stroke="#f29e4c" stroke-width="12">
+		<rect x="214" y="218" width="84" height="54" rx="14" fill="#1f1c26"/>
+		<circle cx="182" cy="246" r="84" fill="#1f1c26"/>
+		<circle cx="330" cy="246" r="84" fill="#1f1c26"/>
+	</g>
+	<circle cx="182" cy="246" r="58" fill="#8fdcef"/>
+	<circle cx="330" cy="246" r="58" fill="#8fdcef"/>
+	<path d="M144 236 A40 40 0 0 1 176 204" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
+	<path d="M292 236 A40 40 0 0 1 324 204" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
+	<circle cx="210" cy="276" r="8" fill="#ffffff"/>
+	<circle cx="358" cy="276" r="8" fill="#ffffff"/>
+</svg></td>
+	<td><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"  viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="body-c4"><circle cx="256" cy="290" r="178"/></clipPath>
+	</defs>
+	<path d="M250 120 C236 86 250 58 284 50 C276 74 280 98 268 120 Z" fill="#3a69b0"/>
+	<path d="M262 122 C276 98 300 90 322 98 C304 108 292 120 278 130 Z" fill="#3a69b0"/>
+	<path d="M192 446 L180 480 M192 446 L198 482 M320 446 L314 482 M320 446 L332 480" stroke="#e0702e" stroke-width="14" stroke-linecap="round"/>
+	<circle cx="256" cy="290" r="178" fill="#f29e4c"/>
+	<g clip-path="url(#body-c4)">
+		<rect x="0" y="0" width="512" height="214" fill="#3a69b0"/>
+		<ellipse cx="256" cy="374" rx="108" ry="78" fill="#fde7c8"/>
+	</g>
+	<path d="M84 280 C66 342 96 406 158 416 C138 380 132 336 144 298 Z" fill="#3a69b0"/>
+	<path d="M428 280 C446 342 416 406 354 416 C374 380 380 336 368 298 Z" fill="#3a69b0"/>
+	<path d="M232 316 L280 316 L256 350 Z" fill="#2b2733" stroke="#2b2733" stroke-width="10" stroke-linejoin="round"/>
+	<g stroke="#f29e4c" stroke-width="12">
+		<rect x="214" y="218" width="84" height="54" rx="14" fill="#1f1c26"/>
+		<circle cx="182" cy="246" r="84" fill="#1f1c26"/>
+		<circle cx="330" cy="246" r="84" fill="#1f1c26"/>
+	</g>
+	<circle cx="182" cy="246" r="58" fill="#8fdcef"/>
+	<circle cx="330" cy="246" r="58" fill="#8fdcef"/>
+	<path d="M144 236 A40 40 0 0 1 176 204" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
+	<path d="M292 236 A40 40 0 0 1 324 204" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
+	<circle cx="210" cy="276" r="8" fill="#ffffff"/>
+	<circle cx="358" cy="276" r="8" fill="#ffffff"/>
+</svg> <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"  viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="body-c5"><circle cx="256" cy="290" r="178"/></clipPath>
+	</defs>
+	<path d="M250 120 C236 86 250 58 284 50 C276 74 280 98 268 120 Z" fill="#3a69b0"/>
+	<path d="M262 122 C276 98 300 90 322 98 C304 108 292 120 278 130 Z" fill="#3a69b0"/>
+	<path d="M192 446 L180 480 M192 446 L198 482 M320 446 L314 482 M320 446 L332 480" stroke="#e0702e" stroke-width="14" stroke-linecap="round"/>
+	<circle cx="256" cy="290" r="178" fill="#f29e4c"/>
+	<g clip-path="url(#body-c5)">
+		<rect x="0" y="0" width="512" height="214" fill="#3a69b0"/>
+		<ellipse cx="256" cy="374" rx="108" ry="78" fill="#fde7c8"/>
+	</g>
+	<path d="M84 280 C66 342 96 406 158 416 C138 380 132 336 144 298 Z" fill="#3a69b0"/>
+	<path d="M428 280 C446 342 416 406 354 416 C374 380 380 336 368 298 Z" fill="#3a69b0"/>
+	<path d="M232 316 L280 316 L256 350 Z" fill="#2b2733" stroke="#2b2733" stroke-width="10" stroke-linejoin="round"/>
+	<g stroke="#f29e4c" stroke-width="12">
+		<rect x="214" y="218" width="84" height="54" rx="14" fill="#1f1c26"/>
+		<circle cx="182" cy="246" r="84" fill="#1f1c26"/>
+		<circle cx="330" cy="246" r="84" fill="#1f1c26"/>
+	</g>
+	<circle cx="182" cy="246" r="58" fill="#8fdcef"/>
+	<circle cx="330" cy="246" r="58" fill="#8fdcef"/>
+	<path d="M144 236 A40 40 0 0 1 176 204" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
+	<path d="M292 236 A40 40 0 0 1 324 204" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
+	<circle cx="210" cy="276" r="8" fill="#ffffff"/>
+	<circle cx="358" cy="276" r="8" fill="#ffffff"/>
+</svg></td>
+	<th>2. Binocular Bird<small>The cutest of the five and the clearest “looking”, but nothing says eagle, and at 16 px the binoculars become two blue dots.</small></th>
+	<td class="n">9</td><td class="n">9</td><td class="n">3</td><td class="n">7</td><td class="n">8</td><td class="n">8</td><td class="n tot">44</td>
+</tr><tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" width="72" height="72"  viewBox="0 0 512 512">
+	<path d="M210 470 l-14 26 M226 472 v28 M302 470 l14 26 M286 472 v28" stroke="#e9902f" stroke-width="14" stroke-linecap="round"/>
+	<!-- left tuft is a plain point; the right one is drawn as a "4" -->
+	<path d="M112 204 L124 72 L204 140 Z" fill="#8c5a3a" stroke="#8c5a3a" stroke-width="22" stroke-linejoin="round"/>
+	<path d="M376 176 V60 L300 138 H414" fill="none" stroke="#8c5a3a" stroke-width="36" stroke-linejoin="round" stroke-linecap="round"/>
+	<path d="M96 210 C96 150 150 126 256 126 C362 126 416 150 416 210 L416 330 C416 430 350 478 256 478 C162 478 96 430 96 330 Z" fill="#8c5a3a"/>
+	<ellipse cx="256" cy="396" rx="104" ry="70" fill="#c48a5c"/>
+	<path d="M210 380 l16 14 l16 -14 M270 380 l16 14 l16 -14 M240 418 l16 14 l16 -14" fill="none" stroke="#8c5a3a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+	<circle cx="186" cy="244" r="82" fill="#f7e7c6"/>
+	<circle cx="326" cy="244" r="82" fill="#f7e7c6"/>
+	<circle cx="186" cy="244" r="48" fill="#f6a821"/>
+	<circle cx="192" cy="248" r="27" fill="#2a2f27"/>
+	<circle cx="201" cy="235" r="9" fill="#ffffff"/>
+	<!-- the magnifier doubles the eye, which is the whole joke -->
+	<path d="M376 296 L444 364" stroke="#2f7565" stroke-width="34" stroke-linecap="round"/>
+	<circle cx="326" cy="244" r="68" fill="#dff1ee"/>
+	<circle cx="326" cy="244" r="56" fill="#f6a821"/>
+	<circle cx="333" cy="249" r="33" fill="#2a2f27"/>
+	<circle cx="345" cy="234" r="11" fill="#ffffff"/>
+	<circle cx="326" cy="244" r="68" fill="none" stroke="#2f7565" stroke-width="20"/>
+	<path d="M282 214 A50 50 0 0 1 308 192" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" opacity="0.85"/>
+	<path d="M240 314 L272 314 L256 340 Z" fill="#e9902f" stroke="#e9902f" stroke-width="10" stroke-linejoin="round"/>
+</svg></td>
+	<td><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"  viewBox="0 0 512 512">
+	<path d="M210 470 l-14 26 M226 472 v28 M302 470 l14 26 M286 472 v28" stroke="#e9902f" stroke-width="14" stroke-linecap="round"/>
+	<!-- left tuft is a plain point; the right one is drawn as a "4" -->
+	<path d="M112 204 L124 72 L204 140 Z" fill="#8c5a3a" stroke="#8c5a3a" stroke-width="22" stroke-linejoin="round"/>
+	<path d="M376 176 V60 L300 138 H414" fill="none" stroke="#8c5a3a" stroke-width="36" stroke-linejoin="round" stroke-linecap="round"/>
+	<path d="M96 210 C96 150 150 126 256 126 C362 126 416 150 416 210 L416 330 C416 430 350 478 256 478 C162 478 96 430 96 330 Z" fill="#8c5a3a"/>
+	<ellipse cx="256" cy="396" rx="104" ry="70" fill="#c48a5c"/>
+	<path d="M210 380 l16 14 l16 -14 M270 380 l16 14 l16 -14 M240 418 l16 14 l16 -14" fill="none" stroke="#8c5a3a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+	<circle cx="186" cy="244" r="82" fill="#f7e7c6"/>
+	<circle cx="326" cy="244" r="82" fill="#f7e7c6"/>
+	<circle cx="186" cy="244" r="48" fill="#f6a821"/>
+	<circle cx="192" cy="248" r="27" fill="#2a2f27"/>
+	<circle cx="201" cy="235" r="9" fill="#ffffff"/>
+	<!-- the magnifier doubles the eye, which is the whole joke -->
+	<path d="M376 296 L444 364" stroke="#2f7565" stroke-width="34" stroke-linecap="round"/>
+	<circle cx="326" cy="244" r="68" fill="#dff1ee"/>
+	<circle cx="326" cy="244" r="56" fill="#f6a821"/>
+	<circle cx="333" cy="249" r="33" fill="#2a2f27"/>
+	<circle cx="345" cy="234" r="11" fill="#ffffff"/>
+	<circle cx="326" cy="244" r="68" fill="none" stroke="#2f7565" stroke-width="20"/>
+	<path d="M282 214 A50 50 0 0 1 308 192" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" opacity="0.85"/>
+	<path d="M240 314 L272 314 L256 340 Z" fill="#e9902f" stroke="#e9902f" stroke-width="10" stroke-linejoin="round"/>
+</svg> <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"  viewBox="0 0 512 512">
+	<path d="M210 470 l-14 26 M226 472 v28 M302 470 l14 26 M286 472 v28" stroke="#e9902f" stroke-width="14" stroke-linecap="round"/>
+	<!-- left tuft is a plain point; the right one is drawn as a "4" -->
+	<path d="M112 204 L124 72 L204 140 Z" fill="#8c5a3a" stroke="#8c5a3a" stroke-width="22" stroke-linejoin="round"/>
+	<path d="M376 176 V60 L300 138 H414" fill="none" stroke="#8c5a3a" stroke-width="36" stroke-linejoin="round" stroke-linecap="round"/>
+	<path d="M96 210 C96 150 150 126 256 126 C362 126 416 150 416 210 L416 330 C416 430 350 478 256 478 C162 478 96 430 96 330 Z" fill="#8c5a3a"/>
+	<ellipse cx="256" cy="396" rx="104" ry="70" fill="#c48a5c"/>
+	<path d="M210 380 l16 14 l16 -14 M270 380 l16 14 l16 -14 M240 418 l16 14 l16 -14" fill="none" stroke="#8c5a3a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+	<circle cx="186" cy="244" r="82" fill="#f7e7c6"/>
+	<circle cx="326" cy="244" r="82" fill="#f7e7c6"/>
+	<circle cx="186" cy="244" r="48" fill="#f6a821"/>
+	<circle cx="192" cy="248" r="27" fill="#2a2f27"/>
+	<circle cx="201" cy="235" r="9" fill="#ffffff"/>
+	<!-- the magnifier doubles the eye, which is the whole joke -->
+	<path d="M376 296 L444 364" stroke="#2f7565" stroke-width="34" stroke-linecap="round"/>
+	<circle cx="326" cy="244" r="68" fill="#dff1ee"/>
+	<circle cx="326" cy="244" r="56" fill="#f6a821"/>
+	<circle cx="333" cy="249" r="33" fill="#2a2f27"/>
+	<circle cx="345" cy="234" r="11" fill="#ffffff"/>
+	<circle cx="326" cy="244" r="68" fill="none" stroke="#2f7565" stroke-width="20"/>
+	<path d="M282 214 A50 50 0 0 1 308 192" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" opacity="0.85"/>
+	<path d="M240 314 L272 314 L256 340 Z" fill="#e9902f" stroke="#e9902f" stroke-width="10" stroke-linejoin="round"/>
+</svg></td>
+	<th>3. Owl Lens<small>Charming at 256 px; the magnifier + owl pairing is a common “search” trope, and the ear-tuft 4 and handle turn to mush below 32 px.</small></th>
+	<td class="n">7</td><td class="n">8</td><td class="n">3</td><td class="n">4</td><td class="n">5</td><td class="n">6</td><td class="n tot">33</td>
+</tr><tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" width="72" height="72"  viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="glass-c9"><circle cx="256" cy="256" r="204"/></clipPath>
+	</defs>
+	<circle cx="256" cy="256" r="244" fill="#3a4757"/>
+	<circle cx="256" cy="256" r="204" fill="#1b3d5a"/>
+	<g clip-path="url(#glass-c9)">
+		<path d="M30 420 C160 404 340 404 480 392" fill="none" stroke="#9a6438" stroke-width="26" stroke-linecap="round"/>
+		<path d="M150 330 L52 420 L114 420 L196 372 Z" fill="#23262b"/>
+		<circle cx="234" cy="298" r="112" fill="#ffd23f"/>
+		<circle cx="302" cy="212" r="78" fill="#ffd23f"/>
+		<path d="M258 150 C294 128 352 138 374 186 C344 180 314 188 290 208 C280 186 270 168 258 150 Z" fill="#23262b"/>
+		<path d="M262 252 C226 218 150 232 128 300 C122 322 118 342 110 360 C170 360 252 334 262 252 Z" fill="#23262b"/>
+		<path d="M146 318 C176 300 214 290 246 288" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/>
+		<path d="M376 196 L420 214 L376 232 Z" fill="#f08a4b" stroke="#f08a4b" stroke-width="12" stroke-linejoin="round"/>
+		<circle cx="336" cy="212" r="13" fill="#23262b"/>
+		<circle cx="341" cy="207" r="5" fill="#ffffff"/>
+		<path d="M220 404 v16 M262 404 v16" stroke="#f08a4b" stroke-width="12" stroke-linecap="round"/>
+	</g>
+	<circle cx="256" cy="256" r="204" fill="none" stroke="#25303c" stroke-width="12"/>
+	<path d="M104 196 A168 168 0 0 1 178 108" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" opacity="0.5"/>
+	<circle cx="412" cy="100" r="15" fill="#ef5a4c"/>
+</svg></td>
+	<td><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"  viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="glass-c10"><circle cx="256" cy="256" r="204"/></clipPath>
+	</defs>
+	<circle cx="256" cy="256" r="244" fill="#3a4757"/>
+	<circle cx="256" cy="256" r="204" fill="#1b3d5a"/>
+	<g clip-path="url(#glass-c10)">
+		<path d="M30 420 C160 404 340 404 480 392" fill="none" stroke="#9a6438" stroke-width="26" stroke-linecap="round"/>
+		<path d="M150 330 L52 420 L114 420 L196 372 Z" fill="#23262b"/>
+		<circle cx="234" cy="298" r="112" fill="#ffd23f"/>
+		<circle cx="302" cy="212" r="78" fill="#ffd23f"/>
+		<path d="M258 150 C294 128 352 138 374 186 C344 180 314 188 290 208 C280 186 270 168 258 150 Z" fill="#23262b"/>
+		<path d="M262 252 C226 218 150 232 128 300 C122 322 118 342 110 360 C170 360 252 334 262 252 Z" fill="#23262b"/>
+		<path d="M146 318 C176 300 214 290 246 288" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/>
+		<path d="M376 196 L420 214 L376 232 Z" fill="#f08a4b" stroke="#f08a4b" stroke-width="12" stroke-linejoin="round"/>
+		<circle cx="336" cy="212" r="13" fill="#23262b"/>
+		<circle cx="341" cy="207" r="5" fill="#ffffff"/>
+		<path d="M220 404 v16 M262 404 v16" stroke="#f08a4b" stroke-width="12" stroke-linecap="round"/>
+	</g>
+	<circle cx="256" cy="256" r="204" fill="none" stroke="#25303c" stroke-width="12"/>
+	<path d="M104 196 A168 168 0 0 1 178 108" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" opacity="0.5"/>
+	<circle cx="412" cy="100" r="15" fill="#ef5a4c"/>
+</svg> <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"  viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="glass-c11"><circle cx="256" cy="256" r="204"/></clipPath>
+	</defs>
+	<circle cx="256" cy="256" r="244" fill="#3a4757"/>
+	<circle cx="256" cy="256" r="204" fill="#1b3d5a"/>
+	<g clip-path="url(#glass-c11)">
+		<path d="M30 420 C160 404 340 404 480 392" fill="none" stroke="#9a6438" stroke-width="26" stroke-linecap="round"/>
+		<path d="M150 330 L52 420 L114 420 L196 372 Z" fill="#23262b"/>
+		<circle cx="234" cy="298" r="112" fill="#ffd23f"/>
+		<circle cx="302" cy="212" r="78" fill="#ffd23f"/>
+		<path d="M258 150 C294 128 352 138 374 186 C344 180 314 188 290 208 C280 186 270 168 258 150 Z" fill="#23262b"/>
+		<path d="M262 252 C226 218 150 232 128 300 C122 322 118 342 110 360 C170 360 252 334 262 252 Z" fill="#23262b"/>
+		<path d="M146 318 C176 300 214 290 246 288" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/>
+		<path d="M376 196 L420 214 L376 232 Z" fill="#f08a4b" stroke="#f08a4b" stroke-width="12" stroke-linejoin="round"/>
+		<circle cx="336" cy="212" r="13" fill="#23262b"/>
+		<circle cx="341" cy="207" r="5" fill="#ffffff"/>
+		<path d="M220 404 v16 M262 404 v16" stroke="#f08a4b" stroke-width="12" stroke-linecap="round"/>
+	</g>
+	<circle cx="256" cy="256" r="204" fill="none" stroke="#25303c" stroke-width="12"/>
+	<path d="M104 196 A168 168 0 0 1 178 108" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" opacity="0.5"/>
+	<circle cx="412" cy="100" r="15" fill="#ef5a4c"/>
+</svg></td>
+	<th>4. Viewfinder Finch<small>Good idea (the shot you were waiting for), but a small bird inside a ring inside a disc leaves too little bird at small sizes.</small></th>
+	<td class="n">5</td><td class="n">7</td><td class="n">2</td><td class="n">4</td><td class="n">5</td><td class="n">6</td><td class="n tot">29</td>
+</tr><tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" width="72" height="72"  viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="lens-c12"><circle cx="220" cy="220" r="140"/></clipPath>
+	</defs>
+	<g transform="translate(14 12)">
+		<!-- the tail is the magnifier handle, forked at the end like a real tail -->
+		<path d="M360 190 L548 190 L516 220 L548 250 L360 250 Z" transform="rotate(45 220 220)" fill="#5a4a46" stroke="#5a4a46" stroke-width="20" stroke-linejoin="round"/>
+		<path d="M200 60 C190 30 206 12 236 8 C226 28 228 44 220 60 Z" fill="#5a4a46"/>
+		<path d="M212 62 C226 40 250 36 270 44 C254 50 242 58 230 68 Z" fill="#5a4a46"/>
+		<path d="M66 192 L14 222 L66 252 Z" fill="#f4b223" stroke="#f4b223" stroke-width="14" stroke-linejoin="round"/>
+		<circle cx="220" cy="220" r="152" fill="#7a6a64"/>
+		<g clip-path="url(#lens-c12)">
+			<circle cx="250" cy="344" r="152" fill="#ec6a3c"/>
+		</g>
+		<circle cx="220" cy="220" r="150" fill="none" stroke="#5a4a46" stroke-width="36"/>
+		<circle cx="170" cy="188" r="36" fill="#ffffff"/>
+		<circle cx="176" cy="191" r="21" fill="#221c1b"/>
+		<circle cx="183" cy="183" r="7" fill="#ffffff"/>
+		<path d="M268 116 A116 116 0 0 1 326 168" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" opacity="0.6"/>
+	</g>
+</svg></td>
+	<td><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"  viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="lens-c13"><circle cx="220" cy="220" r="140"/></clipPath>
+	</defs>
+	<g transform="translate(14 12)">
+		<!-- the tail is the magnifier handle, forked at the end like a real tail -->
+		<path d="M360 190 L548 190 L516 220 L548 250 L360 250 Z" transform="rotate(45 220 220)" fill="#5a4a46" stroke="#5a4a46" stroke-width="20" stroke-linejoin="round"/>
+		<path d="M200 60 C190 30 206 12 236 8 C226 28 228 44 220 60 Z" fill="#5a4a46"/>
+		<path d="M212 62 C226 40 250 36 270 44 C254 50 242 58 230 68 Z" fill="#5a4a46"/>
+		<path d="M66 192 L14 222 L66 252 Z" fill="#f4b223" stroke="#f4b223" stroke-width="14" stroke-linejoin="round"/>
+		<circle cx="220" cy="220" r="152" fill="#7a6a64"/>
+		<g clip-path="url(#lens-c13)">
+			<circle cx="250" cy="344" r="152" fill="#ec6a3c"/>
+		</g>
+		<circle cx="220" cy="220" r="150" fill="none" stroke="#5a4a46" stroke-width="36"/>
+		<circle cx="170" cy="188" r="36" fill="#ffffff"/>
+		<circle cx="176" cy="191" r="21" fill="#221c1b"/>
+		<circle cx="183" cy="183" r="7" fill="#ffffff"/>
+		<path d="M268 116 A116 116 0 0 1 326 168" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" opacity="0.6"/>
+	</g>
+</svg> <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"  viewBox="0 0 512 512">
+	<defs>
+		<clipPath id="lens-c14"><circle cx="220" cy="220" r="140"/></clipPath>
+	</defs>
+	<g transform="translate(14 12)">
+		<!-- the tail is the magnifier handle, forked at the end like a real tail -->
+		<path d="M360 190 L548 190 L516 220 L548 250 L360 250 Z" transform="rotate(45 220 220)" fill="#5a4a46" stroke="#5a4a46" stroke-width="20" stroke-linejoin="round"/>
+		<path d="M200 60 C190 30 206 12 236 8 C226 28 228 44 220 60 Z" fill="#5a4a46"/>
+		<path d="M212 62 C226 40 250 36 270 44 C254 50 242 58 230 68 Z" fill="#5a4a46"/>
+		<path d="M66 192 L14 222 L66 252 Z" fill="#f4b223" stroke="#f4b223" stroke-width="14" stroke-linejoin="round"/>
+		<circle cx="220" cy="220" r="152" fill="#7a6a64"/>
+		<g clip-path="url(#lens-c14)">
+			<circle cx="250" cy="344" r="152" fill="#ec6a3c"/>
+		</g>
+		<circle cx="220" cy="220" r="150" fill="none" stroke="#5a4a46" stroke-width="36"/>
+		<circle cx="170" cy="188" r="36" fill="#ffffff"/>
+		<circle cx="176" cy="191" r="21" fill="#221c1b"/>
+		<circle cx="183" cy="183" r="7" fill="#ffffff"/>
+		<path d="M268 116 A116 116 0 0 1 326 168" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" opacity="0.6"/>
+	</g>
+</svg></td>
+	<th>5. Search Robin<small>Clever search-icon silhouette, but the brown body disappears on dark backgrounds and the mono version reads as an open mouth.</small></th>
+	<td class="n">5</td><td class="n">7</td><td class="n">1</td><td class="n">5</td><td class="n">7</td><td class="n">5</td><td class="n tot">30</td>
+</tr></tbody>
+</table></div>
+<p>Each concept's full sheet (palettes, mono, wordmark) is in <a href="concepts/index.html">concepts/index.html</a>.</p>
+</body>
+</html>

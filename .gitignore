@@ -1,0 +1,9 @@
+node_modules/
+/data/
+/web/dist/
+/test/fixtures/videos/
+/test/.tmp/
+.env
+look4.config.json
+*.log
+/desktop/dist/

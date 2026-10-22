@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+	<defs>
+		<mask id="cut" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512">
+			<circle cx="256" cy="256" r="244" fill="#fff"/>
+			<path d="M118 292 Q76 334 70 376 Q104 356 132 356 Q112 388 116 420 Q156 386 196 382 Z" fill="#000"/>
+			<path d="M320 186 L410 186 C466 188 492 238 482 294 C476 324 458 344 432 354 C446 324 436 306 410 308 L320 324 Z" fill="#000"/>
+			<circle cx="232" cy="256" r="150" fill="#000"/>
+			<path d="M378 312 Q394 307 410 308" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+			<circle cx="282" cy="234" r="66" fill="#fff"/>
+			<circle cx="282" cy="234" r="50" fill="#000"/>
+			<circle cx="294" cy="238" r="30" fill="#fff"/>
+			<circle cx="307" cy="222" r="13" fill="#000"/>
+			<path d="M216 184 C254 150 320 150 366 196 C320 182 268 182 226 200 Q206 204 216 184 Z" fill="#fff"/>
+		</mask>
+	</defs>
+	<rect width="512" height="512" fill="currentColor" mask="url(#cut)"/>
+</svg>
