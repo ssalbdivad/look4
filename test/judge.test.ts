@@ -233,6 +233,10 @@ test("cropRegion: pads and squares around the box; a tiny box gets the minimum s
 	const t = cropRegion(tiny, 1280, 720)
 	assert.ok(contains(t, tiny))
 	assert.deepEqual([Math.round(t.w * 1280), Math.round(t.h * 720)], [96, 96])
+	// a 47 px nuthatch on a 4K frame fills its crop rather than a fifth of it
+	const nuthatch = { x: 0.16, y: 0.2, w: 47 / 3840, h: 72 / 2160 }
+	const n = cropRegion(nuthatch, 3840, 2160)
+	assert.deepEqual([Math.round(n.w * 3840), Math.round(n.h * 2160)], [122, 122])
 	const corner = { x: 0.99, y: 0, w: 0.01, h: 0.02 }
 	const c = cropRegion(corner, 1280, 720)
 	assert.ok(contains(c, corner) && c.x + c.w <= 1 && c.y >= 0)

@@ -10,9 +10,14 @@ import type { JudgeCrop } from "./types.ts"
 
 /** Context around the box on every side, as a fraction of the box. */
 const PADDING = 0.35
-/** Smallest crop side, in pixels and as a fraction of the frame's short edge, so a tiny bird keeps its perch in view. */
+/**
+ * Smallest crop side, in pixels and as a fraction of the frame's short edge, so a tiny bird keeps its
+ * perch in view. Small: at 12% a 47 px nuthatch on a 4K frame filled a fifth of a 259 px crop, and
+ * Sonnet named it in 2 of 6 calls (a Downy Woodpecker, a House Finch otherwise); cropped at 5% it named
+ * it in 5 of 5, at 60-80% (2026-10-22). The context image still shows where the bird is.
+ */
 const MIN_SIDE_PX = 96
-const MIN_SIDE_FRACTION = 0.12
+const MIN_SIDE_FRACTION = 0.05
 /** Long edge for coarse calls ("any squirrel"), where more pixels buy nothing. */
 const COARSE_EDGE = 384
 /** Two boxes on the same frame overlapping this much show the same thing. */
