@@ -52,6 +52,7 @@ const cfg = (over: Partial<Config["pipeline"]["judge"]> = {}): Config["pipeline"
 	model: "claude-haiku-5-5",
 	escalateModel: null,
 	escalateBelow: 0.6,
+	confirmModel: null,
 	maxCrops: 4,
 	cropSize: 512,
 	...over
@@ -163,13 +164,13 @@ test("judge: a life-list lookout keeps only a species new for its mode named at 
 	assert.deepEqual(lifer.verdict, [true, 0.8, "Seen"])
 	assert.doesNotMatch(lifer.text, /50%\+/)
 	// the morning of 2026-10-22: a Mourning Dove read as a Junco at 55%
-	assert.deepEqual((await run("Dark-eyed Junco", 0.55, "new")).verdict, [false, 0.55, "Dark-eyed Junco at 55% is under the 75% a new species needs"])
+	assert.deepEqual((await run("Dark-eyed Junco", 0.55, "new")).verdict, [false, 0.55, "Dark-eyed Junco at 55% is under the 75% a sighting needs"])
 	assert.deepEqual((await run("Mourning Dove", 0.95, "newOrClipless")).verdict, [false, 0.95, "Mourning Dove is already on the life list with a clip"])
 	// a regular added by hand without a clip only counts when the lookout asks for those
 	assert.deepEqual((await run("House Finch", 0.9, "newOrClipless")).verdict, [true, 0.8, "Seen"])
 	assert.deepEqual((await run("House Finch", 0.9, "new")).verdict, [false, 0.9, "House Finch is already on the life list"])
-	// a listed regular still owed a clip is no lifer claim, so a plain majority call is enough
-	assert.deepEqual((await run("House Finch", 0.6, "newOrClipless")).verdict, [true, 0.6, "Seen"])
+	// the afternoon of 2026-10-22: a female cardinal read as the clipless House Finch at 50-55%
+	assert.deepEqual((await run("House Finch", 0.55, "newOrClipless")).verdict, [false, 0.55, "House Finch at 55% is under the 75% a sighting needs"])
 })
 
 test("judge: a life-list lookout keeps a clip for any bird in it, not only the one its verdict names", async () => {
@@ -192,15 +193,54 @@ test("judge: a life-list lookout keeps a clip for any bird in it, not only the o
 	// 2026-10-22: chickadees and nuthatches at the left feeder, every clip rejected as "chickadee already has a clip"
 	const mixed = await run([
 		{ species: "Black-capped Chickadee", confidence: 0.9 },
-		{ species: " White-breasted Nuthatch ", confidence: 0.65 }
+		{ species: " White-breasted Nuthatch ", confidence: 0.8 }
 	])
-	assert.deepEqual(mixed.verdict, [true, "White-breasted Nuthatch", 0.65, "Birds at the feeder"])
+	assert.deepEqual(mixed.verdict, [true, "White-breasted Nuthatch", 0.8, "Birds at the feeder"])
 	assert.deepEqual((mixed.schema as { required: string[] }).required, ["identification", "birds", "verdicts"])
-	// under 50% the second bird is a guess and does not count
-	assert.deepEqual((await run([{ species: "White-breasted Nuthatch", confidence: 0.4 }])).verdict, [false, "Black-capped Chickadee", 0.9, "Black-capped Chickadee is already on the life list with a clip"])
+	// under the sighting bar the second bird does not count, listed or not
+	assert.deepEqual((await run([{ species: "White-breasted Nuthatch", confidence: 0.65 }])).verdict, [false, "Black-capped Chickadee", 0.9, "Black-capped Chickadee is already on the life list with a clip"])
 	// an unlisted species still needs the lifer bar, wherever in the clip it was seen
 	assert.deepEqual((await run([{ species: "Red-breasted Nuthatch", confidence: 0.6 }])).verdict, [false, "Black-capped Chickadee", 0.9, "Black-capped Chickadee is already on the life list with a clip"])
 	assert.deepEqual((await run([{ species: "Red-breasted Nuthatch", confidence: 0.85 }])).verdict, [true, "Red-breasted Nuthatch", 0.85, "Birds at the feeder"])
+})
+
+test("judge: a life-list sighting stands only when the confirming model keeps the clip for the same species", async () => {
+	const l = lookout("lifer", ["bird"])
+	const lifer: Lookout = { ...l, compiled: { ...l.compiled!, lifeList: "newOrClipless" } }
+	const answer = (species: string, speciesConfidence: number) => ({
+		verdicts: [{ lookoutId: "lifer", rationale: "A bird at the feeder.", label: species, species, speciesConfidence, match: true, confidence: 0.85 }]
+	})
+	const run = async (second: (() => unknown) | null) => {
+		const { llm, calls } = scripted(req => (req.model === "claude-opus-5-5" ? (second ? second() : answer("x", 0)) : answer("White-breasted Nuthatch", 0.8)))
+		const out = await judgeClip(
+			{ ...input([lifer]), lifeList: ["White-breasted Nuthatch", "Black-capped Chickadee"], lifeListWithoutClip: ["White-breasted Nuthatch"] },
+			llm,
+			cfg({ confirmModel: second ? "claude-opus-5-5" : null })
+		)
+		const v = out.verdicts[0]!
+		return [v.match, v.species, v.speciesConfidence, v.rationale.split(".")[0], calls.map(c => c.model ?? "first"), out.usage.length]
+	}
+	assert.deepEqual(await run(() => answer("White-breasted Nuthatch", 0.9)), [true, "White-breasted Nuthatch", 0.8, "A bird at the feeder", ["first", "claude-opus-5-5"], 2])
+	assert.deepEqual(await run(() => answer("Black-capped Chickadee", 0.9)), [
+		false,
+		"White-breasted Nuthatch",
+		0.8,
+		"claude-opus-5-5 did not confirm White-breasted Nuthatch (it named Black-capped Chickadee at 90%)",
+		["first", "claude-opus-5-5"],
+		2
+	])
+	// the same species, but no surer than a coin flip, is no confirmation
+	assert.equal((await run(() => answer("White-breasted Nuthatch", 0.6)))[0], false)
+	// a confirmation that fails is no "no": the first answer stands
+	assert.deepEqual(
+		await run(() => {
+			throw new Error("overloaded")
+		}),
+		[true, "White-breasted Nuthatch", 0.8, "A bird at the feeder", ["first", "claude-opus-5-5"], 1]
+	)
+	// with no confirming model the first answer decides, in one call
+	const alone = await run(null)
+	assert.deepEqual([alone[0], alone[4], alone[5]], [true, ["first"], 1])
 })
 
 test("judge: confidence below the escalation band is a confident no, not escalated", async () => {

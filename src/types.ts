@@ -111,8 +111,8 @@ export type Detection = {
 	label: string
 	score: number
 	box: NormBox
-	/** `full` = found on the whole ROI frame; `zoom` = found on a crop around the motion region. */
-	via: "full" | "zoom"
+	/** `full` = found on the whole ROI frame; `zoom` = found on a crop around the motion region; `feeder` = not the detector: something new on a feeder in this keyframe (`scoreFeederFrames`). */
+	via: "full" | "zoom" | "feeder"
 }
 
 export type Verdict = {

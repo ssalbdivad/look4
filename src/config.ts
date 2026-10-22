@@ -105,7 +105,8 @@ export const Config = type({
 		/**
 		 * Boxes around each feeder, in normalized full-frame coordinates. The detector always runs a
 		 * zoomed view on each, motion or not: a bird clinging to a feeder barely moves, so the motion
-		 * boxes land on a swaying feeder elsewhere and a ~40 px nuthatch is lost in the ROI view.
+		 * boxes land on a swaying feeder elsewhere and a ~40 px nuthatch is lost in the ROI view. Every
+		 * clip the judge checks also gets each feeder's keyframes and a close-up of each visit (`feederLook`).
 		 */
 		feeders: NormBox.array().default(() => []),
 		motion: type({
@@ -137,7 +138,9 @@ export const Config = type({
 			/** Re-ask a stronger model when the first answer's confidence falls in [escalateBelow - 0.3, escalateBelow). Null = never. */
 			escalateModel: "string | null = null",
 			escalateBelow: `${unit} = 0.6`,
-			/** Crops sent per clip, plus one context frame. */
+			/** A clip a life-list lookout would keep is asked of this model too, and kept only if it names the same species at 75% or more. Null = the first answer decides. */
+			confirmModel: "string | null = 'claude-opus-5-5'",
+			/** Close-ups sent per clip of what the detector found, and as many again of feeder visits, plus a sheet per feeder and one context frame. */
 			maxCrops: "1 <= number.integer <= 8 = 4",
 			/** Long edge, in pixels, of each crop sent to the judge. */
 			cropSize: "128 <= number.integer <= 1568 = 512"

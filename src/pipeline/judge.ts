@@ -14,7 +14,8 @@ const log = logger("judge")
 export const JUDGE_SYSTEM = `You are the final check in a wildlife and yard camera filter. A fixed camera records short clips when something moves. A local object detector has already found candidate objects; you decide, for each "lookout" (a person's description of what they want to see), whether this clip truly shows it.
 
 What you receive:
-- Up to several crops: zoomed views around the detector's candidates, from different moments of the SAME clip. The same animal may appear in several crops. Each crop's metadata gives the detector's label and score; treat those as hints, never as evidence. The detector is often wrong (a leaf, a feeder part, a shadow or a pinecone labeled "bird").
+- Up to several crops: zoomed views around the detector's candidates, from different moments of the SAME clip. The same animal may appear in several crops. Each crop's metadata gives the detector's label and score; treat those as hints, never as evidence. The detector is often wrong (a leaf, a feeder part, a shadow or a pinecone labeled "bird"). A crop labeled "feeder visitor" is not the detector's: something appeared on a feeder at that moment that most of the clip's other frames lack, usually a small bird the detector missed, sometimes a squirrel or the feeder itself.
+- A "feeder timeline" crop: one feeder at many moments of the clip, tiled, each tile labeled with its time.
 - One context image: the whole scene (or the watched zone) at lower resolution, for where things are (at the feeder, on the pole, on the ground).
 - For each lookout: its id, the person's own words, and a rubric of the visible criteria that must hold.
 - The life list: every bird species already seen at this camera, its regulars. It is evidence for identification and nothing else. No lookout asks you whether a bird is new to it: look4 compares your species with the list itself, so a lookout marked as a life-list lookout only needs the bird identified.
@@ -208,12 +209,13 @@ const ask = async (
 }
 
 /**
- * How sure the judge must be of a species NOT on the life list before look4 calls it new. Above the
- * 50% a species is named at: almost every bird here is a regular, so a coin-flip ID of an unlisted
+ * How sure the judge must be of a species before a life-list lookout keeps a clip for it. Above the
+ * 50% a species is named at: almost every bird here is a regular, so a coin-flip ID of a wanted
  * species is far likelier a misread regular. On 2026-10-22 Sonnet offered five regulars as lifers, all
  * at 0.5-0.6 (Mourning Doves as a Junco and a Collared-Dove, a cardinal as a House Finch); the real
- * lifers before them came in at 0.88-0.9. A listed species still owed a clip is a regular, so it needs
- * only the 50% any named species has.
+ * lifers before them came in at 0.88-0.9. The same holds for a listed species still owed a clip: let
+ * through at 50% that afternoon, a female cardinal and a House Sparrow became "House Finch" sightings
+ * at 0.50 and 0.55.
  */
 export const NEW_SPECIES_CONFIDENCE = 0.75
 
@@ -224,8 +226,6 @@ export const isNewSpecies = (species: string, mode: LifeListMode, lifeList: stri
 	return !has(lifeList) || (mode === "newOrClipless" && has(withoutClip))
 }
 
-const onList = (species: string, lifeList: string[]) => lifeList.some(x => x.toLowerCase() === species.toLowerCase())
-
 /**
  * A life-list lookout's verdict, decided here rather than by the judge: its rubric's other criteria
  * (the judge's match) and any bird in the clip new for its mode, named sure enough: the verdict's own
@@ -235,8 +235,7 @@ const onList = (species: string, lifeList: string[]) => lifeList.some(x => x.toL
 export const lifeListVerdict = (v: Verdict, mode: LifeListMode, lifeList: string[], withoutClip: string[], birds: SeenBird[] = []): Verdict => {
 	if (!v.match) return v
 	const named: SeenBird[] = [...(v.species ? [{ species: v.species, confidence: v.speciesConfidence ?? 0 }] : []), ...birds]
-	const sureEnough = (b: SeenBird) => b.confidence >= (onList(b.species, lifeList) ? 0.5 : NEW_SPECIES_CONFIDENCE)
-	const hit = named.find(b => isNewSpecies(b.species, mode, lifeList, withoutClip) && sureEnough(b))
+	const hit = named.find(b => isNewSpecies(b.species, mode, lifeList, withoutClip) && b.confidence >= NEW_SPECIES_CONFIDENCE)
 	if (hit) return { ...v, species: hit.species, speciesConfidence: hit.confidence, confidence: Math.min(v.confidence, hit.confidence) }
 	const sure = v.speciesConfidence ?? 0
 	const why = !v.species
@@ -245,7 +244,7 @@ export const lifeListVerdict = (v: Verdict, mode: LifeListMode, lifeList: string
 			: "no species named"
 		: !isNewSpecies(v.species, mode, lifeList, withoutClip)
 			? `${v.species} is already on the life list${mode === "newOrClipless" ? " with a clip" : ""}`
-			: `${v.species} at ${Math.round(sure * 100)}% is under the ${Math.round(NEW_SPECIES_CONFIDENCE * 100)}% a new species needs`
+			: `${v.species} at ${Math.round(sure * 100)}% is under the ${Math.round(NEW_SPECIES_CONFIDENCE * 100)}% a sighting needs`
 	// a "no" is as sure as the species call it rests on
 	return { ...v, match: false, confidence: v.species ? Math.max(sure, 1 - sure) : v.confidence, rationale: `${why}. ${v.rationale}`.slice(0, 400) }
 }
@@ -277,9 +276,37 @@ export const judgeClip = async (input: JudgeInput, llm: VisionLLM, cfg: Config["
 		}
 	}
 	const modes = new Map(input.lookouts.flatMap(l => (l.compiled?.lifeList ? [[l.id, l.compiled.lifeList] as const] : [])))
-	verdicts = verdicts.map(v => {
+	const decide = (v: Verdict, seen: SeenBird[]) => {
 		const mode = modes.get(v.lookoutId)
-		return mode ? lifeListVerdict(v, mode, input.lifeList ?? [], input.lifeListWithoutClip ?? [], birds) : v
-	})
+		return mode ? lifeListVerdict(v, mode, input.lifeList ?? [], input.lifeListWithoutClip ?? [], seen) : v
+	}
+	verdicts = verdicts.map(v => decide(v, birds))
+	const keeping = verdicts.filter(v => v.match && modes.has(v.lookoutId))
+	if (cfg.confirmModel && keeping.length) {
+		try {
+			const again = await ask(input, input.lookouts.filter(l => keeping.some(v => v.lookoutId === l.id)), llm, cfg.confirmModel)
+			usage.push(again.usage)
+			verdicts = verdicts.map(v => (keeping.includes(v) ? confirmed(v, again.verdicts.find(x => x.lookoutId === v.lookoutId), again.birds, decide, cfg.confirmModel!) : v))
+		} catch (e) {
+			const spent = usageOf(e)
+			if (spent) usage.push(spent)
+			if (input.signal?.aborted) throw e
+			// a confirmation that could not be had is no "no": the first answer stands
+			log.warn(`confirming ${input.clip.id} with ${cfg.confirmModel} failed: ${e instanceof Error ? e.message : String(e)}`)
+		}
+	}
 	return { verdicts, usage }
+}
+
+/**
+ * A life-list sighting stands only when a second model, asked the same question on its own, keeps the
+ * clip for the same species: a sighting puts a bird on the person's list, so two opinions are worth
+ * one more call on the few clips that get this far. Otherwise it is a "no", saying who named what.
+ */
+const confirmed = (v: Verdict, again: Verdict | undefined, seen: SeenBird[], decide: (v: Verdict, seen: SeenBird[]) => Verdict, model: string): Verdict => {
+	const second = again && decide(again, seen)
+	const same = (s: string | null | undefined) => !!s && s.toLowerCase() === v.species?.toLowerCase()
+	if (second?.match && same(second.species)) return { ...v, confidence: Math.min(v.confidence, second.confidence), speciesConfidence: Math.min(v.speciesConfidence ?? 1, second.speciesConfidence ?? 1) }
+	const named = again?.species ? `${again.species}${typeof again.speciesConfidence === "number" ? ` at ${Math.round(again.speciesConfidence * 100)}%` : ""}` : "no species"
+	return { ...v, match: false, confidence: Math.max(0.5, second?.confidence ?? 0.5), rationale: `${model} did not confirm ${v.species} (it named ${named}). ${v.rationale}`.slice(0, 400) }
 }

@@ -685,3 +685,63 @@ their own: one pass over a 24 s 4K clip's 12 keyframes takes ~3.2 s, where seeki
 
 Also found: the dev server had run since before the feeder fallback was written, so it had never run
 (0 feeder crops in the database, 131 "no bird detected" drops in a day).
+
+## 15. Feeders: every checked clip looks at them; a sighting needs 75% and a second model (2026-10-22)
+
+**What went wrong.** A White-breasted Nuthatch spent the afternoon at the left feeder and never made
+a sighting, while two coin-flip "House Finch" calls did (a female cardinal at 0.50, a House Sparrow
+at 0.55). Three causes, read off the code and confirmed on the clips archived from 14:00:
+- The feeder sheets of §14 went to the judge only when the detector found **nothing**. Doves on the
+  ground were in nearly every daytime clip, so the feeders were almost never looked at: of the 15
+  clips from 13:30 to 14:50 the old pipeline judged on detector crops alone, 11 had something on a
+  feeder in 7-71 of their ~60 keyframes (the scorer below; contact sheets checked by eye on two), and
+  one of those, with two dozen sparrow and chickadee tiles, came back "no species named".
+- A sheet showed 12 evenly spaced keyframes. Clips are up to 2 minutes, ~60 keyframes, and a feeder
+  visit lasts 1-5 of them, so the 12 tiles (one per ~10 s) mostly showed the feeder empty.
+- `lifeListVerdict` let a listed species still owed a clip through at 50%; both false sightings were
+  House Finch, listed without a clip.
+
+**Decision.** With `feeders` set, every clip the judge checks gets, whatever the detector found:
+each feeder's sheet, and a close-up of each visit on a feeder, with their own crop budget
+(`feederLook`). Visits come from `scoreFeederFrames` (occupancy.ts): each keyframe of a feeder at
+96 px is compared with the 5 other keyframes that look most like it overall (the feeder swung to
+about the same place), skipping its 2 neighbours on each side, each pixel against its best match
+within 2 px over a 3×3 patch; the per-pixel median of those 5 differences above 25 grey levels,
+after one erosion, is the visitor, scored by its area. A sheet now holds the occupied keyframes, a
+visit at a time, then the rest spread evenly. Every species a life-list lookout keeps a clip for needs
+0.75, and the clip is then asked of `confirmModel` (Claude Opus 5.5) and kept only if it keeps the
+clip for the same species.
+
+**Measured.** On a labelled 116 s clip (2 feeders × 58 keyframes, a Downy Woodpecker, chickadees, a
+sparrow-sized bird coming and going, the right feeder swinging ~1/10 of the tile):
+
+| Scorer | Birds above every empty frame | Empty frames flagged |
+|---|---|---|
+| Difference from the clip's median, minus 3× its per-pixel variability | 10/27 | 28/87 any, max 79 |
+| Same, each pixel's best match within 6 px | 19/27 | 2/87 |
+| **5 nearest-looking frames, median** (kept) | **24/27** | **0/87** at the 40 cut |
+
+The 3 misses: a tail showing behind the feeder, a bird in the tray at 7. On the 35 archived clips'
+contact sheets, every flagged tile of two busy clips was a bird (48/48); the 12 clips the old judge
+called "feeder empty in every tile" had no visit; 4 tiles on two quiet clips were empty feeders, one
+at 238, likely the mesh turning a different face. A false visit costs one close-up.
+
+A bird that clings through the whole clip is in its own neighbours and scores low: the 16 s
+nuthatch clip of 2026-10-21 (nuthatch in all 8 keyframes) scored 4-20. The sheet's even fill shows it,
+and the full cascade then kept the clip for White-breasted Nuthatch at 0.80 (Sonnet), where it had
+none before. Replaying the two false sightings: House Sparrow 0.85 and House Sparrow 0.70 + Northern
+Cardinal, both rejected.
+
+**Cost.** Decoding a 2-minute 4K clip's keyframes: 24 CPU-s on the CPU, so `keyframeRegions` uses
+NVDEC when it can (it cannot skip to keyframes: it decodes every frame, cropped to the box around
+the feeders on the GPU, and picks the keyframes by time): 11.6 CPU-s, same pixels, 25 s wall
+instead of 38 (contended, load ~30 on 16 cores). Scoring: ~4-5 s per feeder per 2-minute clip,
+contended. Judge: two 1024×768 sheets (~1k tokens each) and up to 4 visit close-ups (~350 each) on
+every checked clip; the old pipeline sent sheets only to clips with no detection. Unmeasured over a
+day; at Sonnet's $2/M input, +3k tokens on ~200 calls is ~$1.2/day. Confirmation is an Opus call on
+the few clips that would become a sighting.
+
+**Gaps.** A bird away from the feeders that the detector misses (on the fence, a trunk) still goes
+unseen. Recall of the scorer is from one labelled clip; precision from contact sheets read by eye.
+The worker ran ~20 minutes behind before this change (concurrency 1, 60-250 s a clip on a loaded
+machine), and the feeder look adds ~30 s a clip.

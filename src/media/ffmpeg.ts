@@ -102,8 +102,19 @@ export type KeyframeRegions = { t: number; tiles: Buffer[] }
  * `tile`-pixel square, in one decode. Keyframes decode without their neighbours, so this sees a whole
  * clip cheaply: the camera's every-2 s keyframes of a 24 s 4K clip in ~3 s, where seeking to 12
  * arbitrary frames costs ~1.5 s each. Times come from the packet index.
+ *
+ * Given the clip's probe, a big H.264/HEVC clip goes through NVDEC instead when it works: it cannot
+ * skip to keyframes, but it decodes every frame on the GPU, crops them there to the box around all
+ * the rects, and the keyframes are then picked out by time. Same pixels; on a 2-minute 4K clip ~5
+ * CPU-seconds instead of ~24, which matters on a machine whose cores are busy.
  */
-export const keyframeRegions = async (path: string, rects: PixelRect[], tile: number, signal?: AbortSignal): Promise<KeyframeRegions[]> => {
+export const keyframeRegions = async (
+	path: string,
+	rects: PixelRect[],
+	tile: number,
+	signal?: AbortSignal,
+	info?: Pick<ProbeResult, "codec" | "width" | "height" | "rotation">
+): Promise<KeyframeRegions[]> => {
 	if (!rects.length) return []
 	const packets = await run(FFPROBE, ["-v", "error", "-select_streams", "v:0", "-show_entries", "packet=pts_time,flags", "-of", "csv=p=0", path], { signal })
 	const times = packets
@@ -115,18 +126,40 @@ export const keyframeRegions = async (path: string, rects: PixelRect[], tile: nu
 		})
 		.sort((a, b) => a - b)
 	// side by side in one output frame: [0:v] split → crop+scale each → hstack
-	const cut = (r: PixelRect) => `crop=${r.width}:${r.height}:${r.left}:${r.top},scale=${tile}:${tile}`
-	const graph =
-		rects.length === 1
-			? `[0:v]${cut(rects[0]!)},format=rgb24[out]`
-			: `[0:v]split=${rects.length}${rects.map((_, i) => `[s${i}]`).join("")};` +
-				rects.map((r, i) => `[s${i}]${cut(r)}[c${i}]`).join(";") +
-				`;${rects.map((_, i) => `[c${i}]`).join("")}hstack=inputs=${rects.length},format=rgb24[out]`
-	const raw = await run(
-		FFMPEG,
-		["-hide_banner", "-loglevel", "error", "-nostdin", "-skip_frame", "nokey", "-i", path, "-filter_complex", graph, "-map", "[out]", "-vsync", "0", "-f", "rawvideo", "pipe:1"],
-		{ signal }
-	)
+	const graph = (rs: PixelRect[], first = "") => {
+		const cut = (r: PixelRect) => `crop=${r.width}:${r.height}:${r.left}:${r.top},scale=${tile}:${tile}`
+		return rs.length === 1
+			? `[0:v]${first}${cut(rs[0]!)},format=rgb24[out]`
+			: `[0:v]${first}split=${rs.length}${rs.map((_, i) => `[s${i}]`).join("")};` +
+					rs.map((r, i) => `[s${i}]${cut(r)}[c${i}]`).join(";") +
+					`;${rs.map((_, i) => `[c${i}]`).join("")}hstack=inputs=${rs.length},format=rgb24[out]`
+	}
+	const out = ["-map", "[out]", "-vsync", "0", "-f", "rawvideo", "pipe:1"]
+	const cpu = () => run(FFMPEG, ["-hide_banner", "-loglevel", "error", "-nostdin", "-skip_frame", "nokey", "-i", path, "-filter_complex", graph(rects), ...out], { signal })
+	const cuvid = info && cuvidDecoders[info.codec]
+	let raw: Buffer
+	if (cuvid && info.width * info.height >= HWDEC_MIN_PIXELS && nvdec.usable() && !info.rotation && hwdecMode() === "auto" && times.length) {
+		const even = (n: number) => n & ~1
+		const left = even(Math.min(...rects.map(r => r.left)))
+		const top = even(Math.min(...rects.map(r => r.top)))
+		const right = Math.min(info.width, even(Math.max(...rects.map(r => r.left + r.width)) + 1))
+		const bottom = Math.min(info.height, even(Math.max(...rects.map(r => r.top + r.height)) + 1))
+		const inner = rects.map(r => ({ ...r, left: r.left - left, top: r.top - top }))
+		// NVDEC sets no picture type, so the keyframes are picked by their packet times
+		const pick = `select='${times.map(t => `lt(abs(t-${t.toFixed(6)})\\,0.0005)`).join("+")}',`
+		try {
+			raw = await run(
+				FFMPEG,
+				["-hide_banner", "-loglevel", "error", "-nostdin", "-c:v", cuvid, "-crop", `${top}x${info.height - bottom}x${left}x${info.width - right}`, "-i", path, "-an", "-sn", "-filter_complex", graph(inner, pick), ...out],
+				{ signal }
+			)
+			nvdec.succeeded()
+		} catch (e) {
+			if (signal?.aborted) throw e
+			raw = await cpu()
+			if (nvdec.failed()) log.warn(`NVDEC decode keeps failing, using the CPU decoder for the next 30 min: ${(e as Error).message}`)
+		}
+	} else raw = await cpu()
 	const row = tile * 3
 	const frameBytes = row * tile * rects.length
 	const n = Math.min(times.length, Math.floor(raw.length / frameBytes))

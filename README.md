@@ -295,8 +295,10 @@ any bird not on my life list
 Don't copy the species into the prompt. The lookout follows the list as it grows. look4 itself
 decides what is new, not the spotter: a clip is kept only when the spotter names a species missing
 from the list (or, if the prompt asks, one you added by hand without a clip) and is at least 75%
-sure of it. Nearly every bird at a feeder is a regular, so a coin-flip call of a new species is
-usually a regular seen badly.
+sure of it, and a second model (`pipeline.judge.confirmModel`, Claude Opus 5.5 by default), shown the
+same images, names the same species at 75% or more. Nearly every bird at a feeder is a regular, so a
+coin-flip call of a new species is usually a regular seen badly. The second look costs one more call,
+only on the few clips that would become a sighting.
 
 - **Add a bird** from the panel's box: its common name and, optionally, the day you first saw it.
 - **Confirm a sighting** with the button on its card (or on the clip page). That says "yes" for
@@ -429,6 +431,7 @@ The wizard and **Settings** write `look4.config.json` for you. To edit it by han
 | `dataDir` | `./data` | Clips, database, media, model weights (relative to the config file). |
 | `server.host` / `.port` | `127.0.0.1` / `4040` | `0.0.0.0` opens it to your LAN. **There is no login**, so anyone on the network can then change settings. |
 | `pipeline.roi` | `null` | The feeder zone, as fractions of the frame. |
+| `pipeline.feeders` | `[]` | A box around each hanging feeder. Every checked clip then also shows the spotter each feeder over the whole clip and a close-up of whatever landed on one: small birds clinging still are what the detector misses. |
 | `pipeline.motion.*` | 22 / 0.0008 / 0.7 | `pixelThreshold`, `minArea`, `maxArea`; also `sampleFps` 2, `maxFrames` 6. |
 | `pipeline.detector.enabled` | `true` | Off: every clip with motion goes to the spotter. |
 | `pipeline.detector.model` | `Xenova/owlvit-base-patch32` | Add `:fp32` (or `:q4`, `:fp16`) to choose other weights. The default is q8. |
@@ -437,6 +440,7 @@ The wizard and **Settings** write `look4.config.json` for you. To edit it by han
 | `pipeline.judge.provider` | `auto` | `auto` picks `anthropic` when an API key is set, else `claude-code` when `claude` is installed, else `none` (detector-only verdicts). |
 | `pipeline.judge.model` | `claude-haiku-5-5` | |
 | `pipeline.judge.escalateModel` / `escalateBelow` | `null` / `0.6` | Ask a stronger model again when the first answer's confidence is in [0.3, 0.6). |
+| `pipeline.judge.confirmModel` | `claude-opus-5-5` | A clip a life-list lookout would keep is kept only if this model names the same species at 75%+. `null` skips the check. |
 | `pipeline.judge.maxCrops` / `cropSize` | `4` / `512` | Images per checked clip, and their size. Lower both to cut cost. |
 | `retention.rejectedDays` / `motionlessDays` / `uncheckedGb` | `7` / `2` / `10` | When rejected clips are deleted, and the most unchecked footage to keep. |
 | `retention.minFreeGb` | `5` | Free disk space to keep (see below). |

@@ -152,7 +152,7 @@ test("claude-code output: structured output with API-equivalent cost; not-logged
 
 test("createLlm auto: API key wins, else Claude Code on PATH, else no judge", async () => {
 	const saved = { key: process.env.ANTHROPIC_API_KEY, token: process.env.ANTHROPIC_AUTH_TOKEN, path: process.env.PATH }
-	const cfg = { provider: "auto", model: "claude-haiku-5-5", escalateModel: null, escalateBelow: 0.6, maxCrops: 4, cropSize: 512 } as const
+	const cfg = { provider: "auto", model: "claude-haiku-5-5", escalateModel: null, escalateBelow: 0.6, confirmModel: null, maxCrops: 4, cropSize: 512 } as const
 	try {
 		delete process.env.ANTHROPIC_AUTH_TOKEN
 		process.env.ANTHROPIC_API_KEY = "sk-test"

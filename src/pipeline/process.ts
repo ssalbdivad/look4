@@ -17,7 +17,7 @@ import { clipMediaDir, localDate } from "../paths.ts"
 import { mediaUrls } from "../server/dto.ts"
 import type { Clip, ClipMedia, Detection, Lookout, MotionResult, Stage, Usage, Verdict } from "../types.ts"
 import { isStale } from "./compile.ts"
-import { buildCrops, contextImage, feederSheets, pickDetections } from "./crops.ts"
+import { buildCrops, contextImage, feederLook, pickDetections } from "./crops.ts"
 import { judgeClip } from "./judge.ts"
 import { runMotionGate } from "./motion.ts"
 import type { JudgeCrop } from "./types.ts"
@@ -37,7 +37,7 @@ export type CascadeRun = {
 	dropReason: string | null
 	probe: ProbeResult | null
 	motion: MotionResult | null
-	/** Real detector detections (never the motion pseudo-detections). */
+	/** Detector detections and feeder visits (`via: "feeder"`), never the motion pseudo-detections. */
 	detections: Detection[]
 	/** Decoded frames keyed by `t`, for the poster. */
 	frames: Map<number, Buffer>
@@ -194,7 +194,8 @@ export const runCascade = async (
 	const judgeOn = ctx.llm && cfg.judge.provider !== "none"
 	let candidates: Lookout[]
 	let evidence: Detection[]
-	let sheets: JudgeCrop[] | null = null
+	let sheets: JudgeCrop[] = []
+	let visits: Detection[] = []
 	if (detectorOn) {
 		const out = await atStage("detect", () =>
 			timed(run.timings, "detect", () =>
@@ -209,11 +210,18 @@ export const runCascade = async (
 		evidence = out.detections.filter(d => wanted.has(norm(d.label)))
 		// A bird clinging to a feeder barely moves and is too small for the detector: a White-breasted
 		// Nuthatch scored 0.04 on OWL-ViT even zoomed on the feeder (0.15 needed), and Grounding DINO
-		// scored the empty feeder as "squirrel" as high as the bird. So a moving clip the detector found
-		// nothing in still goes to the judge, with a sheet of each feeder over the whole clip as its crops
-		// (`feederSheets`). One judge call per such clip.
-		if (!candidates.length && cfg.feeders.length && judgeOn) {
-			sheets = await atStage("detect", () => feederSheets(path, probed, cfg.feeders, signal))
+		// scored the empty feeder as "squirrel" as high as the bird. So every moving clip goes to the
+		// judge with a sheet of each feeder and a close-up of whatever turned up on one (`feederLook`),
+		// whatever else the detector found: looked at only when it found nothing, the feeders went
+		// unseen behind the doves it found on the ground all day. One judge call per clip.
+		if (cfg.feeders.length && judgeOn) {
+			const start = performance.now()
+			const look = await atStage("detect", () => feederLook(clip.id, path, probed, cfg.feeders, signal))
+			// part of looking for a subject, so it counts toward the detect stage's time
+			run.timings.detect = (run.timings.detect ?? 0) + Math.round(performance.now() - start)
+			sheets = look.sheets
+			visits = look.visits
+			run.detections = [...run.detections, ...look.visits]
 			candidates = lookouts
 		}
 		if (!candidates.length) return drop("detect", noneDetected(queries))
@@ -240,10 +248,12 @@ export const runCascade = async (
 	await atStage("judge", () =>
 		timed(run.timings, "judge", async () => {
 			// detectors sometimes return a frameT the frames map lacks (zoom views); decode the ones that will be cropped
-			for (const d of pickDetections(evidence, cfg.judge.maxCrops))
+			for (const d of [...pickDetections(evidence, cfg.judge.maxCrops), ...pickDetections(visits, cfg.judge.maxCrops)])
 				if (!run.frames.has(d.frameT)) run.frames.set(d.frameT, await extractFrame(path, d.frameT))
 			const fineGrained = candidates.some(l => l.compiled?.fineGrained)
-			run.crops = sheets ?? (await buildCrops(run.frames, evidence, { maxCrops: cfg.judge.maxCrops, cropSize: cfg.judge.cropSize, fineGrained }))
+			const opts = { maxCrops: cfg.judge.maxCrops, cropSize: cfg.judge.cropSize, fineGrained }
+			// feeder visits get close-ups of their own: sharing the detector's, they lost to the doves it found
+			run.crops = [...(await buildCrops(run.frames, evidence, opts)), ...(await buildCrops(run.frames, visits, opts)), ...sheets]
 			if (!judgeOn || !ctx.llm) {
 				run.verdicts = candidates.map(l => detectorOnlyVerdict(clip.id, l, evidence))
 				return
@@ -538,7 +548,8 @@ export const processClip = async (ctx: AppContext, clip: Clip, signal?: AbortSig
 			if (run.timings.detect !== undefined || !backfill) {
 				// a backfill only searched for its own nouns, so keep what earlier runs found for the others
 				const searched = new Set(lookouts.flatMap(queriesOf))
-				const kept = backfill ? store.getDetections(clip.id).filter(d => !searched.has(norm(d.label))) : []
+				// feeder visits are looked for on every run, so a backfill's replace them too
+				const kept = backfill ? store.getDetections(clip.id).filter(d => d.via !== "feeder" && !searched.has(norm(d.label))) : []
 				store.replaceDetections(clip.id, [...kept, ...run.detections].sort((a, b) => b.score - a.score))
 			}
 			store.deleteVerdicts(clip.id, backfill ? lookouts.map(l => l.id) : undefined)

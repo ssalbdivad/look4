@@ -3,9 +3,10 @@
 // (is the bird big enough to identify?) and cost (tokens ≈ width × height / 750).
 
 import sharp from "sharp"
-import { expandBox, iou, squareAround, toPixels } from "../geometry.ts"
-import { keyframeRegions } from "../media/ffmpeg.ts"
+import { expandBox, fromInner, iou, squareAround, toPixels } from "../geometry.ts"
+import { keyframeRegions, type ProbeResult } from "../media/ffmpeg.ts"
 import type { Detection, NormBox } from "../types.ts"
+import { OCCUPANCY_SIDE, OCCUPIED, scoreFeederFrames } from "./occupancy.ts"
 import type { JudgeCrop } from "./types.ts"
 
 /** Context around the box on every side, as a fraction of the box. */
@@ -132,32 +133,96 @@ export const buildCrops = async (
 
 /** Tile side in a feeder sheet: a chickadee, ~70 px of a 4K feeder region, stays ~50 px. */
 const SHEET_TILE = 256
-/** Most keyframes a sheet shows; a longer clip's are spread evenly over it. */
+/** Most keyframes a sheet shows. */
 const SHEET_MAX_TILES = 12
+/** The label of a feeder visit found by `scoreFeederFrames`, as a detection. */
+export const FEEDER_VISITOR = "feeder visitor"
 
 /**
- * For a clip the detector found nothing in: one image per feeder, every keyframe of the clip at that
- * feeder tiled in time order, so the judge sees the whole clip at each feeder. Picking frames does
- * not work there: a chickadee sat still on a feeder for the first 3 s of 24 and the feeder then
- * swung for 20, so every frame the motion gate picked showed it empty, and so did the frames a
- * difference score ranked first (the swing outscored the bird, 2026-10-22). Each tile is labeled
- * with its time; the crop's `frameT` is the first tile's.
+ * A feeder's visits: runs of occupied frames (`OCCUPIED` or more), one unoccupied frame allowed inside
+ * a run since a bird ducking behind the feeder for a keyframe is still the same visit. Each run's
+ * frames are best first; runs are ordered by their best frame.
  */
-export const feederSheets = async (
+export const visitRuns = (scores: number[]): number[][] => {
+	const runs: number[][] = []
+	let open: number[] | null = null
+	let last = -Infinity
+	scores.forEach((s, i) => {
+		if (s < OCCUPIED) return
+		if (open && i - last <= 2) open.push(i)
+		else runs.push((open = [i]))
+		last = i
+	})
+	return runs.map(r => r.sort((a, b) => scores[b]! - scores[a]!)).sort((a, b) => scores[b[0]!]! - scores[a[0]!]!)
+}
+
+/**
+ * Up to `max` of a feeder's frames for its sheet, in time order: occupied frames first, taken a visit
+ * at a time (each visit's best, then each one's second best, ...) so a nuthatch dropping in for one
+ * keyframe still makes it beside a sparrow that sat through twenty; then the rest spread evenly.
+ * Spread alone missed most visits: a 2-minute clip has ~60 keyframes and a chickadee or woodpecker
+ * stays for 1-5 of them, so 12 evenly spaced tiles (one per ~10 s) showed the feeder empty while
+ * birds came and went. The even fill covers what scoring cannot see: a bird that clings through the
+ * whole clip.
+ */
+export const sheetFrames = (scores: number[], max: number): number[] => {
+	const n = scores.length
+	if (n <= max) return scores.map((_, i) => i)
+	const runs = visitRuns(scores)
+	const chosen = new Set<number>()
+	for (let round = 0; chosen.size < max && runs.some(r => r[round] !== undefined); round++)
+		for (const r of runs) if (r[round] !== undefined && chosen.size < max) chosen.add(r[round]!)
+	const rest = scores.map((_, i) => i).filter(i => !chosen.has(i))
+	const fill = max - chosen.size
+	for (let j = 0; j < fill; j++) chosen.add(rest[Math.round(fill === 1 ? (rest.length - 1) / 2 : (j * (rest.length - 1)) / (fill - 1))]!)
+	return [...chosen].sort((a, b) => a - b)
+}
+
+/**
+ * Every feeder's keyframes, for every clip that reaches the judge, whatever the detector found: a
+ * small bird clinging to a feeder is too small and too still for it, and on 2026-10-22 the doves the
+ * detector found on the ground kept the feeders out of the judge's sight (they were looked at only
+ * when it found nothing at all) while chickadees, a woodpecker and nuthatches came and went.
+ *
+ * Returns one sheet per feeder, its keyframes tiled in time order (picked by `sheetFrames`), each
+ * tile labeled with its time; and each visit `scoreFeederFrames` finds (`visitRuns`), as a detection
+ * labeled FEEDER_VISITOR on its best frame, boxed on the visitor, so the judge also gets a close-up of
+ * it (a bird is ~34 px in a sheet tile). Picking frames by the motion gate alone does not work at a
+ * feeder: a chickadee sat still on one for the first 3 s of 24 and the feeder then swung for 20, so
+ * every frame motion picked showed it empty. Keyframes decode on their own: one pass over a 24 s 4K
+ * clip's 12 takes ~3.2 s.
+ */
+export const feederLook = async (
+	clipId: string,
 	path: string,
-	size: { width: number; height: number },
+	size: Pick<ProbeResult, "width" | "height"> & Partial<Pick<ProbeResult, "codec" | "rotation">>,
 	feeders: NormBox[],
 	signal?: AbortSignal
-): Promise<JudgeCrop[]> => {
+): Promise<{ sheets: JudgeCrop[]; visits: Detection[] }> => {
 	const regions = feeders.map(box => cropRegion(box, size.width, size.height))
-	const frames = await keyframeRegions(path, regions.map(r => toPixels(r, size.width, size.height)), SHEET_TILE, signal)
-	if (!frames.length) return []
-	const picked = frames.length <= SHEET_MAX_TILES ? frames : Array.from({ length: SHEET_MAX_TILES }, (_, i) => frames[Math.round((i * (frames.length - 1)) / (SHEET_MAX_TILES - 1))]!)
-	// about 4:3, the shape vision models read best: 12 tiles are 4×3
-	const cols = Math.ceil(Math.sqrt((picked.length * 4) / 3) - 1e-9)
-	const rows = Math.ceil(picked.length / cols)
-	return Promise.all(
+	const rects = regions.map(r => toPixels(r, size.width, size.height))
+	const frames = await keyframeRegions(path, rects, SHEET_TILE, signal, size.codec ? { ...size, codec: size.codec } : undefined)
+	if (!frames.length) return { sheets: [], visits: [] }
+	const visits: Detection[] = []
+	const sheets = await Promise.all(
 		feeders.map(async (box, f) => {
+			const small = await Promise.all(
+				frames.map(k => sharp(k.tiles[f]!, { raw: { width: SHEET_TILE, height: SHEET_TILE, channels: 3 } }).resize(OCCUPANCY_SIDE, OCCUPANCY_SIDE).raw().toBuffer())
+			)
+			signal?.throwIfAborted()
+			const occupancy = scoreFeederFrames(small, OCCUPANCY_SIDE)
+			// one close-up per visit, on its best frame
+			for (const [i] of visitRuns(occupancy.map(o => o.score))) {
+				const o = occupancy[i!]!
+				visits.push({ clipId, frameT: frames[i!]!.t, label: FEEDER_VISITOR, score: Math.min(1, o.score / 300), box: fromInner(o.box!, regions[f]!), via: "feeder" })
+			}
+			const picked = sheetFrames(
+				occupancy.map(o => o.score),
+				SHEET_MAX_TILES
+			).map(i => frames[i]!)
+			// about 4:3, the shape vision models read best: 12 tiles are 4×3
+			const cols = Math.ceil(Math.sqrt((picked.length * 4) / 3) - 1e-9)
+			const rows = Math.ceil(picked.length / cols)
 			const tiles = picked.map((k, i) => ({
 				input: k.tiles[f]!,
 				raw: { width: SHEET_TILE, height: SHEET_TILE, channels: 3 as const },
@@ -178,6 +243,7 @@ export const feederSheets = async (
 			return { jpeg, frameT: picked[0]!.t, label: "feeder timeline", score: 0, box, sheet: picked.map(k => k.t) }
 		})
 	)
+	return { sheets, visits: visits.sort((a, b) => b.score - a.score) }
 }
 
 /** The whole scene (or the detection zone) for the judge's context, long edge at most `maxEdge`. */

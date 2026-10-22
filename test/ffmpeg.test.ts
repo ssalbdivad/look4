@@ -4,7 +4,7 @@ import { join } from "node:path"
 import { before, test } from "node:test"
 import sharp from "sharp"
 import { createHwdecHealth, decodeGray, extractFrame, keyframeRegions, probe, run } from "../src/media/ffmpeg.ts"
-import { feederSheets } from "../src/pipeline/crops.ts"
+import { feederLook } from "../src/pipeline/crops.ts"
 
 const tmp = join(import.meta.dirname, ".tmp", "ffmpeg")
 
@@ -68,10 +68,10 @@ test("keyframeRegions cuts every keyframe to each region, in the regions' order,
 	)
 })
 
-test("feederSheets: one image per feeder with every keyframe tiled in time order, so a bird in one keyframe is in its tile", async () => {
+test("feederLook: one image per feeder with every keyframe tiled in time order, so a bird in one keyframe is in its tile", async () => {
 	const clip = await birdAtTwo()
 	const feeder = { x: 120 / 640, y: 70 / 360, w: 0.01, h: 0.01 }
-	const [sheet] = await feederSheets(clip, { width: 640, height: 360 }, [feeder])
+	const { sheets: [sheet] } = await feederLook("c", clip, { width: 640, height: 360 }, [feeder])
 	assert.deepEqual([sheet!.label, sheet!.frameT, sheet!.sheet, sheet!.box], ["feeder timeline", 0, [0, 1, 2], feeder])
 	const { data, info } = await sharp(sheet!.jpeg).raw().toBuffer({ resolveWithObject: true })
 	// three 256 px tiles, two to a row; the bird sits mid-tile, clear of the time labels
@@ -116,6 +116,31 @@ test("decodeGray's GPU and CPU paths see the same cropped region", async t => {
 			// the two resizers differ by well under a grey level; a misplaced crop is off by dozens
 			assert.ok(sum / cpu.frames[k]!.length < 2, `frame ${k}: mean abs diff ${sum / cpu.frames[k]!.length}`)
 		}
+	} finally {
+		delete process.env.LOOK4_HWDEC
+	}
+})
+
+test("keyframeRegions' GPU path picks the same keyframes and cuts the same regions as the CPU path", async t => {
+	const clip = await make("big-gop.mp4", "testsrc2=size=2560x1440:rate=5:duration=3", ["-g", "5", "-keyint_min", "5", "-sc_threshold", "0"])
+	const p = await probe(clip)
+	if ((await decodeGray(clip, p, { fps: 1, maxEdge: 64, maxFrames: 1 })).decoder !== "cuvid") return t.skip("NVDEC is not available here")
+	// odd offsets, so the GPU's even-pixel crop around both has to be undone exactly
+	const rects = [{ left: 301, top: 97, width: 349, height: 349 }, { left: 1871, top: 803, width: 349, height: 349 }]
+	const gpu = await keyframeRegions(clip, rects, 64, undefined, p)
+	process.env.LOOK4_HWDEC = "off"
+	try {
+		const cpu = await keyframeRegions(clip, rects, 64, undefined, p)
+		assert.deepEqual(gpu.map(f => f.t), [0, 1, 2])
+		assert.deepEqual(gpu.map(f => f.t), cpu.map(f => f.t))
+		gpu.forEach((f, k) =>
+			f.tiles.forEach((tile, r) => {
+				let sum = 0
+				for (let i = 0; i < tile.length; i++) sum += Math.abs(tile[i]! - cpu[k]!.tiles[r]![i]!)
+				// testsrc2 moves every frame, so a wrong frame or a shifted crop is off by dozens
+				assert.ok(sum / tile.length < 2, `keyframe ${k}, region ${r}: mean abs diff ${sum / tile.length}`)
+			})
+		)
 	} finally {
 		delete process.env.LOOK4_HWDEC
 	}

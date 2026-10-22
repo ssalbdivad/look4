@@ -79,6 +79,16 @@
 				"judge": {
 					"type": "object",
 					"properties": {
+						"confirmModel": {
+							"anyOf": [
+								{
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							]
+						},
 						"cropSize": {
 							"type": "integer",
 							"maximum": 1568,
