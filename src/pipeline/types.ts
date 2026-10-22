@@ -3,6 +3,7 @@
 import type { Config } from "../config.ts"
 import type { ProbeResult } from "../media/ffmpeg.ts"
 import type { Clip, Detection, Lookout, MotionResult, NormBox, Usage, Verdict } from "../types.ts"
+import type { SeenBird } from "./judge.ts"
 
 export type MotionOptions = Config["pipeline"]["motion"] & { roi: NormBox | null }
 
@@ -67,5 +68,7 @@ export type JudgeInput = {
 export type JudgeOutput = {
 	/** One per input lookout. `match` is the judge's raw yes/no; the lookout threshold is applied by the caller. */
 	verdicts: Verdict[]
+	/** Every species the judge saw, with the crop that shows each best. */
+	birds: SeenBird[]
 	usage: Usage[]
 }

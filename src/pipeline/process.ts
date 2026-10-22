@@ -18,7 +18,7 @@ import { mediaUrls } from "../server/dto.ts"
 import type { Clip, ClipMedia, Detection, Lookout, MotionResult, Stage, Usage, Verdict } from "../types.ts"
 import { isStale } from "./compile.ts"
 import { buildCrops, contextImage, feederLook, pickDetections } from "./crops.ts"
-import { judgeClip } from "./judge.ts"
+import { judgeClip, type SeenBird } from "./judge.ts"
 import { runMotionGate } from "./motion.ts"
 import type { JudgeCrop } from "./types.ts"
 
@@ -37,6 +37,8 @@ export type CascadeRun = {
 	dropReason: string | null
 	probe: ProbeResult | null
 	motion: MotionResult | null
+	/** Every species the judge saw, with the crop that shows each best. */
+	birds: SeenBird[]
 	/** Detector detections and feeder visits (`via: "feeder"`), never the motion pseudo-detections. */
 	detections: Detection[]
 	/** Decoded frames keyed by `t`, for the poster. */
@@ -155,6 +157,7 @@ export const runCascade = async (
 		detections: [],
 		frames: new Map(),
 		judged: [],
+		birds: [],
 		crops: [],
 		verdicts: [],
 		usage: [],
@@ -266,6 +269,7 @@ export const runCascade = async (
 			const probedClip = { ...clip, durationS: probed.durationS, width: probed.width, height: probed.height }
 			const out = await judgeClip({ clip: probedClip, lookouts: candidates, crops: run.crops, context, lifeList: ctx.store.lifeListSpecies(), lifeListWithoutClip: ctx.store.lifeListWithoutClip(), signal }, ctx.llm, cfg.judge)
 			run.verdicts = out.verdicts
+			run.birds = out.birds
 			run.usage = out.usage.map(u => ({ ...u, clipId: clip.id }))
 		})
 	)
@@ -352,6 +356,18 @@ export const placeClipFile = async (ctx: Pick<AppContext, "paths">, clip: Clip, 
 	if (target === clip.path) return clip.path
 	await moveFile(clip.path, target)
 	return target
+}
+
+/**
+ * The crops, the one showing what the clip was kept for first: the first crop is the sighting's
+ * picture, and in detector order it was whatever the detector found first. On 2026-10-22 a correct
+ * White-breasted Nuthatch sighting showed a Mourning Dove on the fence rail.
+ */
+export const leadWithSighting = (run: Pick<CascadeRun, "crops" | "birds">, keeping: Verdict[]): JudgeCrop[] => {
+	const species = keeping.flatMap(v => (v.species ? [v.species.toLowerCase()] : []))
+	const best = species.flatMap(s => run.birds.filter(b => b.species.toLowerCase() === s && typeof b.crop === "number"))[0]
+	if (!best || !run.crops[best.crop!]) return run.crops
+	return [run.crops[best.crop!]!, ...run.crops.filter((_, i) => i !== best.crop)]
 }
 
 const posterJpeg = (frame: Buffer) =>
@@ -568,7 +584,7 @@ export const processClip = async (ctx: AppContext, clip: Clip, signal?: AbortSig
 		if (path !== clip.path) store.updateClip(clip.id, { path })
 		// a backfill that adds no match leaves a sighting's close-ups and poster as they were
 		const keepMedia = backfill && isKept && keptBefore.size > 0 && !fresh.length
-		const media = path && !keepMedia ? await writeMedia(ctx, clip, path, run, isKept) : clip.media
+		const media = path && !keepMedia ? await writeMedia(ctx, clip, path, { ...run, crops: leadWithSighting(run, keeping) }, isKept) : clip.media
 
 		let droppedAt: Stage | null = null
 		let reason: string

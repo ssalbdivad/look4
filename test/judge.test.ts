@@ -2,6 +2,7 @@ import { test } from "node:test"
 import assert from "node:assert/strict"
 import sharp from "sharp"
 import { judgeClip } from "../src/pipeline/judge.ts"
+import { leadWithSighting } from "../src/pipeline/process.ts"
 import { buildCrops, cropRegion, pickDetections } from "../src/pipeline/crops.ts"
 import { createMockLlm } from "../src/llm/mock.ts"
 import type { LlmRequest, VisionLLM } from "../src/llm/types.ts"
@@ -204,14 +205,14 @@ test("judge: a life-list lookout keeps a clip for any bird in it, not only the o
 	assert.deepEqual((await run([{ species: "Red-breasted Nuthatch", confidence: 0.85 }])).verdict, [true, "Red-breasted Nuthatch", 0.85, "Birds at the feeder"])
 })
 
-test("judge: a life-list sighting stands only when the confirming model keeps the clip for the same species", async () => {
+test("judge: a life-list sighting stands only when the confirming model keeps the clip for a species the first look named more likely than not", async () => {
 	const l = lookout("lifer", ["bird"])
 	const lifer: Lookout = { ...l, compiled: { ...l.compiled!, lifeList: "newOrClipless" } }
 	const answer = (species: string, speciesConfidence: number) => ({
 		verdicts: [{ lookoutId: "lifer", rationale: "A bird at the feeder.", label: species, species, speciesConfidence, match: true, confidence: 0.85 }]
 	})
-	const run = async (second: (() => unknown) | null) => {
-		const { llm, calls } = scripted(req => (req.model === "claude-opus-5-5" ? (second ? second() : answer("x", 0)) : answer("White-breasted Nuthatch", 0.8)))
+	const run = async (second: (() => unknown) | null, first = 0.8) => {
+		const { llm, calls } = scripted(req => (req.model === "claude-opus-5-5" ? (second ? second() : answer("x", 0)) : answer("White-breasted Nuthatch", first)))
 		const out = await judgeClip(
 			{ ...input([lifer]), lifeList: ["White-breasted Nuthatch", "Black-capped Chickadee"], lifeListWithoutClip: ["White-breasted Nuthatch"] },
 			llm,
@@ -220,7 +221,17 @@ test("judge: a life-list sighting stands only when the confirming model keeps th
 		const v = out.verdicts[0]!
 		return [v.match, v.species, v.speciesConfidence, v.rationale.split(".")[0], calls.map(c => c.model ?? "first"), out.usage.length]
 	}
-	assert.deepEqual(await run(() => answer("White-breasted Nuthatch", 0.9)), [true, "White-breasted Nuthatch", 0.8, "A bird at the feeder", ["first", "claude-opus-5-5"], 2])
+	assert.deepEqual(await run(() => answer("White-breasted Nuthatch", 0.9)), [
+		true,
+		"White-breasted Nuthatch",
+		0.9,
+		"claude-opus-5-5 named White-breasted Nuthatch at 90% (first look at 80%)",
+		["first", "claude-opus-5-5"],
+		2
+	])
+	// under the bar on the first look is a candidate, not a "no": Sonnet named one live nuthatch at 0.70-0.80
+	assert.deepEqual((await run(() => answer("White-breasted Nuthatch", 0.85), 0.65)).slice(0, 3), [true, "White-breasted Nuthatch", 0.85])
+	assert.deepEqual((await run(() => answer("Black-capped Chickadee", 0.9), 0.65)).slice(0, 4), [false, "White-breasted Nuthatch", 0.65, "White-breasted Nuthatch at 65% is under the 75% a sighting needs"])
 	assert.deepEqual(await run(() => answer("Black-capped Chickadee", 0.9)), [
 		false,
 		"White-breasted Nuthatch",
@@ -241,6 +252,30 @@ test("judge: a life-list sighting stands only when the confirming model keeps th
 	// with no confirming model the first answer decides, in one call
 	const alone = await run(null)
 	assert.deepEqual([alone[0], alone[4], alone[5]], [true, ["first"], 1])
+})
+
+test("judge: each bird comes back with the crop that shows it, and a sighting's picture is that crop", async () => {
+	const l = lookout("lifer", ["bird"])
+	const lifer: Lookout = { ...l, compiled: { ...l.compiled!, lifeList: "newOrClipless" } }
+	const { llm } = scripted(() => ({
+		birds: [
+			{ species: "Mourning Dove", confidence: 0.95, crop: 0 },
+			{ species: "White-breasted Nuthatch", confidence: 0.8, crop: 2 },
+			// an index past the images sent is no index
+			{ species: "House Sparrow", confidence: 0.85, crop: 7 }
+		],
+		verdicts: [{ lookoutId: "lifer", rationale: "Birds.", label: "Mourning Dove", species: "Mourning Dove", speciesConfidence: 0.95, match: true, confidence: 0.9 }]
+	}))
+	const crops = [crop("bird"), crop("feeder visitor"), crop("feeder visitor")]
+	const out = await judgeClip({ ...input([lifer], crops), lifeList: ["Mourning Dove", "White-breasted Nuthatch"], lifeListWithoutClip: ["White-breasted Nuthatch"] }, llm, cfg())
+	assert.deepEqual(
+		out.birds.map(b => [b.species, b.crop]),
+		[["Mourning Dove", 0], ["White-breasted Nuthatch", 2], ["House Sparrow", null]]
+	)
+	// 2026-10-22: the nuthatch sighting's card showed the dove the detector found first
+	assert.deepEqual(leadWithSighting({ crops, birds: out.birds }, out.verdicts).map(c => crops.indexOf(c)), [2, 0, 1])
+	// no crop named for the species: the order stands
+	assert.deepEqual(leadWithSighting({ crops, birds: [] }, out.verdicts), crops)
 })
 
 test("judge: confidence below the escalation band is a confident no, not escalated", async () => {

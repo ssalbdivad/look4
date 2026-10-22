@@ -38,7 +38,7 @@ Calibrate confidence (0 to 1) as the probability that your match answer is right
 - Below 0.6 when you are guessing either way.
 For match: false, confidence is how sure you are that the lookout is NOT satisfied.
 
-Then return "birds": every distinct bird species in the clip, from any crop, tile or the context image, one entry each, whatever the lookouts ask about: species (named exactly as for a verdict below) and confidence (the probability it is that species). Leave out a bird too small or blurred to favor any species; an empty list when no bird is visible.
+Then return "birds": every distinct bird species in the clip, from any crop, tile or the context image, one entry each, whatever the lookouts ask about: species (named exactly as for a verdict below), confidence (the probability it is that species), and crop: the N of the "crop N" image that shows that bird best, a close-up over a feeder timeline, or null when only the context image shows it. Leave out a bird too small or blurred to favor any species; an empty list when no bird is visible.
 
 For each lookout return:
 - lookoutId: exactly as given.
@@ -59,12 +59,15 @@ const VerdictAnswer = type({
 	"speciesConfidence?": "number | null",
 	rationale: "string"
 })
-const BirdAnswer = type({ species: "string", confidence: "number" })
+const BirdAnswer = type({ species: "string", confidence: "number", "crop?": "number | null" })
 // optional on read: the identification only steers generation, nothing downstream stores it
 const JudgeAnswer = type({ "identification?": "string", "birds?": BirdAnswer.array(), verdicts: VerdictAnswer.array() })
 
-/** A species the judge saw anywhere in the clip, not only the subject a verdict was about. */
-export type SeenBird = { species: string; confidence: number }
+/**
+ * A species the judge saw anywhere in the clip, not only the subject a verdict was about, and the
+ * index of the crop that shows it best (null: only the context image, or not said).
+ */
+export type SeenBird = { species: string; confidence: number; crop?: number | null }
 
 /**
  * Property order is generation order: evidence first, then the call. `identification` comes
@@ -81,8 +84,8 @@ export const JUDGE_SCHEMA: JsonSchema = {
 			type: "array",
 			items: {
 				type: "object",
-				properties: { species: { type: "string" }, confidence: { type: "number" } },
-				required: ["species", "confidence"],
+				properties: { species: { type: "string" }, confidence: { type: "number" }, crop: { anyOf: [{ type: "integer" }, { type: "null" }] } },
+				required: ["species", "confidence", "crop"],
 				additionalProperties: false
 			}
 		},
@@ -203,7 +206,8 @@ const ask = async (
 	const birds = (parsed.birds ?? []).flatMap(b => {
 		const species = b.species.trim()
 		const confidence = clamp01(b.confidence)
-		return species && confidence >= 0.5 ? [{ species, confidence }] : []
+		const crop = typeof b.crop === "number" && Number.isInteger(b.crop) && b.crop >= 0 && b.crop < input.crops.length ? b.crop : null
+		return species && confidence >= 0.5 ? [{ species, confidence, crop }] : []
 	})
 	return { verdicts, birds, answered: new Set(lookouts.filter(l => byId.has(l.id)).map(l => l.id)), usage: res.usage }
 }
@@ -226,6 +230,10 @@ export const isNewSpecies = (species: string, mode: LifeListMode, lifeList: stri
 	return !has(lifeList) || (mode === "newOrClipless" && has(withoutClip))
 }
 
+/** The birds named in a verdict or anywhere in the clip that are new for a lookout of this mode, at any confidence. */
+export const wantedBirds = (v: Verdict, mode: LifeListMode, lifeList: string[], withoutClip: string[], birds: SeenBird[]): SeenBird[] =>
+	[...(v.species ? [{ species: v.species, confidence: v.speciesConfidence ?? 0 }] : []), ...birds].filter(b => isNewSpecies(b.species, mode, lifeList, withoutClip))
+
 /**
  * A life-list lookout's verdict, decided here rather than by the judge: its rubric's other criteria
  * (the judge's match) and any bird in the clip new for its mode, named sure enough: the verdict's own
@@ -235,7 +243,7 @@ export const isNewSpecies = (species: string, mode: LifeListMode, lifeList: stri
 export const lifeListVerdict = (v: Verdict, mode: LifeListMode, lifeList: string[], withoutClip: string[], birds: SeenBird[] = []): Verdict => {
 	if (!v.match) return v
 	const named: SeenBird[] = [...(v.species ? [{ species: v.species, confidence: v.speciesConfidence ?? 0 }] : []), ...birds]
-	const hit = named.find(b => isNewSpecies(b.species, mode, lifeList, withoutClip) && b.confidence >= NEW_SPECIES_CONFIDENCE)
+	const hit = wantedBirds(v, mode, lifeList, withoutClip, birds).find(b => b.confidence >= NEW_SPECIES_CONFIDENCE)
 	if (hit) return { ...v, species: hit.species, speciesConfidence: hit.confidence, confidence: Math.min(v.confidence, hit.confidence) }
 	const sure = v.speciesConfidence ?? 0
 	const why = !v.species
@@ -253,7 +261,7 @@ export const lifeListVerdict = (v: Verdict, mode: LifeListMode, lifeList: string
 const uncertain = (v: Verdict, below: number) => v.confidence >= below - 0.3 && v.confidence < below
 
 export const judgeClip = async (input: JudgeInput, llm: VisionLLM, cfg: Config["pipeline"]["judge"]): Promise<JudgeOutput> => {
-	if (input.lookouts.length === 0) return { verdicts: [], usage: [] }
+	if (input.lookouts.length === 0) return { verdicts: [], birds: [], usage: [] }
 	const first = await ask(input, input.lookouts, llm, undefined)
 	const usage = [first.usage]
 	let verdicts = first.verdicts
@@ -280,13 +288,23 @@ export const judgeClip = async (input: JudgeInput, llm: VisionLLM, cfg: Config["
 		const mode = modes.get(v.lookoutId)
 		return mode ? lifeListVerdict(v, mode, input.lifeList ?? [], input.lifeListWithoutClip ?? [], seen) : v
 	}
-	verdicts = verdicts.map(v => decide(v, birds))
-	const keeping = verdicts.filter(v => v.match && modes.has(v.lookoutId))
-	if (cfg.confirmModel && keeping.length) {
+	// the wanted birds named more likely than not: each one a sighting if the confirming model agrees
+	const candidates = (v: Verdict) => {
+		const mode = modes.get(v.lookoutId)
+		return mode && v.match ? wantedBirds(v, mode, input.lifeList ?? [], input.lifeListWithoutClip ?? [], birds).filter(b => b.confidence >= 0.5) : []
+	}
+	const raw = verdicts
+	verdicts = raw.map(v => decide(v, birds))
+	const doubtful = raw.filter(v => candidates(v).length)
+	if (cfg.confirmModel && doubtful.length) {
 		try {
-			const again = await ask(input, input.lookouts.filter(l => keeping.some(v => v.lookoutId === l.id)), llm, cfg.confirmModel)
+			const again = await ask(input, input.lookouts.filter(l => doubtful.some(v => v.lookoutId === l.id)), llm, cfg.confirmModel)
 			usage.push(again.usage)
-			verdicts = verdicts.map(v => (keeping.includes(v) ? confirmed(v, again.verdicts.find(x => x.lookoutId === v.lookoutId), again.birds, decide, cfg.confirmModel!) : v))
+			verdicts = verdicts.map((d, k) => {
+				const wanted = candidates(raw[k]!)
+				if (!wanted.length) return d
+				return confirmed(raw[k]!, d, wanted, again.verdicts.find(x => x.lookoutId === d.lookoutId), again.birds, decide, cfg.confirmModel!)
+			})
 		} catch (e) {
 			const spent = usageOf(e)
 			if (spent) usage.push(spent)
@@ -295,18 +313,33 @@ export const judgeClip = async (input: JudgeInput, llm: VisionLLM, cfg: Config["
 			log.warn(`confirming ${input.clip.id} with ${cfg.confirmModel} failed: ${e instanceof Error ? e.message : String(e)}`)
 		}
 	}
-	return { verdicts, usage }
+	return { verdicts, birds, usage }
 }
 
 /**
  * A life-list sighting stands only when a second model, asked the same question on its own, keeps the
- * clip for the same species: a sighting puts a bird on the person's list, so two opinions are worth
- * one more call on the few clips that get this far. Otherwise it is a "no", saying who named what.
+ * clip for one of the wanted birds the first named more likely than not, at the full sighting bar.
+ * Each opinion alone was too noisy: Sonnet named the same live nuthatch at 0.70, 0.75 and 0.80 in
+ * three runs, around the bar, and named a female cardinal "House Finch" at 0.50. So a candidate under
+ * the bar is not dropped, and one over it is not trusted, until the second model has looked; the
+ * sighting carries its call. Otherwise the first decision stands, or a sighting it made becomes a "no"
+ * saying who named what.
  */
-const confirmed = (v: Verdict, again: Verdict | undefined, seen: SeenBird[], decide: (v: Verdict, seen: SeenBird[]) => Verdict, model: string): Verdict => {
+const confirmed = (
+	first: Verdict,
+	decided: Verdict,
+	wanted: SeenBird[],
+	again: Verdict | undefined,
+	seen: SeenBird[],
+	decide: (v: Verdict, seen: SeenBird[]) => Verdict,
+	model: string
+): Verdict => {
 	const second = again && decide(again, seen)
-	const same = (s: string | null | undefined) => !!s && s.toLowerCase() === v.species?.toLowerCase()
-	if (second?.match && same(second.species)) return { ...v, confidence: Math.min(v.confidence, second.confidence), speciesConfidence: Math.min(v.speciesConfidence ?? 1, second.speciesConfidence ?? 1) }
-	const named = again?.species ? `${again.species}${typeof again.speciesConfidence === "number" ? ` at ${Math.round(again.speciesConfidence * 100)}%` : ""}` : "no species"
-	return { ...v, match: false, confidence: Math.max(0.5, second?.confidence ?? 0.5), rationale: `${model} did not confirm ${v.species} (it named ${named}). ${v.rationale}`.slice(0, 400) }
+	const pct = (n: number | null | undefined) => (typeof n === "number" ? ` at ${Math.round(n * 100)}%` : "")
+	const agreed = second?.match && wanted.find(b => b.species.toLowerCase() === second.species?.toLowerCase())
+	if (agreed && second)
+		return { ...first, species: agreed.species, speciesConfidence: second.speciesConfidence, confidence: Math.min(first.confidence, second.confidence), rationale: `${model} named ${agreed.species}${pct(second.speciesConfidence)} (first look${pct(agreed.confidence)}). ${first.rationale}`.slice(0, 400) }
+	if (!decided.match) return decided
+	const named = again?.species ? `${again.species}${pct(again.speciesConfidence)}` : "no species"
+	return { ...decided, match: false, confidence: Math.max(0.5, second?.confidence ?? 0.5), rationale: `${model} did not confirm ${decided.species} (it named ${named}). ${decided.rationale}`.slice(0, 400) }
 }
