@@ -269,7 +269,7 @@ export const lifeListVerdict = (v: Verdict, mode: LifeListMode, lifeList: string
 const uncertain = (v: Verdict, below: number) => v.confidence >= below - 0.3 && v.confidence < below
 
 export const judgeClip = async (input: JudgeInput, llm: VisionLLM, cfg: Config["pipeline"]["judge"]): Promise<JudgeOutput> => {
-	if (input.lookouts.length === 0) return { verdicts: [], birds: [], usage: [] }
+	if (input.lookouts.length === 0) return { verdicts: [], birds: [], nearMisses: [], usage: [] }
 	const first = await ask(input, input.lookouts, llm, undefined)
 	const usage = [first.usage]
 	let verdicts = first.verdicts
@@ -326,17 +326,25 @@ export const judgeClip = async (input: JudgeInput, llm: VisionLLM, cfg: Config["
 			log.warn(`confirming ${input.clip.id} with ${cfg.confirmModel} failed: ${e instanceof Error ? e.message : String(e)}`)
 		}
 	}
-	return { verdicts, birds, usage }
+	// a wanted bird named more likely than not that did not become a sighting: kept to be looked at by eye
+	const kept = new Set(verdicts.filter(v => v.match).map(v => v.lookoutId))
+	const nearMisses = [...new Set(doubtful.filter(v => !kept.has(v.lookoutId)).flatMap(v => candidates(v).map(b => b.species)))]
+	return { verdicts, birds, nearMisses, usage }
 }
 
 /**
  * A life-list sighting stands only when a second model, asked the same question on its own, keeps the
- * clip for one of the wanted birds the first named more likely than not, at the full sighting bar.
- * Each opinion alone was too noisy: Sonnet named the same live nuthatch at 0.70, 0.75 and 0.80 in
- * three runs, around the bar, and named a female cardinal "House Finch" at 0.50. So a candidate under
+ * clip for one of the wanted birds the first named more likely than not, and names it more likely than
+ * not too. Each opinion alone was too noisy: Sonnet named the same live nuthatch at 0.70, 0.75 and 0.80
+ * in three runs, around the bar, and named a female cardinal "House Finch" at 0.50. So a candidate under
  * the bar is not dropped, and one over it is not trusted, until the second model has looked; the
  * sighting carries its call. Otherwise the first decision stands, or a sighting it made becomes a "no"
  * saying who named what.
+ *
+ * Two independent calls of the same bird are the agreement; the second is not also held to the 75% a
+ * lone call needs. Held to it, no House Finch was kept from 10-22 to 10-27 while they visited daily:
+ * Sonnet's calls of one ran 0.50-0.70, and on 10-24 Opus, shown the House Sparrow it is usually mistaken
+ * for, still named it at 0.70 and the clip was dropped.
  */
 const confirmed = (
 	first: Verdict,
@@ -347,12 +355,18 @@ const confirmed = (
 	decide: (v: Verdict, seen: SeenBird[]) => Verdict,
 	model: string
 ): Verdict => {
-	const second = again && decide(again, seen)
 	const pct = (n: number | null | undefined) => (typeof n === "number" ? ` at ${Math.round(n * 100)}%` : "")
-	const agreed = second?.match && wanted.find(b => b.species.toLowerCase() === second.species?.toLowerCase())
-	if (agreed && second)
-		return { ...first, species: agreed.species, speciesConfidence: second.speciesConfidence, confidence: Math.min(first.confidence, second.confidence), rationale: `${model} named ${agreed.species}${pct(second.speciesConfidence)} (first look${pct(agreed.confidence)}). ${first.rationale}`.slice(0, 400) }
+	// the second model's own calls, held to the same more-likely-than-not bar the first look's candidates met
+	const calls: SeenBird[] = again?.match ? [...(again.species ? [{ species: again.species, confidence: again.speciesConfidence ?? 0 }] : []), ...seen] : []
+	const agreement = wanted
+		.map(w => ({ w, s: calls.find(b => b.confidence >= 0.5 && b.species.toLowerCase() === w.species.toLowerCase()) }))
+		.find(x => x.s)
+	if (agreement && again) {
+		const { w, s } = agreement
+		return { ...first, match: true, species: w.species, speciesConfidence: s!.confidence, confidence: Math.min(first.confidence, again.confidence, s!.confidence), rationale: `${model} named ${w.species}${pct(s!.confidence)} (first look${pct(w.confidence)}). ${first.rationale}`.slice(0, 400) }
+	}
 	if (!decided.match) return decided
+	const second = again && decide(again, seen)
 	const named = again?.species ? `${again.species}${pct(again.speciesConfidence)}` : "no species"
 	return { ...decided, match: false, confidence: Math.max(0.5, second?.confidence ?? 0.5), rationale: `${model} did not confirm ${decided.species} (it named ${named}). ${decided.rationale}`.slice(0, 400) }
 }

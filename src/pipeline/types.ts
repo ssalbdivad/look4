@@ -81,5 +81,7 @@ export type JudgeOutput = {
 	verdicts: Verdict[]
 	/** Every species the judge saw, with the crop that shows each best. */
 	birds: SeenBird[]
+	/** Wanted species the first look named more likely than not, on a life-list lookout that kept nothing. */
+	nearMisses: string[]
 	usage: Usage[]
 }

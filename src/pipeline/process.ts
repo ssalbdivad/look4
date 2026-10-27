@@ -39,6 +39,8 @@ export type CascadeRun = {
 	motion: MotionResult | null
 	/** Every species the judge saw, with the crop that shows each best. */
 	birds: SeenBird[]
+	/** Wanted species the judge named more likely than not that made no sighting (`JudgeOutput.nearMisses`). */
+	nearMisses: string[]
 	/** Detector detections and feeder visits (`via: "feeder"`), never the motion pseudo-detections. */
 	detections: Detection[]
 	/** Decoded frames keyed by `t`, for the poster. */
@@ -158,6 +160,7 @@ export const runCascade = async (
 		frames: new Map(),
 		judged: [],
 		birds: [],
+		nearMisses: [],
 		crops: [],
 		verdicts: [],
 		usage: [],
@@ -270,6 +273,7 @@ export const runCascade = async (
 			const out = await judgeClip({ clip: probedClip, lookouts: candidates, crops: run.crops, context, lifeList: ctx.store.lifeListSpecies(), lifeListWithoutClip: ctx.store.lifeListWithoutClip(), lookAlikes: lookAlikes(ctx), signal }, ctx.llm, cfg.judge)
 			run.verdicts = out.verdicts
 			run.birds = out.birds
+			run.nearMisses = out.nearMisses
 			run.usage = out.usage.map(u => ({ ...u, clipId: clip.id }))
 		})
 	)
@@ -518,9 +522,16 @@ const sightingEvent = (ctx: Pick<AppContext, "paths">, clip: Clip, v: Verdict, l
 	}
 }
 
-/** When an unkept clip's file goes; never for a labeled clip (ground truth for eval). */
+/**
+ * kv key naming the wanted species a rejected clip came close on (`CascadeRun.nearMisses`).
+ * Such a clip is kept until it is labeled: deleted at once, the House Finches the bar held back from
+ * 10-22 to 10-27 could not be checked by eye.
+ */
+export const nearMissKey = (clipId: string) => `near-miss:${clipId}`
+
+/** When an unkept clip's file goes; never for a labeled clip (ground truth for eval) or a near miss. */
 export const expiry = (ctx: Pick<AppContext, "store">, clipId: string, days: number) =>
-	ctx.store.getLabels({ clipId }).length ? null : new Date(Date.now() + days * DAY_MS).toISOString()
+	ctx.store.getLabels({ clipId }).length || ctx.store.getKv(nearMissKey(clipId)) !== null ? null : new Date(Date.now() + days * DAY_MS).toISOString()
 
 /**
  * The worker's last word on a clip whose judge kept failing; `isRetryable` is false from then on.
@@ -621,6 +632,10 @@ export const processClip = async (ctx: AppContext, clip: Clip, signal?: AbortSig
 		// a backfill that adds no match leaves a sighting's close-ups and poster as they were
 		const keepMedia = backfill && isKept && keptBefore.size > 0 && !fresh.length
 		const media = path && !keepMedia ? await writeMedia(ctx, clip, path, { ...run, crops: leadWithSighting(run, keeping) }, isKept) : clip.media
+
+		// before the expiry below; a backfill judged only its own lookouts, so it adds a near miss but clears none
+		if (run.nearMisses.length) store.setKv(nearMissKey(clip.id), run.nearMisses)
+		else if (!backfill) store.deleteKv(nearMissKey(clip.id))
 
 		let droppedAt: Stage | null = null
 		let reason: string

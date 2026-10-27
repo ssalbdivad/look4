@@ -240,8 +240,10 @@ test("judge: a life-list sighting stands only when the confirming model keeps th
 		["first", "claude-opus-5-5"],
 		2
 	])
-	// the same species, but no surer than a coin flip, is no confirmation
-	assert.equal((await run(() => answer("White-breasted Nuthatch", 0.6)))[0], false)
+	// two models naming the same wanted bird more likely than not agree, though neither alone clears the bar
+	assert.deepEqual((await run(() => answer("White-breasted Nuthatch", 0.6), 0.55)).slice(0, 4), [true, "White-breasted Nuthatch", 0.6, "claude-opus-5-5 named White-breasted Nuthatch at 60% (first look at 55%)"])
+	// a second call no surer than a coin flip names no species, and is no confirmation
+	assert.equal((await run(() => answer("White-breasted Nuthatch", 0.45), 0.55))[0], false)
 	// a confirmation that fails is no "no": the first answer stands
 	assert.deepEqual(
 		await run(() => {

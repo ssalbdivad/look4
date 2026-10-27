@@ -56,7 +56,7 @@ const stubDetector = (labels: () => string[]): Detector => ({
 	}
 })
 
-type Answer = { match: boolean; confidence: number; label: string | null; rationale: string }
+type Answer = { match: boolean; confidence: number; label: string | null; rationale: string; species?: string; speciesConfidence?: number }
 
 /** What the judge does besides answering: throw, or run something while it "thinks". */
 type JudgeHooks = { fail: Error | null; during: (() => void) | null; malformed: boolean }
@@ -90,9 +90,9 @@ describe("processClip", () => {
 	after(() => rmSync(root, { recursive: true, force: true }))
 
 	/** A fresh data dir with lookouts `{ name: [queries, threshold] }`. */
-	const setup = async (lookouts: Record<string, [string[], number]>, opts: { judge?: boolean; detector?: boolean } = {}) => {
+	const setup = async (lookouts: Record<string, [string[], number]>, opts: { judge?: boolean; detector?: boolean; confirm?: boolean } = {}) => {
 		const dir = join(root, `run-${++n}`)
-		const pipeline = { judge: { provider: opts.judge === false ? "none" : "mock" }, ...(opts.detector === false ? { detector: { enabled: false } } : {}) }
+		const pipeline = { judge: { provider: opts.judge === false ? "none" : "mock", ...(opts.confirm === false ? { confirmModel: null } : {}) }, ...(opts.detector === false ? { detector: { enabled: false } } : {}) }
 		const config = parseConfig({ dataDir: "data", pipeline }, null, dir)
 		const answers = new Map<string, Answer>()
 		const detected = { labels: [] as string[] }
@@ -208,6 +208,24 @@ describe("processClip", () => {
 		assert.equal(out.media.preview, null)
 		assert.deepEqual(out.media.crops, ["crop-0.jpg"])
 		assert.deepEqual(sightings, [])
+	})
+
+	test("a wanted bird named under the sighting bar is rejected but kept on disk with no expiry, so it can be checked by eye", async () => {
+		const { ctx, answers, detected, ingest, lookouts, sightings } = await setup({ lifer: [["bird"], 0.5] }, { confirm: false })
+		ctx.store.updateLookout(lookouts.lifer!.id, { compiled: { ...lookouts.lifer!.compiled!, lifeList: "newOrClipless" } })
+		detected.labels = ["bird"]
+		answers.set("lifer", { match: true, confidence: 0.85, label: "House Finch", species: "House Finch", speciesConfidence: 0.6, rationale: "A streaky bird on the tray." })
+		const out = await processClip(ctx, await ingest(videos.mover))
+		assert.equal(out.status, "rejected")
+		assert.match(out.reason!, /House Finch at 60% is under the 75% a sighting needs/)
+		assert.equal(out.expiresAt, null)
+		assert.ok(out.path && existsSync(out.path))
+		assert.deepEqual(sightings, [])
+		// judged again with no wanted bird named, it is an ordinary reject and expires as one
+		answers.set("lifer", { match: true, confidence: 0.85, label: "House Sparrow", species: "House Sparrow", speciesConfidence: 0.9, rationale: "A sparrow." })
+		ctx.store.addLifer({ species: "House Sparrow", firstSeenAt: null, clipId: out.id })
+		const again = await processClip(ctx, ctx.store.updateClip(out.id, { status: "processing" }))
+		assert.equal(expiresInDays(again), ctx.config.retention.rejectedDays)
 	})
 
 	test("a backfill of one lookout keeps the other lookout's verdict, the kept status and the file where it is", async () => {
