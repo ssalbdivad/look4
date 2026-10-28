@@ -10,7 +10,7 @@ import { loopbackOrigin, VITE_PORT } from "../desktop/src/server.ts"
 
 const repo = resolve(import.meta.dirname, "..")
 const extra = process.argv.slice(2).filter(arg => arg !== "--")
-// Run directly rather than through a package manager, so it works under pnpm, npm and nub alike.
+// Run directly rather than through a package manager, so it works under pnpm and npm alike.
 const node = (...args: string[]) => spawn(process.execPath, args, { cwd: repo, stdio: "inherit" })
 const server = node("--disable-warning=ExperimentalWarning", "scripts/dev.ts")
 const desktop = node("desktop/scripts/dev.ts", `--url=${loopbackOrigin(VITE_PORT)}`, ...extra)

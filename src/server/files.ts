@@ -132,7 +132,7 @@ const MISSING_UI = `<!doctype html>
 <style>body{font:16px/1.5 system-ui,sans-serif;max-width:36rem;margin:15vh auto;padding:0 1rem;color:#233}code{background:#eef;padding:.1em .3em;border-radius:4px}</style>
 </head><body>
 <h1>look4 is running</h1>
-<p>The API is up, but the web UI has not been built yet. Run <code>pnpm build</code> (or <code>nub run build</code>) in the look4 folder, then reload this page.</p>
+<p>The API is up, but the web UI has not been built yet. Run <code>pnpm build</code> in the look4 folder, then reload this page.</p>
 <p>For UI development, <code>pnpm dev</code> serves it with live reload.</p>
 </body></html>`
 
