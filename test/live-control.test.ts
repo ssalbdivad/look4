@@ -96,6 +96,7 @@ describe("reading the camera", () => {
 				],
 				dayNight: "auto",
 				siren: true,
+				talk: true,
 				microphone: false,
 				snapshot: true,
 				model: "RLC-823S1"

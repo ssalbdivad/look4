@@ -20,6 +20,7 @@ import { HttpError } from "./http.ts"
 import { liveRoutes } from "./live.ts"
 import { liveMediaRoutes } from "./live-media.ts"
 import { liveRecordRoutes } from "./live-record.ts"
+import { attachTalk } from "./live-talk.ts"
 import { setupRoutes } from "./setup.ts"
 import { createSseHub } from "./sse.ts"
 import { createStatusChecks } from "./status.ts"
@@ -162,6 +163,7 @@ export const createServer = (ctx: AppContext, opts: ServerOptions = {}) => {
 			// `instanceof Response`, skips writing the downloaded model to its file cache,
 			// and a first run fails with "Unable to get model file path or buffer".
 			const server = serve({ fetch: app.fetch, hostname: host, port, overrideGlobalObjects: false }) as Server
+			const talk = attachTalk(server, { live, hostAllowed: name => hostAllowed(name, ctx.config.server.host) })
 			const onError = (e: NodeJS.ErrnoException) => {
 				reject(
 					e.code === "EADDRINUSE"
@@ -182,6 +184,7 @@ export const createServer = (ctx: AppContext, opts: ServerOptions = {}) => {
 						return new Promise<void>(done => {
 							// open SSE streams and live video would otherwise hold the server open forever
 							hub.closeAll()
+							talk.close()
 							void live.close()
 							const force = setTimeout(() => server.closeAllConnections(), 2000)
 							force.unref()

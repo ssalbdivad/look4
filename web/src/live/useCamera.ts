@@ -14,6 +14,7 @@ import { api, errorMessage } from "../api.ts"
 import type { OpticalZoom, StageBox } from "../components/LiveStage.tsx"
 import { useFeedback } from "../feedback.tsx"
 import { useLatest, useResource } from "../hooks.ts"
+import { startTalking, type TalkEvents } from "./talk.ts"
 
 // One camera's controls and state for the Live page: what it can do, where it is, and every action
 // that moves or changes it. Failures go to the caller's `onError` (a toast without one), so callers only
@@ -42,6 +43,8 @@ export type Camera = {
 	// beyond the page contract: what the rail (and a pop-out mini d-pad) need
 	preset(body: PresetBody): Promise<boolean>
 	siren(): Promise<boolean>
+	/** Starts talking through the camera's speaker; failures go to a toast. Returns stop. */
+	talk(on: Omit<TalkEvents, "error">): () => void
 	hold: Hold
 	/** The view last sent (a saved view's id, or "home"), until the next manual move. */
 	view: number | "home" | null
@@ -498,6 +501,7 @@ export const useCamera = (source: string, controllable: boolean, onError?: (mess
 				return false
 			}
 		},
+		talk: on => startTalking(source, { ...on, error: message => fail("Talk", new Error(message)) }),
 		hold,
 		view,
 		moving: settleFrom !== null || !!state?.moving,

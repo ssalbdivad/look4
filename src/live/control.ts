@@ -5,6 +5,7 @@
 
 import type { CameraControls, CameraSettingBody, CameraState, LightBody, PresetBody, PtzBody } from "../api-types.ts"
 import type { SourceConfig } from "../config.ts"
+import type { TalkStream } from "./talk.ts"
 
 /** A control request that failed, with a sentence for the user and the HTTP status to answer with. */
 export class ControlError extends Error {
@@ -30,6 +31,8 @@ export type CameraControl = {
 	presetImage(id: number, signal?: AbortSignal): Promise<Buffer>
 	/** One burst of the camera's siren. */
 	siren(): Promise<void>
+	/** Claims the camera's speaker for one stretch of talking. Absent when the driver can't talk. */
+	talk?(): Promise<TalkStream>
 	/** A full-resolution still from the camera itself. */
 	snapshot(signal?: AbortSignal): Promise<Buffer>
 	close(): Promise<void>

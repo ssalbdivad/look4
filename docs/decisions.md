@@ -360,7 +360,7 @@ reports `defaultStream: "sub"` when neither holds. Changes that made it viable:
   server pausing (a `waiting` over 3 s, a GOP arriving late), so no threshold separates them;
   Sharp vs Quick is now only ever the user's pick. A stream that stops entirely still reconnects.
 
-Skipped from the Reolink app as niche here: two-way talk, patrol and auto-scan, multi-camera
+Skipped from the Reolink app as niche here: ~~two-way talk~~ (added 2026-10-29, see 17), patrol and auto-scan, multi-camera
 grids, the SD playback timeline, PTZ calibration, image sliders, and alerts inside Live.
 
 **The wheel zooms where the pointer is.** The lens only zooms around the middle of the picture, so
@@ -765,3 +765,39 @@ made reluctant by the comparison.
 **Measured.** Replaying both nuthatch clips with the nuthatch still owed a clip, references in
 place: kept, Opus 0.80 and 0.85 (first look 0.75 and 0.80). Not measured on a false case: the three
 false House Finch clips had been deleted, which is what Wrong bird now prevents.
+
+## 17. Talk: Reolink's own protocol on port 9000, push-to-talk over a WebSocket (2026-10-29)
+
+**Decision.** Live's **Talk** button streams the browser's microphone to the camera's speaker.
+Reolink's HTTP API has no talk, so look4 speaks Reolink's own protocol ("Baichuan", TCP 9000),
+which is what the Reolink app talks over. The wire format
+comes from neolink's reverse engineering (`src/live/baichuan.ts`, `src/live/talk.ts`). It signs
+in, reads `TalkAbility`, claims the speaker with `TalkConfig`, streams IMA ADPCM blocks wrapped as
+Reolink media frames, and releases with a talk reset. The page sends 16-bit PCM at the camera's
+rate over `/api/live/:name/talk`: an AudioWorklet brings the microphone down to 16 kHz with a box
+filter. The server encodes ADPCM, holds two blocks (128 ms) before the first goes out so a late
+packet leaves no gap, and on release lets what was sent play out before the reset. A reset cuts
+off playback.
+
+**Why push-to-talk, one voice per camera.** The camera takes one talker. A client that crashed
+holding it gets 422, and the official app resets and claims again, so look4 does the same. Two
+look4 windows would otherwise keep resetting each other, so the newest takes over and the first is
+told. The next claim waits until the old one has released, so a late reset can't cut off the new
+voice. A tab left holding the button ends after 10 s without sound, and any one stretch ends after
+5 min.
+
+**Security.** The WebSocket keeps the HTTP routes' Host rule and also requires Origin to name the
+same host, since browsers always send Origin on a WebSocket. A page from another site must never
+reach the speaker. A refused password on port 9000 is recorded like the HTTP API's, so look4
+never tries it twice (the camera's lockout counts both).
+
+**Measured, on the RLC-823S1 (firmware with full AES).** Sign-in takes 180–290 ms. A 1 kHz tone
+sent from Node came back through the camera's own microphone at 35× the background for its full
+2 s. A 600 Hz tone from Chromium's fake microphone came back through the whole path (page,
+WebSocket, driver, camera) with the envelope it was sent with. From press to sound flowing:
+about 0.66 s. Chrome's noise suppression fades a steady tone over about 2 s. A voice is not
+steady, so suppression stays on, with echo cancellation, which keeps the camera's own sound
+playing in the page from going back out through its speaker.
+
+**Gaps.** Port 9000 is assumed: a camera whose media port was changed in the Reolink app can't
+talk. HTTPS is needed for a phone's microphone (`tailscale serve`). Not tested on a phone yet.

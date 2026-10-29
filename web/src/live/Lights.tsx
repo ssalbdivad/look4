@@ -5,6 +5,7 @@ import { Switch } from "../components/ui.tsx"
 import { releaseAfterClick, useShortcutLabel, withShortcut } from "../keyboard.tsx"
 import { RangeRow, useCommitted } from "./Move.tsx"
 import { RailSection } from "./Rail.tsx"
+import { talkAvailable } from "./talk.ts"
 import type { Camera } from "./useCamera.ts"
 
 // Picture & lights: one compact row per thing the camera has, nothing for what it lacks.
@@ -119,12 +120,70 @@ export const LightsSection = ({ camera }: { camera: Camera }) => {
 					<ShooButton camera={camera} />
 				</Row>
 			)}
+			{c.talk && (
+				<Row icon="megaphone" label="Talk" note={talkAvailable() ? "Hold to talk through the camera" : "Needs localhost, the desktop app or HTTPS"} warn={!talkAvailable()}>
+					<TalkButton camera={camera} />
+				</Row>
+			)}
 			{c.microphone !== null && (
 				<Row icon={c.microphone ? "mic" : "micOff"} label="Microphone" note="Also adds sound to the camera's recordings">
 					<BusySwitch checked={c.microphone} label="Microphone" onChange={on => camera.setting({ setting: "microphone", on })} />
 				</Row>
 			)}
 		</RailSection>
+	)
+}
+
+/** Push to talk: the microphone goes to the camera's speaker while it is held. */
+const TalkButton = ({ camera }: { camera: Camera }) => {
+	const [phase, setPhase] = useState<"idle" | "connecting" | "live">("idle")
+	const stopRef = useRef<(() => void) | null>(null)
+	useEffect(() => () => stopRef.current?.(), [])
+
+	const start = () => {
+		if (stopRef.current) return
+		setPhase("connecting")
+		stopRef.current = camera.talk({
+			live: () => setPhase("live"),
+			ended: () => {
+				stopRef.current = null
+				setPhase("idle")
+			}
+		})
+	}
+	const stop = () => stopRef.current?.()
+	const available = talkAvailable()
+	return (
+		<button
+			type="button"
+			className={`rail-talk is-${phase}`}
+			aria-label="Talk: hold to speak through the camera"
+			aria-pressed={phase !== "idle"}
+			title={available ? "Hold to talk through the camera's speaker" : "The browser only lends the microphone to a page on localhost, the desktop app, or HTTPS (tailscale serve)"}
+			disabled={!available}
+			onPointerDown={e => {
+				if (e.button !== 0) return
+				e.currentTarget.setPointerCapture(e.pointerId)
+				start()
+			}}
+			onPointerUp={stop}
+			onPointerCancel={stop}
+			onLostPointerCapture={stop}
+			onBlur={stop}
+			onKeyDown={e => {
+				if ((e.key === "Enter" || e.key === " ") && !e.repeat) {
+					e.preventDefault()
+					start()
+				}
+			}}
+			onKeyUp={e => {
+				if (e.key === "Enter" || e.key === " ") stop()
+			}}
+			onContextMenu={e => e.preventDefault()}
+		>
+			<Icon name={phase === "live" ? "mic" : "megaphone"} size={16} className="rail-talk-icon" />
+			<span>{phase === "live" ? "Talking" : phase === "connecting" ? "Connecting…" : "Hold"}</span>
+		</button>
 	)
 }
 

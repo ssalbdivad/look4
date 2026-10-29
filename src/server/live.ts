@@ -36,7 +36,7 @@ const Preset = type({ op: "'save'", name: "string", "id?": viewId, "digital?": d
 	.or({ op: "'rename'", id: viewId, name: "string", "+": "delete" })
 	.or({ op: "'delete'", id: viewId, "+": "delete" })
 
-const NO_CONTROLS: CameraControls = { ptz: null, lights: [], dayNight: null, siren: false, microphone: null, snapshot: false, model: null }
+const NO_CONTROLS: CameraControls = { ptz: null, lights: [], dayNight: null, siren: false, talk: false, microphone: null, snapshot: false, model: null }
 const NO_STATE: CameraState = { moving: false, atHome: null, zoom: null, focus: null }
 
 export const liveRoutes = (live: Live, opts: { /** Someone steered this camera (moved it, chose a view, changed a setting): close-ups give way. */ onSteer?: (name: string) => void } = {}) => {

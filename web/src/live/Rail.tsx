@@ -25,7 +25,7 @@ export const railSections = (c: CameraControls | null): Has => {
 		views: !!p && (p.presets.length > 0 || p.maxPresets > 0 || !!p.guard),
 		move: !!p && (p.pan || p.tilt || p.zoom || p.focus),
 		home: !!p?.guard,
-		lights: !!c && (c.lights.length > 0 || c.dayNight !== null || !!p?.tracking || c.siren || c.microphone !== null)
+		lights: !!c && (c.lights.length > 0 || c.dayNight !== null || !!p?.tracking || c.siren || c.talk || c.microphone !== null)
 	}
 }
 

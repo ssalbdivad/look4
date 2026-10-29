@@ -193,6 +193,11 @@ The **Live** page plays any Reolink or RTSP camera, one to three seconds behind 
   rename, update, delete; <kbd>1</kbd>–<kbd>9</kbd> go to them), **Home** (the camera's guard
   position, with auto-return after 1–5 min), night picture and night vision, the spotlight and its
   brightness, auto-tracking, and the siren (hold **Shoo** for a second).
+- **Talk**: hold the button and speak, and your voice comes out of the camera's speaker, about
+  ¾ s after you press it. Reolink's web API has no talk, so look4 signs in on the camera's own
+  port, 9000, just as the Reolink app does. Browsers only share the microphone with a secure page:
+  localhost, the desktop app, or HTTPS. On a phone, that means `tailscale serve --bg 4040` and the
+  `https://` address it prints. One voice at a time: a second window that starts talking takes over.
 - **Pop out** (<kbd>P</kbd>) floats the picture in an always-on-top window where the browser
   supports it (Chrome, Edge), else a plain small window; tile it anywhere. **Snapshot**
   (<kbd>S</kbd>) downloads the camera's own full-resolution still.

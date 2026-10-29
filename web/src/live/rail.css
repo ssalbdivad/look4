@@ -627,6 +627,59 @@ button.rail-dpad-hub:disabled {
 	-webkit-user-select: none;
 }
 
+.rail-talk {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	flex: none;
+	min-width: 7.5em;
+	justify-content: center;
+	padding: 7px 12px;
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	background: var(--l4-surface);
+	color: var(--l4-ink);
+	font-weight: 700;
+	cursor: pointer;
+	touch-action: none;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+.rail-talk:hover:not(:disabled) {
+	border-color: color-mix(in srgb, var(--l4-primary) 50%, var(--line));
+}
+
+.rail-talk:disabled {
+	cursor: default;
+	opacity: 0.5;
+}
+
+.rail-talk-icon {
+	color: var(--l4-primary);
+}
+
+.rail-talk.is-connecting {
+	border-color: var(--l4-primary);
+}
+
+.rail-talk.is-live {
+	background: var(--l4-primary);
+	border-color: var(--l4-primary);
+	color: var(--l4-primary-ink);
+}
+
+.rail-talk.is-live .rail-talk-icon {
+	color: inherit;
+	animation: rail-shoo-pulse 0.5s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rail-talk.is-live .rail-talk-icon {
+		animation: none;
+	}
+}
+
 .rail-shoo:hover:not(:disabled) {
 	border-color: color-mix(in srgb, var(--l4-bad) 50%, var(--line));
 }

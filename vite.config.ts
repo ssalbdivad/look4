@@ -17,7 +17,8 @@ export default defineConfig({
 		// Windows Electron across WSL's loopback forwarding reaches; a browser on localhost still does.
 		host: "127.0.0.1",
 		proxy: {
-			"/api": { target: api, changeOrigin: false },
+			// ws: the Talk button's WebSocket
+			"/api": { target: api, changeOrigin: false, ws: true },
 			"/media": { target: api, changeOrigin: false }
 		}
 	}

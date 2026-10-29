@@ -534,6 +534,8 @@ export type CameraControls = {
 	dayNight: DayNightMode | null
 	/** The camera can sound its siren. */
 	siren: boolean
+	/** The camera has a speaker look4 can talk through (WebSocket /api/live/:name/talk). */
+	talk: boolean
 	/**
 	 * The camera's microphone (Reolink `Enc.audio`). Null when it has none. Turning it on also adds
 	 * sound to the camera's own recordings.
@@ -544,6 +546,9 @@ export type CameraControls = {
 	/** e.g. "RLC-823S1", when known. */
 	model: string | null
 }
+
+/** What the server sends on the talk WebSocket (`/api/live/:name/talk`), as JSON text. */
+export type TalkServerMessage = { type: "ready"; /** Send mono 16-bit little-endian PCM at this rate. */ sampleRate: number } | { type: "error"; message: string }
 
 /** GET /api/live/:name/state, polled while the page is visible. */
 export type CameraState = {

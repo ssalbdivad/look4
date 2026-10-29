@@ -27,11 +27,13 @@ import type {
 } from "../api-types.ts"
 import type { ReolinkSourceConfig } from "../config.ts"
 import { logger } from "../log.ts"
-import { createReolinkClient, loginProblem, type ReolinkCall, ReolinkError, ReolinkNetworkError, type ReolinkResult } from "../sources/reolink-api.ts"
+import { createReolinkClient, loginProblem, parseHost, type ReolinkCall, ReolinkError, ReolinkNetworkError, type ReolinkResult } from "../sources/reolink-api.ts"
+import { BaichuanAuthError, BaichuanError, openBaichuan } from "./baichuan.ts"
 import { type CameraControl, ControlError, type ControlDriver } from "./control.ts"
 import { createDigitalStore } from "./digital.ts"
 import { createHomeStore, type PtzPosition, samePosition } from "./home.ts"
 import { createPresetStore, isJpeg, makeThumbnail } from "./presets.ts"
+import { startTalk, type TalkStream, TalkUnsupportedError } from "./talk.ts"
 import { lensFactor, lensPosition } from "./zoom-curve.ts"
 
 const log = logger("live")
@@ -84,6 +86,8 @@ export type ReolinkFeatures = ReolinkCapabilities & {
 	siren: boolean
 	tracking: boolean
 	microphone: boolean
+	/** A speaker clients may talk through (the device's `talk` ability, on port 9000). */
+	talk: boolean
 	brightness: boolean
 }
 
@@ -105,6 +109,7 @@ export const reolinkFeatures = (ability: unknown, channel: number, devInfo: unkn
 		tracking: ver(chn, "aiTrack") > 0,
 		// `Enc.audio` exists on cameras without a microphone too; DevInfo's audioNum says whether one is fitted
 		microphone: (chn.enc === undefined || ver(chn, "enc") > 0) && audioNum !== 0,
+		talk: ver(a, "talk") > 0,
 		brightness: base.spotlight && ver(chn, "supportFLBrightness") > 0
 	}
 }
@@ -488,7 +493,7 @@ export const createReolinkControl = (cfg: ReolinkSourceConfig, env: NodeJS.Proce
 			}
 		}
 
-		return { ptz: controlsPtz, lights, dayNight: f.dayNight ? dayNight : null, siren: f.siren, microphone: f.microphone ? microphone : null, snapshot: f.snap, model }
+		return { ptz: controlsPtz, lights, dayNight: f.dayNight ? dayNight : null, siren: f.siren, talk: f.talk, microphone: f.microphone ? microphone : null, snapshot: f.snap, model }
 	}
 
 	const ptzCtrl = (param: Record<string, unknown>) => client.command("PtzCtrl", { channel: ch, ...param })
@@ -1006,6 +1011,26 @@ export const createReolinkControl = (cfg: ReolinkSourceConfig, env: NodeJS.Proce
 		await client.command("AudioAlarmPlay", { channel: ch, alarm_mode: "times", times: 1 })
 	}
 
+	/** Signs in on port 9000 (the HTTP API has no talk) and claims the speaker. */
+	const talk = async (): Promise<TalkStream> => {
+		const f = await features()
+		if (!f.talk) throw new ControlError(400, "This camera has no speaker look4 can talk through.")
+		const host = parseHost(cfg.host, "auto").hostPort.replace(/:\d+$/, "").replace(/^\[|\]$/g, "")
+		try {
+			const session = await openBaichuan({ host, username: cfg.username, password: env[cfg.passwordEnv] ?? "", channel: ch })
+			return await startTalk(session)
+		} catch (e) {
+			if (e instanceof BaichuanAuthError) {
+				// the same lockout counts these as the HTTP API's: never try them twice
+				refused = "The camera turned down the saved password on its talk port, so look4 won't try it again. Fix the password in Settings → Sources."
+				throw new ControlError(409, refused)
+			}
+			if (e instanceof TalkUnsupportedError) throw new ControlError(400, e.message)
+			if (e instanceof BaichuanError) throw new ControlError(502, `Couldn't talk through the camera: ${e.message}`)
+			throw e
+		}
+	}
+
 	return {
 		controls: signal => call(() => read(signal)),
 		state: signal => call(() => state(signal)),
@@ -1015,6 +1040,7 @@ export const createReolinkControl = (cfg: ReolinkSourceConfig, env: NodeJS.Proce
 		preset: body => call(() => preset(body)),
 		presetImage: (id, signal) => call(() => presetImage(id, signal)),
 		siren: () => call(siren),
+		talk: () => call(talk),
 		snapshot: signal => call(() => client.snapshot(signal)),
 		close: async () => {
 			clearAutoStop()
