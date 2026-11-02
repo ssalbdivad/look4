@@ -84,7 +84,23 @@ const audioArgs = (audio: Mp4Audio) =>
 		? ["-an"]
 		: ["-map", "0:a:0?", ...(audio === "copy" ? ["-c:a", "copy"] : ["-c:a", "aac", "-b:a", "64k"]), "-max_interleave_delta", "500000"]
 
-const fragmented = (audio: Mp4Audio) => [...audioArgs(audio), "-f", "mp4", "-movflags", "empty_moov+default_base_moof+frag_every_frame", "pipe:1"]
+/**
+ * One fragment per frame for video alone. With sound, fragments of ~40 ms instead: when every fragment
+ * holds a single sample, ffmpeg 5+ (measured on 8.0) has to guess each lone sample's duration and guesses
+ * short whenever the other track's packet came next — the copied audio's 64 ms AAC frames came out ~5 ms
+ * long (77 gaps in 8 s), or the video's with re-encoded audio. MSE plays only where both tracks are
+ * buffered, so every gap froze the picture until the player jumped past it: live view stalled for
+ * seconds and the lens's zoom never animated. At 40 ms each fragment holds a sample whose successor in
+ * its own track is known, and both timelines come out gap-free for about one frame of added delay.
+ */
+const fragmented = (audio: Mp4Audio) => [
+	...audioArgs(audio),
+	"-f", "mp4",
+	...(audio === "none"
+		? ["-movflags", "empty_moov+default_base_moof+frag_every_frame"]
+		: ["-movflags", "empty_moov+default_base_moof", "-frag_duration", "40000"]),
+	"pipe:1"
+]
 
 /** 1080p of a mostly still scene: 6M gave 6.7–7.3 Mbps, 3.5× the camera's own HEVC. */
 const NVENC = ["-c:v", "h264_nvenc", "-preset", "p2", "-tune", "ll", "-zerolatency", "1", "-bf", "0", "-g", "50", "-b:v", "2.5M", "-maxrate", "4M", "-bufsize", "4M"]
