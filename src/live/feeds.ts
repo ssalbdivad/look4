@@ -34,7 +34,7 @@ export class AudioCopyError extends FeedError {}
  */
 export const inputArgs = (url: string, pre: string[] = []) => [
 	"-hide_banner", "-nostdin", "-loglevel", "info",
-	...(/^rtsps?:/i.test(url) ? ["-rtsp_transport", "tcp", "-stimeout", "10000000"] : ["-rw_timeout", "10000000"]),
+	...(/^rtsps?:/i.test(url) ? ["-rtsp_transport", "tcp", "-timeout", "10000000"] : ["-rw_timeout", "10000000"]),
 	"-analyzeduration", "1500000", "-probesize", "2000000",
 	...pre,
 	"-i", url
