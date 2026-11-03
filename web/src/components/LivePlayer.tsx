@@ -67,8 +67,16 @@ const failure = async (res: Response) => {
 
 /** No bytes for this long: the connection is dead, reconnect. */
 const STALL_MS = 10_000
-/** Further behind the live edge than this, the player jumps forward. */
-const MAX_LAG_S = 1.2
+/**
+ * Further behind the live edge than this, the player jumps forward. A lens move makes the camera's stream
+ * briefly heavy (the whole picture changes every frame), and a jump at 1.2 s landed right as the zoom
+ * settled: a visible skip at the end of every move. Between FAST_LAG_S and this it plays FAST_RATE faster
+ * instead, which closes 1.8 s in under 4 s without a skip; only a real stall (a background tab, a dropped
+ * connection) is far enough behind to jump.
+ */
+const MAX_LAG_S = 3
+const FAST_LAG_S = 1.2
+const FAST_RATE = 1.5
 /**
  * The cushion the player keeps behind the newest frame it has: more than CATCH_UP_S over it, the player
  * plays CATCH_UP_RATE times faster until it is back under it. The Live page sat p50 0.79 s (p90 0.83)
@@ -168,7 +176,15 @@ const playVideo = async (run: VideoRun) => {
 			const b = video.buffered
 			const lag = b.length ? b.end(b.length - 1) - video.currentTime : 0
 			const behind = started && !video.paused && !video.seeking && waitingSince === null && video.readyState >= 3
-			const rate = !behind ? 1 : lag > cushion + CATCH_UP_S ? CATCH_UP_RATE : lag < cushion ? 1 : video.playbackRate
+			const rate = !behind
+				? 1
+				: lag > FAST_LAG_S
+					? FAST_RATE
+					: lag > cushion + CATCH_UP_S
+						? CATCH_UP_RATE
+						: lag < cushion
+							? 1
+							: Math.min(video.playbackRate, CATCH_UP_RATE)
 			if (video.playbackRate !== rate) video.playbackRate = rate
 		}
 		const queue: Uint8Array[] = []

@@ -687,7 +687,8 @@ export const LiveStage = ({
 			// pointer now, never while the picture is still zooming. Less than a lens step left over goes.
 			const more = r.rest
 			endRun()
-			if (more > 0) zoomAt(pointer(), view.current.z * Math.exp(more), false)
+			// eased, not snapped: it lands the moment the lens's own zoom ends, and a snap there read as a stumble
+			if (more > 0) zoomAt(pointer(), view.current.z * Math.exp(more), true)
 		}
 		tick()
 	}
