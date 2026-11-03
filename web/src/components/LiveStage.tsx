@@ -111,11 +111,14 @@ const HANDOFF_MS = 700
 /** ...if the lens can take at least this much of it. Camera first drives the lens while it has this much room. */
 const MIN_HANDOFF = 1.1
 /**
- * Camera first: the first request of a run goes this long after the first notch, so the first events of a
- * flick go as one move. Later notches don't push it back: the camera takes a second a step, so any wait here
- * is lag, and what comes meanwhile goes with the next step.
+ * Camera first: a step goes once the wheel has rested this long, so a whole flick goes as one move. A mouse
+ * wheel's notches come 15–60 ms apart within a flick; sent 50 ms after the first notch, a flick's first step
+ * carried a notch or two and the rest followed as a second aim-and-zoom once the camera arrived (a second
+ * later), which read as move, zoom, move again.
  */
-const GATHER_MS = 50
+const GATHER_MS = 120
+/** ...but a wheel that keeps turning doesn't hold the step back longer than this from its first unsent notch. */
+const GATHER_MAX_MS = 300
 /** Camera first: a request under one lens step waits for more notches, and is dropped after this without any. */
 const SMALL_DROP_MS = 600
 /**
@@ -152,6 +155,8 @@ type LensRun = {
 	rest: number
 	overlay: boolean
 	shown: boolean
+	/** When the oldest notch not sent yet came: the gather waits for the wheel to rest, but no longer than GATHER_MAX_MS from it. */
+	pendingSince: number | null
 }
 
 type Geometry = { cw: number; ch: number; ox: number; oy: number; w: number; h: number }
@@ -613,6 +618,20 @@ export const LiveStage = ({
 		}
 	}
 
+	/**
+	 * Sends the zoom not sent yet once the wheel has rested GATHER_MS (or GATHER_MAX_MS after its oldest unsent
+	 * notch, if it keeps turning). Unlike armGather, a newer notch pushes the send back.
+	 */
+	const sendWhenRested = (r: LensRun) => {
+		const now = performance.now()
+		const due = Math.min(lastNotch.current + GATHER_MS, (r.pendingSince ?? now) + GATHER_MAX_MS)
+		const t = gatherTimer.current
+		if (t) t.win.clearTimeout(t.id)
+		gatherTimer.current = null
+		if (due <= now) return pump()
+		armGather(due - now)
+	}
+
 	/** The run is over (finished, refused, cancelled, or taken over by a zoom out): its feedback goes, unsent zoom with it. */
 	function endRun() {
 		const r = run.current
@@ -639,9 +658,9 @@ export const LiveStage = ({
 	 * again, then magnifies what the lens couldn't take.
 	 */
 	const beginRun = () => {
-		const r: LensRun = { inFlight: false, steps: 0, sent: null, arrived: null, target: null, rest: 0, overlay: staleFor() === 0, shown: false }
+		const r: LensRun = { inFlight: false, steps: 0, sent: null, arrived: null, target: null, rest: 0, overlay: staleFor() === 0, shown: false, pendingSince: performance.now() }
 		run.current = r
-		armGather()
+		sendWhenRested(r)
 		drawLens(true)
 		const win = surfaceRef.current!.ownerDocument.defaultView ?? window
 		let read: ReturnType<typeof pictureSampler> | null = null
@@ -714,6 +733,7 @@ export const LiveStage = ({
 		r.inFlight = true
 		r.steps++
 		r.sent = performance.now()
+		r.pendingSince = null
 		drawLens()
 		const arrived = (ok: boolean) => {
 			if (run.current !== r) return
@@ -721,7 +741,8 @@ export const LiveStage = ({
 			// refused (useCamera says so): no retry, and what was asked meanwhile goes with it
 			if (!ok) return endRun()
 			r.arrived = performance.now()
-			pump()
+			// still turning: the rest of the flick goes as one step once the wheel rests
+			if (want.current > 0) sendWhenRested(r)
 		}
 		lens.aimZoom({ aim: { x: box.x + box.w / 2, y: box.y + box.h / 2 }, factor: f }).then(arrived, () => arrived(false))
 	}
@@ -746,8 +767,10 @@ export const LiveStage = ({
 				lastNotch.current = performance.now()
 				if (!r) beginRun()
 				else {
-					// nothing on its way: this goes as the next step; on its way, it goes when the camera arrives
-					if (!r.inFlight) armGather()
+					r.pendingSince ??= lastNotch.current
+					// nothing on its way: this goes as the next step once the wheel rests; on its way, it goes
+					// when the camera arrives (and the wheel rests)
+					if (!r.inFlight) sendWhenRested(r)
 					drawLens(true)
 				}
 				return
