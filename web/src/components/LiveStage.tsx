@@ -98,6 +98,10 @@ export type LiveStageProps = {
 
 const MIN_ZOOM = 1
 const MAX_ZOOM = 8
+/** Camera first: what the lens couldn't take magnifies over this long, plus this much per e-fold, at most this. */
+const GLIDE_MS = 450
+const GLIDE_PER_LOG_MS = 350
+const GLIDE_MAX_MS = 1000
 const TAP_ZOOM = 2.5
 /** A switch shows the new stream after this long even if it isn't playing yet. */
 const SWITCH_MAX_MS = 8000
@@ -377,7 +381,8 @@ export const LiveStage = ({
 		})
 	}
 
-	const setView = (v: View, animate: boolean) => {
+	const setView = (v: View, animate: boolean, fromGlide = false) => {
+		if (!fromGlide) stopGlide()
 		view.current = v
 		apply(animate)
 	}
@@ -392,6 +397,35 @@ export const LiveStage = ({
 	const zoomAt = (p: Point, z: number, animate: boolean) => {
 		const g = geo.current
 		setView(anchored(g, toFrame(g, view.current, p), p, clamp(z, MIN_ZOOM, MAX_ZOOM)), animate)
+	}
+
+	const glide = useRef<{ id: number; win: Window } | null>(null)
+	function stopGlide() {
+		if (glide.current) glide.current.win.cancelAnimationFrame(glide.current.id)
+		glide.current = null
+	}
+	/**
+	 * Magnifies by `log` at `p` frame by frame, carrying on from the lens's own zoom as it slows. A CSS
+	 * transition (180 ms) read as a jump to the end, and any other transform write mid-way snapped it there;
+	 * this one goes at a pace near the lens's and only stops for another change of view (which wins).
+	 */
+	const glideAt = (p: Point, log: number) => {
+		stopGlide()
+		const g = geo.current
+		const at = toFrame(g, view.current, p)
+		const z0 = view.current.z
+		const ms = Math.min(GLIDE_MAX_MS, GLIDE_MS + GLIDE_PER_LOG_MS * log)
+		const win = surfaceRef.current?.ownerDocument.defaultView ?? window
+		const reduce = win.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+		const start = performance.now()
+		const step = () => {
+			const t = reduce ? 1 : Math.min(1, (performance.now() - start) / ms)
+			// ease out from a running start: it picks up the lens's motion rather than starting from rest
+			const e = Math.sin((t * Math.PI) / 2)
+			setView(anchored(geo.current, at, p, clamp(z0 * Math.exp(log * e), MIN_ZOOM, MAX_ZOOM)), false, true)
+			glide.current = t < 1 ? { id: win.requestAnimationFrame(step), win } : null
+		}
+		step()
 	}
 
 	// ---------- handing the magnification to the lens (lens.ts) ----------
@@ -682,13 +716,16 @@ export const LiveStage = ({
 				r.shown = true
 				drawLens()
 			}
+			// What was past the lens's limit magnifies at the pointer as the lens's zoom comes to rest in the
+			// picture (its first still sample after the arrival shows), carrying it on as one zoom. Waiting for
+			// the run's end (three still samples) left a visible pause between the two.
+			if (r.rest > 0 && b.phase !== "live" && (b.still > 0 || b.phase === "done")) {
+				const more = r.rest
+				r.rest = 0
+				glideAt(pointer(), more)
+			}
 			if (b.phase !== "done") return void win.setTimeout(tick, SAMPLE_MS)
-			// The picture shows where the camera went: what was past the lens's limit magnifies at the
-			// pointer now, never while the picture is still zooming. Less than a lens step left over goes.
-			const more = r.rest
 			endRun()
-			// eased, not snapped: it lands the moment the lens's own zoom ends, and a snap there read as a stumble
-			if (more > 0) zoomAt(pointer(), view.current.z * Math.exp(more), true)
 		}
 		tick()
 	}
@@ -808,6 +845,7 @@ export const LiveStage = ({
 	}
 
 	useEffect(() => cancelHandoff, [])
+	useEffect(() => stopGlide, [])
 	// a request from the other mode no longer applies
 	useEffect(() => dropWheel, [wheel])
 
