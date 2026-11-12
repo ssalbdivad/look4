@@ -22,7 +22,9 @@ const USAGE = [
 	'compile "<prompt>" [--json]           show detector nouns + spotter checklist',
 	"eval [--lookout name] [--no-rerun] [--json]",
 	"doctor                                check ffmpeg, detector, spotter, sources, disk",
-	"clean                                 run retention now"
+	"clean                                 run retention now",
+	"export <file.tgz | url>               settings, life list and keepable clips, for another machine",
+	"import <file.tgz | -> [--force]       or: import --listen [--port 4041] to receive an export"
 ]
 
 /** Spelled the way look4 was invoked (`pnpm look4 …` from a package script), so each line works when pasted. */
@@ -226,6 +228,10 @@ export const main = async (argv: string[]): Promise<number> => {
 				return await (await import("./doctor.ts")).doctorCmd(rest)
 			case "clean":
 				return await cleanCmd(rest)
+			case "export":
+				return await (await import("./transfer.ts")).exportCmd(rest)
+			case "import":
+				return await (await import("./transfer.ts")).importCmd(rest)
 			case undefined:
 			case "help":
 			case "-h":

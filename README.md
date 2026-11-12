@@ -25,6 +25,7 @@ cameras over RTSP, a folder, drag-and-drop uploads, or files on the command line
 - [CLI reference](#cli-reference)
 - [Configuration](#configuration)
 - [Data on disk and retention](#data-on-disk-and-retention)
+- [Moving to another machine](#moving-to-another-machine)
 - [Troubleshooting](#troubleshooting)
 - [Development](#development)
 - [Credits](#credits)
@@ -404,6 +405,8 @@ pnpm look4 compile "<prompt>" [--json]     detector nouns + spotter checklist, n
 pnpm look4 eval [--lookout name] [--no-rerun] [--json]
 pnpm look4 doctor                          check node, ffmpeg, config, disk, detector, spotter, sources
 pnpm look4 clean                           run retention now
+pnpm look4 export <file.tgz | url>         settings, life list and keepable clips, as one bundle
+pnpm look4 import <file.tgz | -> [--force] | --listen [--port 4041]
 pnpm look4 --help | --version
 ```
 
@@ -508,6 +511,31 @@ Clip ids are `<YYYYMMDD>-<HHMMSS>-<hash>` from the recording time.
   space.
 
 The cleanup runs hourly while look4 is running; `pnpm look4 clean` runs it now.
+
+## Moving to another machine
+
+`export` and `import` carry a look4 over: settings, secrets, lookouts, the life list, labels and
+cost history, and every clip that is kept for good (sightings, labeled clips, life-list clips,
+Live recordings) with its photos. Rejected clips due to expire stay behind, recorded as deleted.
+
+On the new machine, with look4 stopped, in its look4 folder:
+
+```sh
+pnpm look4 import --listen
+```
+
+It prints a command with a one-time address. Run that on the old machine, in its look4 folder
+(look4 can keep running there); the export streams straight across the network:
+
+```sh
+pnpm look4 export http://192.168.1.41:4041/<token>
+```
+
+Or move a file: `pnpm look4 export look4.tgz`, copy it over, `pnpm look4 import look4.tgz`.
+Import refuses while a look4 runs on the data, and when there is data already (`--force` replaces
+the database). The data stays in the new machine's data dir, whatever the old one used; `.env`
+gains only the secrets it lacked. Both machines then pull from the same camera, so stop the old one
+unless you want both spotters paying for the same clips.
 
 ## Troubleshooting
 
