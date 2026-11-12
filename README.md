@@ -78,6 +78,11 @@ first launch adds a **look4** shortcut to the Start Menu; right-click the taskba
 `%LOCALAPPDATA%\look4\desktop`, which every `pnpm desktop` refreshes. `pnpm desktop --wslg` runs
 the Linux build through WSLg instead.
 
+On macOS it runs `~/Applications/look4.app`, which the first `pnpm desktop` builds and every later one
+refreshes. Right-click its Dock icon and choose **Options → Keep in Dock**; the kept look4 opens without
+a terminal and starts look4 on the PATH of the terminal that last ran `pnpm desktop`, so ffmpeg and
+`claude` resolve as they do there.
+
 The window remembers its size, position and page. Links to other sites open in your browser.
 
 ## Connecting a Reolink camera

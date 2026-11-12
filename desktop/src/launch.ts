@@ -13,6 +13,8 @@ import { readFileSync } from "node:fs"
 export type ServerLaunch = {
 	repo: string
 	node: string
+	/** The PATH to start look4 on, off WSL (scripts/dev.ts): a Dock launch's own has no ffmpeg or claude. */
+	path?: string
 	/** Set when the window runs on Windows and look4 in this WSL distro. */
 	distro?: string
 }
@@ -23,7 +25,12 @@ export const readServerLaunch = (path: string): ServerLaunch | undefined => {
 	try {
 		const launch = JSON.parse(readFileSync(path, "utf8")) as Partial<ServerLaunch>
 		if (typeof launch.repo !== "string" || typeof launch.node !== "string") return undefined
-		return { repo: launch.repo, node: launch.node, ...(typeof launch.distro === "string" ? { distro: launch.distro } : {}) }
+		return {
+			repo: launch.repo,
+			node: launch.node,
+			...(typeof launch.path === "string" ? { path: launch.path } : {}),
+			...(typeof launch.distro === "string" ? { distro: launch.distro } : {})
+		}
 	} catch {
 		return undefined
 	}
@@ -67,7 +74,8 @@ export const quoteWindowsArg = (arg: string) => {
 export const startServer = (launch: ServerLaunch, onFailed: () => void): void => {
 	const [command, args] = serverCommand(launch)
 	if (!launch.distro) {
-		const child = spawn(command, args, { cwd: launch.repo, detached: true, stdio: "ignore" })
+		const env = launch.path ? { ...process.env, PATH: launch.path } : process.env
+		const child = spawn(command, args, { cwd: launch.repo, detached: true, stdio: "ignore", env })
 		child.on("error", onFailed)
 		child.on("exit", onFailed)
 		child.unref()

@@ -12,16 +12,19 @@
 // On WSL it runs the WINDOWS build of Electron, natively, rather than the Linux one through WSLg
 // (scripts/windows.ts); `--wslg` runs the Linux one there instead. The first Windows launch registers a
 // Start Menu shortcut, which is what "Pin to taskbar" pins; the pinned look4 then opens without this
-// script, from the copy under %LOCALAPPDATA%\look4\desktop, and this script refreshes that copy.
+// script, from the copy under %LOCALAPPDATA%\look4\desktop, and this script refreshes that copy. On macOS
+// it runs ~/Applications/look4.app, a copy of the same Electron the Dock can keep (scripts/mac.ts).
 //
 // Pass `--url=http://127.0.0.1:<port>` to show a particular look4 (LOOK4_DESKTOP_URL); without it the
 // window joins whichever look4 answers (server.ts). Extra arguments go to Electron.
 import { spawn, type ChildProcess } from "node:child_process"
 import { copyFileSync, mkdirSync, rmSync, writeFileSync } from "node:fs"
 import { createRequire } from "node:module"
-import { join, resolve } from "node:path"
+import { tmpdir } from "node:os"
+import { delimiter, join, resolve } from "node:path"
 import { context, type BuildOptions, type Plugin } from "esbuild"
 import type { ServerLaunch } from "../src/launch.ts"
+import { prepareMacApp } from "./mac.ts"
 import { isWsl, prepareWindowsElectron } from "./windows.ts"
 
 const pkg = resolve(import.meta.dirname, "..")
@@ -43,6 +46,14 @@ delete env.ELECTRON_RUN_AS_NODE
 
 const windows = onWindows ? await prepareWindowsElectron() : undefined
 if (windows) console.log(`[desktop] Windows Electron onto ${pinnedUrl ?? "whichever look4 answers"}`)
+const mac =
+	process.platform === "darwin"
+		? prepareMacApp(
+				electronBinary,
+				(createRequire(import.meta.url)("electron/package.json") as { version: string }).version,
+				join(repo, "brand", "logo-512.png")
+			)
+		: undefined
 
 rmSync(dist, { recursive: true, force: true })
 mkdirSync(dist, { recursive: true })
@@ -55,7 +66,14 @@ copyFileSync(join(pkg, "icon.ico"), join(dist, "icon.ico"))
 // Windows Electron outside a named distro, which would have nowhere to start it.
 const distro = process.env.WSL_DISTRO_NAME
 if (!windows || distro) {
-	const launch: ServerLaunch = { repo, node: process.execPath, ...(windows ? { distro } : {}) }
+	// This terminal's PATH, less what `pnpm` put on it, goes with it off WSL: a window opened from the macOS
+	// Dock has launchd's, with neither Homebrew's ffmpeg nor ~/.local/bin's claude. From Windows the distro's
+	// own login PATH applies, as before.
+	const path = (process.env.PATH ?? "")
+		.split(delimiter)
+		.filter(dir => dir && !dir.includes("node_modules") && !dir.startsWith(tmpdir()))
+		.join(delimiter)
+	const launch: ServerLaunch = { repo, node: process.execPath, ...(windows ? { distro } : { path }) }
 	writeFileSync(join(dist, "server.json"), JSON.stringify(launch))
 }
 
@@ -66,7 +84,9 @@ let pendingRestart: NodeJS.Timeout | undefined
 const launch = () => {
 	const child = windows
 		? windows.start(dist, [...(pinnedUrl ? [`--look4-url=${pinnedUrl}`] : []), ...electronArgs])
-		: spawn(electronBinary, [pkg, ...electronArgs], { env, stdio: "inherit" })
+		: mac
+			? mac.start(dist, electronArgs, env)
+			: spawn(electronBinary, [pkg, ...electronArgs], { env, stdio: "inherit" })
 	electron = child
 	child.on("exit", (code, signal) => {
 		if (electron !== child) return
