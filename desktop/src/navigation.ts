@@ -43,12 +43,17 @@ export const appPath = (rawUrl: string, appOrigin: string): string | undefined =
  * Where a launch opens: the remembered in-app path on this launch's server, or the server's root. The
  * path is resolved AGAINST the origin and then checked, because a remembered `//host/…` would otherwise
  * resolve to another host entirely.
+ *
+ * The setup wizard is never reopened: it is a one-time flow, and a window last closed on it (before the
+ * camera was added, or before a config was imported) would otherwise ask to find the camera on every
+ * launch. The root's first-run check sends a look4 that still needs setting up there anyway.
  */
 export const startAddress = (savedPath: string | undefined, serverOrigin: string): string => {
 	const root = `${serverOrigin}/`
 	if (!savedPath) return root
 	try {
 		const url = new URL(savedPath, serverOrigin)
+		if (url.pathname === "/setup" || url.pathname.startsWith("/setup/")) return root
 		return url.origin === serverOrigin ? url.toString() : root
 	} catch {
 		return root

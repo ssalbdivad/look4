@@ -40,6 +40,11 @@ test("a remembered path reopens on this launch's server, never on another host",
 	assert.equal(startAddress("https://evil.example/", origin), `${origin}/`)
 })
 
+test("a window last closed on the setup wizard reopens on the app, which redirects to setup only if it is still needed", () => {
+	assert.equal(startAddress("/setup?step=reolink", origin), `${origin}/`)
+	assert.equal(startAddress("/settings", origin), `${origin}/settings`)
+})
+
 test("the running server wins over a dev server; nothing answering is undefined", async () => {
 	const probed: string[] = []
 	const found = await locateServer({
